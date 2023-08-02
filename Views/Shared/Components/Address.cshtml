@@ -1,0 +1,97 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model ProfileAddressViewModel
+
+@{
+   
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<section class="section ">
+    <div class="row">
+        <form asp-action="Address" method="post">
+            <div class="col-lg-8 col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">New Residential Address</h5>
+        
+                        <!-- Profile Edit Form -->                        
+
+                        <div asp-validation-summary="All"></div>
+
+                        <!-- No Labels Form -->
+                        <div class="row g-3">
+
+                            <label class="col-sm-4 col-form-label">Province</label>
+                            <div class="col-sm-8">
+                                <select class="form-select">
+                                    <option selected>Select Province</option>
+                                    <option value="1">Easten Cape</option>
+                                    <option value="2">Free State</option>
+                                    <option value="3">Gauten</option>
+                                    <option value="4">Kwa-Zulu Natal</option>
+                                    <option value="5">Limpopo</option>
+                                    <option value="6">Northen Cape</option>
+                                    <option value="7">North West</option>                             
+                                    <option value="8">Mpumalanga</option>
+                                    <option value="9">Western Cape</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div><span asp-validation-for="@Model.AddressModel.StreetName" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.StreetName" type="text" class="form-control" placeholder="Street Name">
+                            </div>
+                            <div class="col-md-12">
+                                <div><span asp-validation-for="@Model.AddressModel.StreetNumber" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.StreetNumber" type="number" class="form-control" placeholder="Street Number">
+                            </div>
+                            <div class="col-md-8">
+                                <div><span asp-validation-for="@Model.AddressModel.City" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.City" type="text" class="form-control" placeholder="City">
+                            </div>
+                            <div class="col-md-4">
+                                <div><span asp-validation-for="@Model.AddressModel.Zip" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.Zip" type="text" class="form-control" placeholder="Zip">
+                            </div>
+                            <div class="col-12">
+                                <div><span asp-validation-for="@Model.AddressModel.Suburb" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.Suburb" type="text" class="form-control" placeholder="Suburb">
+                            </div>           
+
+                            @{
+                                int AccountID = 0;
+
+                                  if((signInManager.IsSignedIn(User)))                                                
+                                    {
+                                        if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                                        {
+                                            foreach (var item in Model.Accounts.Where(c => c.Id == userId))
+                                            {
+                                                AccountID = item.AccountID;
+                                            }
+                                        }
+                                    }
+                            }                         
+                            
+                            <div class="col-12">
+                                <div><span asp-validation-for="@Model.AddressModel.AccountID" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.AccountID" type="text" value="@AccountID" class="form-control" placeholder="Suburb">
+                            </div> 
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Save Address</button>                 
+                                <a href="~/Home/Index" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div><!-- Address Form -->
+            
+                    </div>
+                </div>    
+           
+            </div>
+        </form><!-- End Profile Edit Form -->
+    </div>
+    
+</section>
