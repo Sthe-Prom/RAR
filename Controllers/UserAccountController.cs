@@ -63,11 +63,12 @@ namespace rar.Controllers
                         //     return Redirect(ReturnUrl ?? "/Account/Profile");
                         // }
 
-                        return Content("Logged In");
+                        //return Content("Logged In");
+                        return Redirect(ReturnUrl ?? "/Home/Index"); 
                     }
                     else
-                        //return Redirect(ReturnUrl ?? "/UserAccount/Login");
-                        Content("Not logged In");
+                        return Redirect(ReturnUrl ?? "/UserAccount/Login");
+                        //Content("Not logged In");
 
 
                     //var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
@@ -96,7 +97,7 @@ namespace rar.Controllers
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-            return RedirectToAction("Home", "Home");
+            return RedirectToAction("Login", "UserAccount");
         }
 
         [AllowAnonymous]

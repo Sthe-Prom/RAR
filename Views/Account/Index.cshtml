@@ -1,0 +1,155 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model ProfileAddressViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "_Layout";
+
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<div class="container-fluid p-0">
+    <h1 class="h3 mb-3">Profile</h1>
+
+   
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="~/Home/Index">Home</a></li>
+                <li class="breadcrumb-item active">Account</li>
+            </ol>
+        </nav>
+    
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Manage Your Account</h5>
+                </div>
+                <div class="card-body">
+                     <section>
+                        <div class="col-lg-12">
+
+                            <div class="card">
+                                <div class="card-body">
+                                <h5 class="card-title">Your Account Details</h5>
+
+                                
+
+                                </div>
+                            </div>
+
+                            </div>
+                    </section>
+
+                    <section>
+                            
+                            @{                    
+                                var ProfileAddress = from profile in Model.Accounts
+                                                        join address in Model.Addresses
+                                                        on profile.AccountID equals address.AccountID
+                                                        select new 
+                                                        {
+                                                            profile.Id,
+                                                            profile.Name, 
+                                                            profile.Surname,
+                                                            profile.Cell,
+                                                            profile.Email,
+                                                            profile.FullAddress,                                                           
+                                                            address.Province,
+                                                            address.StreetName,
+                                                            address.City,
+                                                            address.StreetNumber,
+                                                            address.Suburb,
+                                                            address.Zip
+                                                        };
+                            }
+
+                            @if((signInManager.IsSignedIn(User)))                                                
+                                { 
+                                if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                                {
+                                    foreach (var item in ProfileAddress.Where(c => c.Id == userId))
+                                    {      
+                                        <div class="card">
+                                            <div class="card-body">
+                                                
+                                                <div class="row">
+                                                    <div class="row">
+                                                    
+                                                        <div class="col-lg-12 col-md-12 text-center">
+                                                            <a href="~/Account/myprofile" class="btn btn-sm btn-info">Manage Profile</a>    
+                                                            <hr />                                
+                                                            
+                                                        </div>
+                                                </div>
+                                                    <div class="col-lg-6 col-md-6">           
+                                                
+                                                                <h5 class="card-title">Profile Details</h5>
+
+                                                                <div class="row mb-3">
+                                                                    <div class="col-lg-4 col-md-4 label ">Full Name</div>
+                                                                    <div class="col-lg-8 col-md-8">@item.Name @item.Surname</div>
+                                                                </div>
+
+                                                               
+                                                                <div class="row mb-3">
+                                                                    <div class="col-lg-4 col-md-4 label">Address</div>
+                                                                    <div class="col-lg-8 col-md-8">@item.FullAddress</div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <div class="col-lg-4 col-md-4 label">Phone</div>
+                                                                    <div class="col-lg-8 col-md-8">@item.Cell</div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <div class="col-lg-4 col-md-4 label">Email</div>
+                                                                    <div class="col-lg-8 col-md-8">@item.Email</div>
+                                                                </div>
+                                                        
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6">
+                                                            
+                                                                <h5 class="card-title">Address Detail</h5>
+
+                                                                <div class="row mb-3">
+                                                                    <div class="col-lg-4 col-md-4 label ">Province</div>
+                                                                    <div class="col-lg-8 col-md-8">@item.Province</div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <div class="col-lg-4 col-md-4 label">Street Name</div>
+                                                                    <div class="col-lg-8 col-md-8">@item.StreetName @item.StreetNumber, @item.Suburb</div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <div class="col-lg-4 col-md-4 label">City</div>
+                                                                    <div class="col-lg-8 col-md-8">@item.City, @item.Zip</div>
+                                                                </div>
+
+                                                            
+                                                            
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    }
+                                }
+                            }
+                    </section>
+                </div>
+            
+            </div>
+        </div>
+    </div>
+
+   
+</div>
+
+

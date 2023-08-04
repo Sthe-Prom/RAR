@@ -1,0 +1,86 @@
+@model ProfileAddressViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "_Layout";
+}
+
+<div class="pagetitle">
+    <h1>Step 2 - Your Residential Address</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="~/Home/Index">Home</a></li>
+            <li class="breadcrumb-item active">Add Profile</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- End Page Title -->
+
+<section class="section ">
+    <div class="row">
+        <form asp-action="Edit" method="post">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Edit Your Residential Address</h5>
+        
+                        <!-- Profile Edit Form -->           
+                                    
+                        <div asp-validation-summary="All"></div>
+                        <input asp-for="@Model.AddressModel.AddressID" type="hidden" />
+
+                        <!-- No Labels Form -->
+                        <div class="row g-3">
+
+                            <label class="col-sm-4 col-form-label">Province</label>
+                            <div class="col-sm-8">
+                                <select class="form-select">
+                                    <option selected>Select Province</option>
+                                    <option value="1">Easten Cape</option>
+                                    <option value="2">Free State</option>
+                                    <option value="3">Gauten</option>
+                                    <option value="4">Kwa-Zulu Natal</option>
+                                    <option value="5">Limpopo</option>
+                                    <option value="6">Northen Cape</option>
+                                    <option value="7">North West</option>                             
+                                    <option value="8">Mpumalanga</option>
+                                    <option value="9">Western Cape</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div><span asp-validation-for="@Model.AddressModel.StreetName" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.StreetName" type="text" class="form-control" placeholder="Street Name">
+                            </div>
+                            <div class="col-md-12">
+                                <div><span asp-validation-for="@Model.AddressModel.StreetNumber" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.StreetNumber" type="number" class="form-control" placeholder="Street Number">
+                            </div>
+                            <div class="col-md-8">
+                                <div><span asp-validation-for="@Model.AddressModel.City" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.City" type="text" class="form-control" placeholder="City">
+                            </div>
+                            <div class="col-md-4">
+                                <div><span asp-validation-for="@Model.AddressModel.Zip" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.Zip" type="text" class="form-control" placeholder="Zip">
+                            </div>
+                            <div class="col-12">
+                                <div><span asp-validation-for="@Model.AddressModel.Suburb" class="text-danger"></span></div>
+                                <input asp-for="@Model.AddressModel.Suburb" type="text" class="form-control" placeholder="Suburb">
+                            </div>                                    
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Submit</button>                 
+                                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div><!-- Address Form -->
+            
+                    </div>
+                </div>    
+           
+            </div>
+        </form><!-- End Profile Edit Form -->
+    </div>
+</section>
+

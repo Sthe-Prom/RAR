@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -22,7 +23,7 @@ using RestSharp;
 
 namespace rar.Controllers
 {
-    [Authorize(Roles = "Applicant")]
+    // [Authorize(Roles = "Applicant")]
     public class AccountController : Controller
     {
         //private properties      
@@ -56,14 +57,7 @@ namespace rar.Controllers
             this.Configuration = configuration;
         }
 
-        // public IActionResult Index()
-        // {
-        //     // ProfileViewModel vm = new ProfileViewModel();
-        //     // vm.Subunits = subunit_ctx.Subunits;
-        //     // return View(vm);    
-        //     return View(context.Accounts);
-        // }
-
+      
         public ViewResult Index()
         {
             ProfileAddressViewModel vm = new ProfileAddressViewModel();
@@ -348,16 +342,17 @@ namespace rar.Controllers
         
         public Microsoft.AspNetCore.Mvc.Rendering.SelectList getUsers()
         {
-            string c = Configuration.GetValue<string>("Data:UserDB2:ConnectionString");
+            //string c = Configuration.GetValue<string>("Data:UserDB2:ConnectionString");
+            string c = Configuration.GetConnectionString("UserDB");
 
             List<User> models = new List<User>();
 
-            using (SqlConnection connection = new SqlConnection(c))
+            using (SqliteConnection connection = new SqliteConnection(c))
             {
-                using (SqlCommand cmd = new SqlCommand("", connection))
+                using (SqliteCommand cmd = new SqliteCommand("", connection))
                 {
                     connection.Open();
-                    cmd.CommandText = "Select Id, Email from [User]";
+                    cmd.CommandText = "Select Id, Email from [AspNetUsers]";
                     using (var reader = cmd.ExecuteReader())
                     {
                         if (reader.HasRows)

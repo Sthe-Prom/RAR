@@ -1,0 +1,110 @@
+@model RoleAdminViewModel
+
+@{
+    ViewBag.Title = "Roles Admin";
+    Layout = "_Layout";
+}
+
+<div class="pagetitle">
+    <h1>User and Role Management</h1>
+    <br />
+    <h6>Add Roles and Assign User to Roles</h6>
+                                    
+    <hr /><br />
+</div>
+<!-- End Page Title -->
+
+<div class="text-center"> 
+
+    <div class="midde_cont">
+        <div class="container-fluid">
+            
+            <div class="card">
+                <div class="card-body">
+              
+
+                <section>
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <a asp-action="Create" asp-controller="RoleAdmin" class="btn btn-primary"><i class="bi-person"></i>&nbsp;Add New Role</a>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </section>
+    
+                <div class="col-md-12" style="margin: 0 auto; float: none;">
+                            <div class="white_shd full margin_bottom_30">
+                                <div class="full">
+                                    <div class="heading1 margin_0 mt-2">
+                                        
+                                        <div class="row column1">         
+                                            
+                                            <div class="col" style="margin: 20px;">
+                                                <div class="col-sm-12 col-md-12 col-lg-12"  style="float:none; margin: 0 auto;">
+                                                    @* <div class="form-group text-right">
+                                                        <span><a asp-action="Create" class="btn btn-outline-info">Add New Role</a></span>                                                             
+                                                        <hr />
+                                                    </div> *@
+                                                    <table class="table table-borderd">
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th>Role Name</th>
+                                                            <th>Users</th>
+                                                            <th class="text-info">Action</th>
+                                                        </tr>
+
+                                                        @if (Model.Roles.Count() == 0)
+                                                        {
+                                                            <tr>
+                                                                <td colspan="4" class="text-center">No Roles</td>
+                                                            </tr>
+                                                        }
+                                                        else
+                                                        {
+                                                            foreach (var role in Model.Roles)
+                                                            {
+                                                                <tr>
+                                                                    <td>@role.Id</td>
+                                                                    <td>@role.Name</td>
+                                                                    <td identity-role="@role.Id"></td>
+                                                                    <td>
+                                                                        <form asp-action="Delete" asp-route-id="@role.Id" method="post">
+                                                                            <a class="" 
+                                                                                asp-action="Edit"
+                                                                                asp-route-id="@role.Id">
+                                                                                    <i class="bi-pencil" style="color: #00675A;"></i>&nbsp;
+                                                                            </a> 
+                                                                            <a type="submit"
+                                                                                    class="">
+                                                                                <i class="bi-trash-fill" style="color: #A71930;" aria-hidden="true"></i>
+                                                                            </a>
+
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        }
+                                                    </table>
+                                                </div>
+                                            </div>
+                                                        
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                </div>
+             </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+            
+
+

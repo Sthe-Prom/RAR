@@ -49,7 +49,7 @@ namespace rar.Extensions
 
             object value = services.AddDbContext<AppDbContext >(opt =>
             {
-                //opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
+                opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
                 //opt.UseSqlServer(config.GetConnectionString("DefaultConnection"));
             });
 

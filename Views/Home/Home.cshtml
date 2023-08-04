@@ -1,0 +1,142 @@
+@{
+    ViewData["Title"] = "Home";
+    Layout = "_HomeLayout";
+}
+
+<div class="container-fluid p-0">
+    <h1 class="h2 mb-3 text-center">Road Accident Reporting</h1>
+    <div class="row">
+
+         <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Road Safety Starts With You</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><strong>Be aware of your surroundings.</strong> Look out for other vehicles, pedestrians, and cyclists.</p>
+                    <p class="card-text"><strong>Obey the traffic laws.</strong> This includes following speed limits, using turn signals, and yielding to pedestrians.</p>  
+                    <hr />                  
+                    <p class="card-text">Get a personal road safety booklet</p>
+                    <a href="https://www.arrivealive.mobi/Precautions" class="btn btn-primary">Safety Guidelines</a>
+                    <a href="#" class="btn btn-primary">Safe Driving</a>
+                    <a href="#" class="btn btn-primary">Driver fitness</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Arrive Alive</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">12,545 people died in road accidents in South Africa last year. Road Traffic Management Corp <span><a href="https://www.rtmc.co.za/" class="card-link">RTMC</a></span></p>
+                                        
+                    <p>Don't text or talk on the phone while driving.<span><br /></span>Yield to pedestrians at crosswalks.</p>
+                   
+                    <hr />
+                    <p class="card-text">Road Safety Articles</p>
+                    <a href="https://www.arrivealive.mobi/" class="btn btn-danger">Latest</a>
+                    <a href="#" class="btn btn-danger">Emergency Lines</a>
+                    <a href="https://www.arrivealive.mobi/report-bad-driving" class="btn btn-danger">Report Bad Driving</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-12 col-md-12" >
+            <h2 class="text-center mb-2 mt-2">R A R - Road Accidents Statistics in Real-time </h2> 
+            <hr />
+
+            <h1 class="h3 mb-3"><strong>Analytics</strong> Dashboard</h1>
+
+            <div class="row">
+                <div class="col-xl-6 col-xxl-5 d-flex">
+                    <div class="w-100">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">Hotspots</h5>
+                                            </div>
+
+                                            <div class="col-auto">
+                                                <div class="stat text-primary">
+                                                    <i class="align-middle" data-feather="truck"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h1 class="mt-1 mb-3">58</h1>
+                                        <div class="mb-0">
+                                            <span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i> +3.65% </span>
+                                            <span class="text-muted">Since last week</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">19/21 % Change (RSA)</h5>
+                                            </div>
+
+                                            <div class="col-auto">
+                                                <div class="stat text-primary">
+                                                    <i class="align-middle" data-feather="percent"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h1 class="mt-1 mb-3">2.2%</h1>
+                                        <div class="mb-0">
+                                            <span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> 6.65% </span>
+                                            <span class="text-muted">Since last week</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-xxl-7">
+                    <div class="card flex-fill w-100">
+                        <div class="card-header">
+
+                            <h5 class="card-title mb-0">Road Accidents</h5>
+                        </div>
+                        <div class="card-body py-3">
+                            <div class="chart chart-sm">
+                                <canvas id="chartjs-dashboard-line"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+
+
+
+
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <img class="card-img-top" src="~/img/photos/road1.jpg" alt="Unsplash">
+                
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <img class="card-img-top" src="img/photos/road2.jpg" alt="Unsplash">
+                
+            </div>
+        </div>
+
+       
+    </div>
+</div>

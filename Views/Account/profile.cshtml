@@ -1,0 +1,184 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model ProfileAddressViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "_Layout";
+    
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<div class="pagetitle">
+    <h1>Add Your Profile Details</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="~/Home/Index">Home</a></li>
+            <li class="breadcrumb-item active">Add Profile</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- End Page Title -->
+
+
+<section class="section ">
+    <div class="row">
+        <div class="col-lg-8">
+             <h6>Step 1 - Personal Details</h6>
+        </div>
+        <form asp-action="Profile" method="post"  enctype="multipart/form-data">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">General Profile Details</h5>
+        
+                        <!-- Profile Edit Form -->                        
+
+                        <div asp-validation-summary="All"></div>
+
+                        <div class="row mb-3">  
+                            <label asp-for="@Model.ProfileModel.Id" class="col-md-4 col-lg-3 col-form-label">Username</label>
+                            <div class="col-md-8 col-lg-9"> 
+                                <div><span asp-validation-for="@Model.ProfileModel.Id" class="text-danger"></span></div>    
+                             
+                              @if((signInManager.IsSignedIn(User)))     
+                              {        
+                                @if(await userManager.IsInRoleAsync(user,"Applicant"))
+                                {
+                                    <input class="form-control" asp-for="@Model.ProfileModel.Id" type="hidden" value="@userId" id="Name" >
+                                    <input class="form-control" type="text" value="@user.UserName"  >
+                                }
+                              }
+
+                            </div>
+                        </div> 
+                        
+                        <div class="row mb-3">
+                            <label asp-for="@Model.ProfileModel.Name" class="col-md-4 col-lg-3 col-form-label">Name(s)</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input asp-for="@Model.ProfileModel.Name" type="text" class="form-control" id="Name" >
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label asp-for="@Model.ProfileModel.Surname" class="col-md-4 col-lg-3 col-form-label">Surname</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input asp-for="@Model.ProfileModel.Surname" type="text" class="form-control" id="Surname">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label asp-for="@Model.ProfileModel.Cell" class="col-md-4 col-lg-3 col-form-label">Cell</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input asp-for="@Model.ProfileModel.Cell" type="text" class="form-control" id="Cell" >
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label asp-for="@Model.ProfileModel.Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                            <div class="col-md-8 col-lg-9">
+                                <input asp-for="@Model.ProfileModel.Email" type="email" class="form-control" id="Email" >
+                            </div>
+                        </div>
+                    
+                        <div class="row mb-3">
+                            <label asp-for="@Model.ProfileModel.ProfileImg" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                            <div class="col-md-8 col-lg-9 custom-file">
+                                <input asp-for="@Model.ProfileModel.ProfileImg" accept="image/gif, image/jpeg" class="custom-file-input form-control" id="customFile" type="file" />                               
+                                @* <label class="custom-file-label" for="customFile">Choose file</label> *@
+                            </div>
+                            <span asp-validation-for="@Model.ProfileModel.ProfileImg" class="text-danger"></span>
+                        </div>
+                                
+                    </div>
+                </div>      
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                       
+                        <h6 class="card-title">Upload Documents</h6>
+                        <div class="row mb-3">
+                            <label asp-for="@Model.ProfileModel.IdentityDoc" class="col-md-4 col-lg-3 col-form-label">Identity Document</label>
+                            <div class="col-md-8 col-lg-9 custom-file">
+                                <input asp-for="@Model.ProfileModel.IdentityDoc"  accept="application/pdf" class="custom-file-input form-control" id="customFile" type="file" />                               
+                                @* <label class="custom-file-label" for="customFile">Choose file</label> *@
+                            </div>
+                            <span asp-validation-for="@Model.ProfileModel.IdentityDoc" class="text-danger"></span>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+
+             <div class="col-lg-8">
+               
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Your Residential Address</h6>
+                        <div class="row mb-3">
+                            <label asp-for="@Model.ProfileModel.FullAddress" class="col-md-4 col-lg-3 col-form-label">Residential Address</label>
+                            <div class="col-md-8 col-lg-9 mb-2">
+                                <div><span asp-validation-for="@Model.ProfileModel.FullAddress" class="text-danger"></span></div>   
+                                <div>                              
+                                    <input asp-for="@Model.ProfileModel.FullAddress" class="form-control" type="text" />                               
+                                    @* <label class="custom-file-label" for="customFile">Choose file</label> *@
+                                </div>
+                                
+                            </div>                                                    
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 text-center center-c">
+                                <h6>Didn't find your address, please save to continue to step 2 to enter your address details.</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+             </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-8">
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </div>                                 
+            </div>
+ 
+            
+        </form><!-- End Profile Edit Form -->
+
+        @* <div class="row mb-3">
+            <div class="col-sm-8">                
+                <h5>
+                    <span>Continue to Step 2: 
+                        <a href="~/Account/Address" class="">Add Your Address</a>
+                    </span>
+                </h5>                
+            </div>
+        </div>    *@
+    </div>
+</section>
+
+<script type="text/javascript">
+      
+    function myFunction() {
+        var x = document.getElementById("CheckOption");
+            if (x.val === "1") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }; 
+</script>
+
+
+     
+
+
+
+

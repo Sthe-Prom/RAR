@@ -1,0 +1,100 @@
+@model RoleEditModel
+
+@{
+    ViewBag.Title = "Edit Roles";
+    Layout = "_Layout";
+}
+
+<div class="text-center"> 
+
+    <div class="midde_cont">
+        <div class="container-fluid">
+            <div class="row column_title">
+                <div class="col-md-12">
+                    <div class="page_title">
+                        <h1>Assign Users to Roles</h1>
+                        <hr />
+                    </div>
+                </div>
+            </div>
+   
+            <div class="white_shd full margin_bottom_30">
+                        <div class="full graph_head">
+                            <div class="col-12 col-md-12 col-lg-12 text-center" style="float:none; margin: 0 auto;">
+
+                                <div class="form-group text-right">                         
+                                    <a class="btn btn-outline-info" href="~/UserAdmin/Index">
+                                        Manage Users
+                                    </a>                      
+                                    <hr />
+                                </div>
+
+                                <div asp-validation-summary="All" class="text-danger"></div>
+
+                                <form asp-action="Edit" method="post">
+
+                                    
+                                    <div class="col-sm-12 col-md-10 col-lg-10 text-center" style="float:none; margin: 0 auto;">
+                                        <input type="hidden" name="roleName" value="@Model.role.Name" />
+                                        <input type="hidden" name="roleId" value="@Model.role.Id" />
+                                        <h6 class="bg-info p-1 text-white">Add To @Model.role.Name</h6>
+
+                                        <table class="table table-bordered table-sm">
+
+                                            @if (Model.NonMembers.Count() == 0)
+                                            {
+                                                <tr><td colspan="2">All Users Are Members</td></tr>
+                                            }
+                                            else
+                                            {
+                                                @foreach (User user in Model.NonMembers)
+                                                {
+                                                    <tr>
+                                                        <td>@user.UserName</td>
+                                                        <td>
+                                                            <input type="checkbox" name="IDstoAdd" value="@user.Id">
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </table>
+                                    </div>
+                                
+                                    <div class="col-sm-12 col-md-10 col-lg-10 text-center" style="float:none; margin: 0 auto;">
+                                        <h6 class="bg-info p-1 text-white">Remove From @Model.role.Name</h6>
+
+                                        <table class="table table-bordered table-sm">
+                                            @if (Model.members.Count() == 0)
+                                            {
+                                                <tr><td colspan="2">No Users Are Members</td></tr>
+                                            }
+                                            else
+                                            {
+                                                @foreach (User user in Model.members)
+                                                {
+                                                    <tr>
+                                                        <td>@user.UserName</td>
+                                                        <td>
+                                                            <input type="checkbox" name="IDstoDelete" value="@user.Id">
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </table>
+                                    </div>
+                                        
+                                    <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                                        <br />
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                                        <hr /><br />
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+            
+            </div>
+        </div>
+    </div>
+</div>

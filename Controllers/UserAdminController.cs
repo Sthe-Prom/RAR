@@ -81,7 +81,7 @@ namespace rar.Controllers
 
                 if (result.Succeeded)
                 {
-                    string role = "Applicant";
+                    string role = "Officer";
                     if (await roleManager.FindByNameAsync(role) == null)
                     {
                         await roleManager.CreateAsync(new IdentityRole(role));

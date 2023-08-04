@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using rar.Models;
 
-namespace rar.Models.ViewModels
+namespace rar.Models
 { 
     public class RoleAdminViewModel : BaseViewModel
     {

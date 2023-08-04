@@ -1,0 +1,58 @@
+@model RoleAdminViewModel
+
+@{
+    ViewBag.Title = "Add New Role";
+    Layout = "_Layout";
+}
+
+<div class="pagetitle text-center">
+    <h1>Add New User Role</h1>
+    <hr /><br />
+</div>
+<!-- End Page Title -->
+
+<div class="text-center"> 
+
+    <div class="midde_cont">
+        <div class="container-fluid">
+            
+   
+            <div class="row column1"> 
+                <div class="white_shd full margin_bottom_30">
+                        <div class="full graph_head">
+                            <div class="col-12 col-md-12 col-lg-12 text-center" style="float:none; margin: 0 auto;">
+
+                                <div class="form-group text-right">
+                                    <span><a href="~/UserAdmin/Index" class="btn btn-outline-info">Manage Users</a></span>
+                                    <hr />
+                                </div>
+
+                                <div asp-validation-summary="All" class="text-danger"></div>
+
+                                <form asp-action="Create" method="post">
+                                    <div class="col-sm-12 col-md-8 col-lg-6 text-center" style="float:none; margin: 0 auto;">
+                                        <div class="form-group">
+                                            <label for="name"></label>
+                                            <input name="name" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    
+
+                                    <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                                        <br />
+                                        <button type="submit" class="btn btn-primary">Create Role</button>
+                                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                                        <hr /><br />
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
