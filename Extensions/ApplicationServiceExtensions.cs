@@ -20,8 +20,8 @@ namespace rar.Extensions
         {
             services.AddDbContext<AppIdentityDbContext>(opt =>
             {
-                opt.UseSqlite(config.GetConnectionString("UserDB"));
-                //opt.UseSqlServer(config.GetConnectionString("UserDB"));           
+                //opt.UseSqlite(config.GetConnectionString("UserDB"));
+                opt.UseSqlServer(config.GetConnectionString("UserDB"));           
 
                 //Register Custom Password (Validation) Services + (built-in validation)
                 //services.AddTransient<IPasswordValidator<User>, CustomPasswordValidator>();
@@ -47,14 +47,14 @@ namespace rar.Extensions
             }).AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
 
-            object value = services.AddDbContext<AppDbContext >(opt =>
+            services.AddDbContext<AppDbContext >(opt =>
             {
-                opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
-                //opt.UseSqlServer(config.GetConnectionString("DefaultConnection"));
+                //opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
+                opt.UseSqlServer(config.GetConnectionString("UserDB"));
             });
 
             //MVC - Route Config
-            //services.AddMvc(options => options.EnableEndpointRouting = false);
+            services.AddMvc(options => options.EnableEndpointRouting = false);
 
             //Application Service Registration
             services.AddTransient<IAccount, EFAccount>();

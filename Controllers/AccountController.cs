@@ -347,9 +347,9 @@ namespace rar.Controllers
 
             List<User> models = new List<User>();
 
-            using (SqliteConnection connection = new SqliteConnection(c))
+            using (SqlConnection connection = new SqlConnection(c))
             {
-                using (SqliteCommand cmd = new SqliteCommand("", connection))
+                using (SqlCommand cmd = new SqlCommand("", connection))
                 {
                     connection.Open();
                     cmd.CommandText = "Select Id, Email from [AspNetUsers]";

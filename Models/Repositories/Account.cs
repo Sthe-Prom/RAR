@@ -36,6 +36,7 @@ namespace rar.Models.Repositories
            FKs         
         */
         [Required(ErrorMessage = "Please enter user id")]
+        [StringLength(50)]
         public string Id { get; set; }
 
         /* Ref Nav Properties */
