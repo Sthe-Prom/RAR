@@ -5,100 +5,84 @@
     Layout = "_Layout";
 }
 
-<div class="pagetitle">
-    <h1>User and Role Management</h1>
-    <br />
-    <h6>Add Roles and Assign User to Roles</h6>
-                                    
-    <hr /><br />
-</div>
-<!-- End Page Title -->
+<div class="container-fluid p-0">
 
-<div class="text-center"> 
+    <h1 class="h3 mb-3">Create Role</h1>
 
-    <div class="midde_cont">
-        <div class="container-fluid">
-            
+    <div class="row">
+        <div class="col-12">
             <div class="card">
-                <div class="card-body">
-              
 
-                <section>
-                    <div class="row">
-                        <div class="col-sm-8">
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <a asp-action="Create" asp-controller="RoleAdmin" class="btn btn-primary"><i class="bi-person"></i>&nbsp;Add New Role</a>
-                                </div>
-                            
-                            </div>
+                <div class="card-header">
+                    <div class="d-flex flex-row justify-content-between">  
+                        <div class="col-auto">
+                            <h5 class="card-title mb-0">User and Role Management</span></h5>
+                        </div>
+                        <div class="col-auto">
+                            <a asp-action="Create" asp-controller="RoleAdmin" class="btn btn-sm btn-primary">Add New Role</a>
                         </div>
                     </div>
-                </section>
-    
-                <div class="col-md-12" style="margin: 0 auto; float: none;">
-                            <div class="white_shd full margin_bottom_30">
-                                <div class="full">
-                                    <div class="heading1 margin_0 mt-2">
-                                        
-                                        <div class="row column1">         
-                                            
-                                            <div class="col" style="margin: 20px;">
-                                                <div class="col-sm-12 col-md-12 col-lg-12"  style="float:none; margin: 0 auto;">
-                                                    @* <div class="form-group text-right">
-                                                        <span><a asp-action="Create" class="btn btn-outline-info">Add New Role</a></span>                                                             
-                                                        <hr />
-                                                    </div> *@
-                                                    <table class="table table-borderd">
-                                                        <tr>
-                                                            <th>ID</th>
-                                                            <th>Role Name</th>
-                                                            <th>Users</th>
-                                                            <th class="text-info">Action</th>
-                                                        </tr>
-
-                                                        @if (Model.Roles.Count() == 0)
-                                                        {
-                                                            <tr>
-                                                                <td colspan="4" class="text-center">No Roles</td>
-                                                            </tr>
-                                                        }
-                                                        else
-                                                        {
-                                                            foreach (var role in Model.Roles)
-                                                            {
-                                                                <tr>
-                                                                    <td>@role.Id</td>
-                                                                    <td>@role.Name</td>
-                                                                    <td identity-role="@role.Id"></td>
-                                                                    <td>
-                                                                        <form asp-action="Delete" asp-route-id="@role.Id" method="post">
-                                                                            <a class="" 
-                                                                                asp-action="Edit"
-                                                                                asp-route-id="@role.Id">
-                                                                                    <i class="bi-pencil" style="color: #00675A;"></i>&nbsp;
-                                                                            </a> 
-                                                                            <a type="submit"
-                                                                                    class="">
-                                                                                <i class="bi-trash-fill" style="color: #A71930;" aria-hidden="true"></i>
-                                                                            </a>
-
-                                                                        </form>
-                                                                    </td>
-                                                                </tr>
-                                                            }
-                                                        }
-                                                    </table>
-                                                </div>
-                                            </div>
-                                                        
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                 </div>
-             </div>
+                <div class="card-body">                                            
+                    <div class="col" style="margin: 20px;">
+                        <div class="col-sm-12 col-md-12 col-lg-12"  style="float:none; margin: 0 auto;">
+                            @* <div class="form-group text-right">
+                                <span><a asp-action="Create" class="btn btn-outline-info">Add New Role</a></span>                                                             
+                                <hr />
+                            </div> *@
+                            <table class="table table-sm table-borderd">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Role Name</th>
+                                    <th>Users</th>
+                                    <th class="text-info">Action</th>
+                                </tr>
 
+                                @if (Model.Roles.Count() == 0)
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center">No Roles</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    var rolelist = Model.Roles.Where(r => r.Name == "Officer" || r.Name == "Admins" || r.Name == "Data Manager").ToList();
+                                    @* foreach(var r in Model.Roles)
+                                    {
+                                        if(r.Name == "Officer" || r.Name == "Admins")
+                                            rolelist.Add(r.Name)
+                                    } *@
+
+                                    foreach (var role in rolelist)
+                                    {
+                                        <tr>
+                                            <td>@role.Id</td>
+                                            <td>@role.Name</td>
+                                            <td identity-role="@role.Id"></td>
+                                            <td>
+                                                <form asp-action="Delete" asp-route-id="@role.Id" method="post">
+                                                   
+                                                    <a class="btn btn-sm btn-outline-info" 
+                                                        asp-action="Edit"
+                                                        asp-route-id="@role.Id">
+                                                            <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                    </a> 
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-outline-danger">
+                                                        <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                    </button>
+
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>                          
+                                       
+              
             </div>
         </div>
 

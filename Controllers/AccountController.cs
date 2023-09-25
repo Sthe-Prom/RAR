@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -56,14 +55,12 @@ namespace rar.Controllers
             this.ViewData["BaseViewModel"] = this.BaseViewModel;
             this.Configuration = configuration;
         }
-
       
         public ViewResult Index()
-        {
+        {           
             ProfileAddressViewModel vm = new ProfileAddressViewModel();
             vm.Accounts = context.Accounts;
             vm.Addresses = ctx_context.Addresses;
-
             return View(vm);
         }
 
@@ -97,19 +94,15 @@ namespace rar.Controllers
         [HttpGet]
         public IActionResult Profile()
         {
-            ProfileAddressViewModel vm = new ProfileAddressViewModel();
-            vm.Users = getUsers();
+            ProfileAddressViewModel vm = new ProfileAddressViewModel()
+            {                
+                Users = getUsers(),
+                Accounts = context.Accounts
+            };
 
             return View(vm);
         }
-
-        public IActionResult Address()
-        {
-            return View();
-        }
-
-
-
+      
         [HttpPost]
         public async Task<IActionResult> Profile(ProfileAddressViewModel vm)
         {
@@ -160,7 +153,7 @@ namespace rar.Controllers
                     new
                     {
                         content = "SMS Test..",
-                        destination = "0817105258",
+                        destination = "0791962740",
                         LandingPageVariables = new
                         {
                             LandingPageId = "20220219160334351"
@@ -169,7 +162,6 @@ namespace rar.Controllers
                 }
 
             });
-
 
 
             string uploadedProfileImage = UploadedProfileImg(vm);
@@ -195,15 +187,15 @@ namespace rar.Controllers
                 ProfileImg = uploadedProfileImage,
                 Cell = vm.ProfileModel.Cell,
                 Id = vm.ProfileModel.Id,
-              
+                MarriageDoc = "No Doc",
                 IdentityDoc = UploadedIdDoc,
-               
+                MaritalStatus = "Not Applicable",//vm.ProfileModel.MaritalStatus,
                 FullAddress = vm.ProfileModel.FullAddress
             };
 
             if (ModelState.IsValid)
             {
-                await context.SaveAccount(Account);
+                context.SaveAccount(Account);
 
                 //Send SMS (request)
                 var sendResponse = client.Execute(sendRequest);
@@ -236,9 +228,9 @@ namespace rar.Controllers
             UploadedProfileImage = Account.ProfileImg;
             vm.ProfileModel.Cell = Account.Cell;
             vm.ProfileModel.Id = Account.Id;
-            
+            vm.ProfileModel.MarriageDoc = Account.MarriageDoc;
             UploadedIdDoc = Account.IdentityDoc;
-           
+            vm.ProfileModel.MaritalStatus = Account.MaritalStatus;
             vm.ProfileModel.FullAddress = Account.FullAddress;
 
             return View(vm);
@@ -266,7 +258,8 @@ namespace rar.Controllers
                 Account.ProfileImg = uploadedProfileImage;
                 Account.Id = vm.ProfileModel.Id;
                 Account.IdentityDoc = UploadedIdDoc;
-              
+                Account.MaritalStatus = vm.ProfileModel.MaritalStatus;
+                Account.MarriageDoc = "Not Applicable";
                 Account.FullAddress = vm.ProfileModel.FullAddress;
             }
 
@@ -343,7 +336,8 @@ namespace rar.Controllers
         public Microsoft.AspNetCore.Mvc.Rendering.SelectList getUsers()
         {
             //string c = Configuration.GetValue<string>("Data:UserDB2:ConnectionString");
-            string c = Configuration.GetConnectionString("UserDB");
+            string c = Configuration.GetConnectionString("ProdDB");
+            //string c = Configuration.GetConnectionString("ProdDB");
 
             List<User> models = new List<User>();
 

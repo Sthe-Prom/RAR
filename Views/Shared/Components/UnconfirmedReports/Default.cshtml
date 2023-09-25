@@ -1,0 +1,227 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model AccidentReportViewModel
+
+@{
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<style>
+     .itemfooter{
+        visibility: hidden;
+        opacity: 0.0;
+        transition: visibility .3; /*Animation*/
+        transition: opacity .3;    
+    }
+
+    .bc_hover:hover .itemfooter{
+        visibility: visible; /*SHOW ITEM*/
+        opacity: 1;   
+    }
+</style>
+
+
+<div class="row">       
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="col-auto">                                                
+                         
+        </div> 
+            @{
+                int AccountID_ = 0;
+
+                if((signInManager.IsSignedIn(User)))                                                
+                {
+                    if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                    {
+                        foreach (var item in Model.Accounts.Where(c => c.Id == userId))
+                        {
+                            AccountID_ = item.AccountID;
+                        }
+                    }
+                }
+            } 
+
+            @{
+                var Reps = from reps in Model.AccidentReports                                                                      
+                            join pols in Model.PoliceStations
+                            on reps.PoliceStationID equals pols.PoliceStationID
+                            join acc_t in Model.AccidentTypes
+                            on reps.AccidentTypeID equals acc_t.AccidentTypeID  
+                            join acc in Model.Accounts
+                            on reps.AccountID equals acc.AccountID                                 
+                            select new {
+                                reps.AccidentID,
+                                reps.AccidentDate,
+                                pols.PoliceStationName,
+                                acc_t.TypeOfAccident,
+                                reps.AccountID,
+                                acc.Name,
+                                acc.Surname,
+                                reps.Confirmed,
+                                reps.AccidentReportID,     
+                                reps.NrPeopleInjured,
+                                reps.NrPeopleKilled,
+                                reps.AccidentLocation                                                                     
+                            };
+
+            }
+
+            <div class=" table-responsive-lg">              
+                
+                <table class="table table-sm table-striped table-bordered">
+                    <tr>
+                        <th>Reported By</th>   
+                        <th>Report Date</th>
+                        <th>Location</th>
+                        <th>Police Station</th>   
+                        <th>Accident Type</th>
+                        <th>Injuries</th>
+                        <th>Deaths</th>                          
+                                          
+                    
+                    </tr>
+                    @if (@Model.AccidentReports.Where(cr => !cr.Confirmed).Count() > 0)
+                    {
+                        @foreach (var item in Reps.Where(ar => !ar.Confirmed))
+                        {
+                            <tr class="">
+                                <td>@item.Name @item.Surname</td>
+                                <td>@item.AccidentDate.ToShortDateString()</td>   
+                                <th>@item.AccidentLocation</th>             
+                                <th>@item.PoliceStationName</th>
+                                <th>@item.TypeOfAccident</th>
+                                <th>@item.NrPeopleInjured</th>
+                                <th>@item.NrPeopleKilled</th>
+                                <td>
+                                
+                                @if((await userManager.IsInRoleAsync(user,"Admins")))
+                                {                                         
+                                    <form asp-action="Delete" method="post" id="frm1">  
+                                        <div class="d-flex flex-row justify-content-center">
+                                            <div class="row">
+                                                <div class="col-sm-10" style="margin:0 auto;float:none;">
+                                                    <a asp-action="EditReport" class="col-auto btn btn-sm btn-outline-info" style="padding:2px;" asp-route-AccidentReportID="@item.AccidentReportID">
+                                                        <i class="align-middle" data-feather="edit"></i>&nbsp;
+                                                    </a>
+                                                    <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID" class="form-control">
+                                                    
+                                                    <a class="btn btn-sm btn-outline-danger col-auto" style="padding:2px;" onclick="del()">
+                                                        <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>                                       
+                                                          
+                                }
+                                else
+                                {
+                                    if((await userManager.IsInRoleAsync(user,"Data Manager")))
+                                    {
+                                        <div class="row">
+                                            <div class="d-flex flex-row justify-content-center">
+                                                                                            
+                                                        
+                                                <form asp-action="ConfirmReport" method="post">
+                                                    <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="col-auto btn btn-sm btn-outline-info" style="padding: 2px;">
+                                                        <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                    </a>
+
+                                                    <input type="hidden" asp-for="@item.AccidentReportID" value="@item.AccidentReportID" name="AccidentReportID" />
+                                                                                        
+                                                    <button style="padding: 2px;" type="submit" class="col-auto btn btn-sm btn-outline-success">
+                                                        <i class="align-middle" data-feather="check-square"></i>&nbsp;
+                                                    </button>                                                 
+
+                                                </form> 
+        
+                                            
+                                            </div>
+                                        </div>
+                                    }
+                                    if((await userManager.IsInRoleAsync(user,"Officer")))
+                                    {
+                                        @*<form asp-action="EditReport" method="get">
+                                            <input type="hidden" asp-for="@item.AccidentReportID" id="@item.AccidentReportID" name="AccidentReportID" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                View Data
+                                            </button>
+                                        </form> *@
+
+                                        <form asp-action="Delete" method="post" id="frm1">  
+                                            <div class="d-flex flex-row justify-content-center">
+                                                <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+                                            
+                                                @if(@item.AccountID == AccountID_) //Officers can only edit reports that they've created.
+                                                {
+                                                    <div style="padding:2px;" class="col-auto">
+                                                        <a asp-action="EditReport" class="btn btn-sm btn-outline-info" asp-route-AccidentReportID="@item.AccidentReportID" disabled>
+                                                            <i class="align-middle" data-feather="edit"></i>&nbsp;
+                                                        </a>
+                                                    </div>
+                                                
+                                                    <div style="padding:2px;" class="col-auto">
+                                                        <a class="btn btn-sm btn-outline-danger" onclick="del()" disabled>
+                                                            <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                        </a>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                        </form>  
+                                    }
+                                }
+
+                                </td>
+                            </tr>                        
+
+                        }                             
+                    }
+                    else
+                    {
+                        <tr class="" >
+                            <td colspan="8" class="text-center"><span class="h4 text-info mt-2 mb-2" style="margin: 2px;padding:10px;" >No Unconfirmed Reports</span></td>
+                        </tr>
+                    }
+                </table>
+            
+            </div>
+
+    </div>
+</div>
+
+<script>
+    function del(){
+    swal({
+        title: "Are you sure?",
+        text: "Reports deleted cannot be recovered",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes, delete report!",
+        cancelButtonText: "No, cancel!",
+        closeOnConfirm: false,
+        closeOnCancel: false
+        },
+    function(isConfirm){
+    if (isConfirm) {
+        document.getElementById('frm1').submit();
+        swal("Deleted!", "Selected report has been deleted.", "success");
+    } else {
+        swal("Cancelled", "Report not deleted:)", "error");
+    }
+})
+       
+       // if(confirm(swal("delete..?"))){        
+        //     return swal("Deleted!", "Your imaginary file has been deleted.", "success");
+        // }else{        
+        //     return swal("Cancelled", "Your imaginary file is safe :)", "error");
+        // }        
+    }
+     
+</script>
+           
+                    
+

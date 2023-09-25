@@ -32,6 +32,10 @@ namespace rar.Models.Repositories
         
         public string FullAddress { get; set; }
 
+        public string MaritalStatus { get; set; }
+
+        public string MarriageDoc { get; set; }
+
         /* Relationship
            FKs         
         */
@@ -44,8 +48,8 @@ namespace rar.Models.Repositories
         public virtual User User { get; set; }
 
         /* Ref. by */
-        //public virtual ICollection<Address> Address { get; set; }
-        //public virtual ICollection<Application> Application { get; set; }
+        public virtual ICollection<Address> Address { get; set; }
+        public virtual ICollection<AccidentReport> AccidentReport { get; set; }
 
     }
 }

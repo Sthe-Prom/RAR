@@ -1,329 +1,76 @@
 @inject SignInManager<User> signInManager;
 @inject UserManager<User> userManager;
 
-@model ProfileAddressViewModel
+@model ProfileAddressViewModel;
 
 @{
-    ViewData["Title"] = "Profilee";
-    Layout = "_Layout";
-
-    var userId = userManager.GetUserId(User);
-    User user = await userManager.FindByIdAsync(userId);
+     ViewData["Title"] = "Account";
 }
 
-<div class="pagetitle">
-    <h1>Profile</h1>
-    <nav>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="~/Home/Index">Home</a></li>
-            <li class="breadcrumb-item active">Profile</li>
-        </ol>
-    </nav>
-</div>
-<!-- End Page Title -->
-
-    <section class="section profile">
-      <div class="row">
-        <div class="col-xl-4">
-
-          <div class="card">
-            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-
-                @if((signInManager.IsSignedIn(User)))                                                
-                  { 
-                    if(Model.Accounts != null && Model.Accounts.Count() != 0)
-                    {
-                      
-                      foreach (var item in Model.Accounts.Where(c => c.Id == userId))
-                      {
-
-                         if(item.ProfileImg != null)
-                            {                                     
-                                <img src="~/users/profiles/@item.ProfileImg"   
-                                        class="rounded-circle img-responsive"                                              
-                                        asp-append-version="true" />
-                            }
-
-                          <h2>@item.Name</h2> 
-
-                      }
-                                           
-                      <div class="social-links mt-2">
-                        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-                      </div>
-                    }
-                  }
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-xl-8">
-
-          <div class="card">
-            <div class="card-body pt-3">
-              <!-- Bordered Tabs -->
-              <ul class="nav nav-tabs nav-tabs-bordered">
-
-                <li class="nav-item">
-                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
-                </li>
-
-                <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
-                </li>
-
-                <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Address Details</button>
-                </li>
-
-                <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
-                </li>
-
-              </ul>
-              <div class="tab-content pt-2">
-
-                <div class="tab-pane fade show active profile-overview" id="profile-overview">
-                 
-                  @if((signInManager.IsSignedIn(User)))                                                
-                  { 
-                    if(Model.Accounts != null && Model.Accounts.Count() != 0)
-                    {
-                      foreach (var item in Model.Accounts.Where(c => c.Id == userId))
-                      {
-
-                        <h5 class="card-title">Profile Details</h5>
-
-                        <div class="row">
-                          <div class="col-lg-3 col-md-4 label ">Full Name</div>
-                          <div class="col-lg-9 col-md-8">@item.Name @item.Surname</div>
-                        </div>
-
-                      
-                        <div class="row">
-                          <div class="col-lg-3 col-md-4 label">Address</div>
-                          <div class="col-lg-9 col-md-8">@item.FullAddress</div>
-                        </div>
-
-                        <div class="row">
-                          <div class="col-lg-3 col-md-4 label">Phone</div>
-                          <div class="col-lg-9 col-md-8">@item.Cell</div>
-                        </div>
-
-                        <div class="row">
-                          <div class="col-lg-3 col-md-4 label">Email</div>
-                          <div class="col-lg-9 col-md-8">@item.Email</div>
-                        </div>
-                      }
-                    }
-                  }
-
+<div class="midde_cont">
+    <div class="container-fluid">
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Profile</h2>
                 </div>
+            </div>
+        </div>
+        <!-- row -->
+        <div class="card column1">
+            <div class="col-md-6" style="margin: 0 auto;float:none;">
+                <div class="white_shd full margin_bottom_30">
+                    <div class="full graph_head">
+                        <div class="card-header">
+                            <h2 class="card-title mb-0">My profile</h2>
+                        </div>
+                       
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- user profile section -->
+                            <!-- profile image -->
+                            <div class="col-lg-12">
+                                <div class="full dis_flex center_text">
 
-                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                                    @if(signInManager.IsSignedIn(User))                                                 
+                                    { 
+                                        var userId = userManager.GetUserId(User);
 
-                  <!-- Profile Edit Form -->
-                  <form asp-action="Edit" method="post"  enctype="multipart/form-data">
-                    <div class="row mb-3">                      
-                      <label asp-for="@Model.ProfileModel.ProfileImg" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
-                      <div class="col-md-8 col-lg-9">
-
-                        
-                      @if((signInManager.IsSignedIn(User)))                                                
-                        { 
-                            if(Model.Accounts != null && Model.Accounts.Count() != 0)
-                            {
-                                var userId = userManager.GetUserId(User);
-                                                                                                       
-                                foreach (var item in Model.Accounts.Where(c => c.Id == userId))
-                                {
-                                    if(item.ProfileImg != null)
-                                    {                                     
-                                        <img src="~/users/profiles/@item.ProfileImg"   
-                                                class="rounded-circle img-responsive"                                              
-                                                asp-append-version="true" />
+                                        @foreach (var item in Model.Accounts.Where(c => c.Id == userId))
+                                        {                               
+                                            <div class="profile_img">                                        
+                                                <img width="200px" height="200px" class="rounded-circle" src="~/users/profiles/@item.ProfileImg"   
+                                                    class="rounded-circle" asp-append-version="true" />                                    
+                                            </div>
+                                            <div class="profile_contant">
+                                                <div class="contact_inner">
+                                                
+                                                        <h3>@User.Identity.Name</h3>
+                                                        <p><strong>About: </strong></p>
+                                                        <ul class="list-unstyled">
+                                                            <li><i class="fa fa-envelope-o"></i>@item.Email</li>
+                                                            <li><i class="fa fa-phone"></i>@item.Cell</li>
+                                                        </ul>
+                                                    
+                                                </div>                                        
+                                            </div>
+                                        }
                                     }
-                                }
-                            }
-                        }
-                         
-
-
-                        <div class="pt-2">
-                          <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></a>
-                          <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
-                           <label asp-for="@Model.ProfileModel.ProfileImg" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
-                            <div class="col-md-8 col-lg-9 custom-file">
-                                <input asp-for="@Model.ProfileModel.ProfileImg" class="custom-file-input form-control" id="customFile" type="file" />                               
-                                @* <label class="custom-file-label" for="customFile">Choose file</label> *@
-                            </div>
-                            <span asp-validation-for="@Model.ProfileModel.ProfileImg" class="text-danger"></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                     
-                      <label asp-for="@Model.ProfileModel.Name" class="col-md-4 col-lg-3 col-form-label">Name(s)</label>
-                      <div class="col-md-8 col-lg-9">
-                          <input asp-for="@Model.ProfileModel.Name" type="text" class="form-control" id="Name" >
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <label asp-for="@Model.ProfileModel.Surname" class="col-md-4 col-lg-3 col-form-label">Surname</label>
-                          <div class="col-md-8 col-lg-9">
-                              <input asp-for="@Model.ProfileModel.Surname" type="text" class="form-control" id="Surname">
-                          </div>
-                    </div>
-
-                    <div class="row mb-3">
-                            <label asp-for="@Model.ProfileModel.Cell" class="col-md-4 col-lg-3 col-form-label">Cell</label>
-                            <div class="col-md-8 col-lg-9">
-                                <input asp-for="@Model.ProfileModel.Cell" type="text" class="form-control" id="Cell" >
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label asp-for="@Model.ProfileModel.Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
-                            <div class="col-md-8 col-lg-9">
-                                <input asp-for="@Model.ProfileModel.Email" type="email" class="form-control" id="Email" >
-                            </div>
-                        </div>
-
-                    
-                     <h6 class="card-title">Upload Documents</h6>
-                        <div class="row mb-3">
-                            <label asp-for="@Model.ProfileModel.IdentityDoc" class="col-md-4 col-lg-3 col-form-label">Identity Document</label>
-                            <div class="col-md-8 col-lg-9 custom-file">
-                                <input asp-for="@Model.ProfileModel.IdentityDoc" class="custom-file-input form-control" id="customFile" type="file" />                               
-                                @* <label class="custom-file-label" for="customFile">Choose file</label> *@
-                            </div>
-                            <span asp-validation-for="@Model.ProfileModel.IdentityDoc" class="text-danger"></span>
-                        </div>
-                                     
-                        <h6 class="card-title">Your Residential Address</h6>
-                        <div class="row mb-3">
-                            <label asp-for="@Model.ProfileModel.FullAddress" class="col-md-4 col-lg-3 col-form-label">Residential Address</label>
-                            <div class="col-md-8 col-lg-9 mb-2">
-                                <div><span asp-validation-for="@Model.ProfileModel.FullAddress" class="text-danger"></span></div>   
-                                <div>                              
-                                    <input asp-for="@Model.ProfileModel.FullAddress" class="form-control" type="text" />                               
-                                    @* <label class="custom-file-label" for="customFile">Choose file</label> *@
                                 </div>
+
                                 
-                            </div>                                                    
+                               
+                                <!-- end user profile section -->
+                            </div>
                         </div>
-
-                   
-
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
-                  </form><!-- End Profile Edit Form -->
-
                 </div>
-
-                <div class="tab-pane fade pt-3 profile-overview" id="profile-settings">
-
-                        @{
-                            int AccountID = 0;
-
-                            if((signInManager.IsSignedIn(User)))                                                
-                              {
-                                  if(Model.Accounts != null && Model.Accounts.Count() != 0)
-                                  {
-                                      foreach (var item in Model.Accounts.Where(c => c.Id == userId))
-                                      {
-                                          AccountID = item.AccountID;
-                                      }
-                                  }
-                              }
-                          }  
-
-                  <!-- Address Form -->
-                  @if((signInManager.IsSignedIn(User)))                                                
-                  { 
-                    if(Model.Addresses != null && Model.Addresses.Count() != 0)
-                    {
-                      foreach (var item in Model.Addresses.Where(c => c.AccountID == AccountID))
-                      {
-
-                        <h5 class="card-title">Address Details</h5>    
-
-                        <div class="row">
-                          <div class="col-lg-3 col-md-4 label">Province</div>
-                          <div class="col-lg-9 col-md-8">@item.Province</div>
-                        </div>
-                        
-                  
-                         
-                        <div class="row">
-                          <div class="col-lg-3 col-md-4 label">Stteet Name</div>
-                          <div class="col-lg-9 col-md-8">@item.StreetNumber @item.StreetName, @item.Suburb</div>
-                        </div>         
-                                        
-                        <div class="row">
-                          <div class="col-lg-3 col-md-4 label">City</div>
-                          <div class="col-lg-9 col-md-8">@item.City</div>
-                        </div>
-
-                        <div class="row mb-3">
-                          <div class="form-group">
-                            <a asp-action="Edit" class="btn btn-sm btn-primary" asp-route-AddressID="@item.AddressID">
-                                Edit Address
-                            </a>
-                            <a href="~/Address/Edit" class="btn btn-sm btn-primary">Add New Address</a>
-                          </div>
-                        </div>
-
-                      }
-                    }
-                  }
-
-                </div>
-
-                <div class="tab-pane fade pt-3" id="profile-change-password">
-                  <!-- Change Password Form -->
-                  <form>
-
-                    <div class="row mb-3">
-                      <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="password" type="password" class="form-control" id="currentPassword">
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="newpassword" type="password" class="form-control" id="newPassword">
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="renewpassword" type="password" class="form-control" id="renewPassword">
-                      </div>
-                    </div>
-
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Change Password</button>
-                    </div>
-                  </form><!-- End Change Password Form -->
-
-                </div>
-
-              </div><!-- End Bordered Tabs -->
-
+               
             </div>
-          </div>
-
+            <!-- end row -->
         </div>
-      </div>
-    </section>
+        
+    </div>
+    <!-- end dashboard inner -->
+</div>

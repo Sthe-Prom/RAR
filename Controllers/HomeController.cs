@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using rar.Models;
+using rar.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -13,31 +14,52 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private RoleManager<IdentityRole> roleManager;
     private UserManager<User> userManager;
+    private IAccount context;
 
-    public HomeController(ILogger<HomeController> logger, RoleManager<IdentityRole> roleManager,
-      UserManager<User> userManager)
+    public HomeController(ILogger<HomeController> logger, RoleManager<IdentityRole> roleManager_,
+      UserManager<User> userManager_, IAccount ctx)
     {
         _logger = logger;
-        roleManager = roleManager;
-        userManager = userManager;
+        roleManager = roleManager_;
+        userManager = userManager_;
+        context = ctx;
 
     }
 
     public IActionResult Index()
     {
-        return View();
+        BaseViewModel vm = new BaseViewModel();
+        vm.Accounts = context.Accounts;
+        return View(vm);
     }
 
     public IActionResult Privacy()
     {
-        return View();
+        BaseViewModel vm = new BaseViewModel();
+        vm.Accounts = context.Accounts;
+        return View(vm);
     }
 
     public IActionResult Home() => View();
-    public IActionResult About() => View();
-    public IActionResult FAQ() => View();
-
-    public IActionResult Contact() => View();
+    public IActionResult About()
+    {
+        BaseViewModel vm = new BaseViewModel();
+        vm.Accounts = context.Accounts;
+        return View(vm);
+    }
+    public IActionResult FAQ()
+    {
+        BaseViewModel vm = new BaseViewModel();
+        vm.Accounts = context.Accounts;
+        return View(vm);
+    }
+ 
+    public IActionResult Contact() 
+    {
+        BaseViewModel vm = new BaseViewModel();
+        vm.Accounts = context.Accounts;
+        return View(vm);
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

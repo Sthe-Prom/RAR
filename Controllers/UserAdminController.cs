@@ -19,16 +19,18 @@ namespace rar.Controllers
     public class UserAdminController : Controller
     {
         private UserManager<User> userManager;
+        private RoleManager<IdentityRole> roleManager;
         private IUserValidator<User> userValidator;
         private IPasswordValidator<User> passwordValidator;
         private IPasswordHasher<User> passwordHasher;
         private IAccount acc_context;
         private IServiceProvider serviceProvider;
 
-        public UserAdminController(UserManager<User> _userMgr, IUserValidator<User> _userValidator,
+        public UserAdminController(UserManager<User> _userMgr, RoleManager<IdentityRole> _roleManager, IUserValidator<User> _userValidator,
                                IPasswordValidator<User> _passwordValidator, IPasswordHasher<User> _passwordHasher,
                                 IAccount acc_context_, IServiceProvider serviceProvider_)
         {
+            roleManager = _roleManager;
             userManager = _userMgr;
             userValidator = _userValidator;
             passwordValidator = _passwordValidator;
@@ -60,6 +62,7 @@ namespace rar.Controllers
         {
             UserAdminViewModel vm = new UserAdminViewModel();
             vm.Accounts = acc_context.Accounts;
+            // vm.Roles = roleManager.Roles;            
 
             return View(vm);
         }
@@ -110,20 +113,23 @@ namespace rar.Controllers
             {
                 User user = new User
                 {
-                    UserName = vm.CreateAdminUserModel.Name,
-                    Email = vm.CreateAdminUserModel.Email
+                    UserName = vm.CreateModel.Name,
+                    Email = vm.CreateModel.Email
                 };
 
                 RoleManager<IdentityRole> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                IdentityResult result = await userManager.CreateAsync(user, vm.CreateAdminUserModel.Password);
+                IdentityResult result = await userManager.CreateAsync(user, vm.CreateModel.Password);
 
                 if (result.Succeeded)
                 {
-                    string role = "SchoolAdmin";
+                    string role = "Data Manager";
                     if (await roleManager.FindByNameAsync(role) == null)
                     {
                         await roleManager.CreateAsync(new IdentityRole(role));
+                        //await userManager.AddToRoleAsync(user, role);
                     }
+                    
+                    await userManager.AddToRoleAsync(user, role);
 
                     return RedirectToAction("Index", "RoleAdmin");
                 }

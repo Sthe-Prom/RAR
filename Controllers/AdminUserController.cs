@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using rar.Infrastructure;
 using rar.Interfaces;
-using rar.Models.ViewModels;
+//using rar.Models.ViewModels;
 using rar.Models;
 
 namespace rar.Controllers

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using rar.Models;
 
-namespace rar.Models.ViewModels
+namespace rar.Models
 {
     public class ProfileViewModel : BaseViewModel
     {
@@ -35,9 +35,14 @@ namespace rar.Models.ViewModels
         [Required(ErrorMessage = "Please Upload Identity Doc")]
         public IFormFile IdentityDoc { get; set; }
 
+        public string MaritalStatus { get; set; }
+
+        public string MarriageDoc { get; set; }
+        
         public string FullAddress { get; set; }
 
         public Microsoft.AspNetCore.Mvc.Rendering.SelectList Users { get; set; }
+
 
     }
 }

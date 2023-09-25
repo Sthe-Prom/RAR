@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using rar.Interfaces;
 using rar.Models;
-using rar.Models.ViewModels;
+//using rar.Models.ViewModels;
 
 namespace rar.Controllers
 {
@@ -72,6 +72,9 @@ namespace rar.Controllers
         //EDIT
         public async Task<IActionResult> Edit(string id)
         {
+            RoleAdminViewModel vm = new RoleAdminViewModel();
+            vm.Accounts = acc_context.Accounts;
+            
             IdentityRole role = await roleManager.FindByIdAsync(id);
 
             List<User> members = new List<User>();
@@ -80,7 +83,7 @@ namespace rar.Controllers
             foreach (User user in userManager.Users)
             {
                 var list = await userManager.IsInRoleAsync(user, role.Name) ? members : nonMembers;
-
+        
                 list.Add(user);
             }
 

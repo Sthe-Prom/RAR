@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using rar.Models.Repositories;
 using rar.Interfaces;
 
+
 namespace rar.Models
 {
     public class BaseViewModel

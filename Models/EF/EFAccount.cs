@@ -41,7 +41,8 @@ namespace rar.Models
                     dbEntry.Id = Account.Id;                   
                     dbEntry.IdentityDoc = Account.IdentityDoc;                   
                     dbEntry.FullAddress = Account.FullAddress;
-                    // dbEntry.SubunitID = Account.SubunitID;
+                    dbEntry.MarriageDoc = Account.MarriageDoc;
+                    dbEntry.MaritalStatus = Account.MaritalStatus;
                 }
             }
 

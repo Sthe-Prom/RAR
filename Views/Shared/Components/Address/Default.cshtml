@@ -3,8 +3,7 @@
 
 @model ProfileAddressViewModel
 
-@{
-   
+@{   
     var userId = userManager.GetUserId(User);
     User user = await userManager.FindByIdAsync(userId);
 }

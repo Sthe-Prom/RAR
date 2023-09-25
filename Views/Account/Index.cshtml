@@ -5,7 +5,6 @@
 
 @{
     ViewData["Title"] = "Index";
-    Layout = "_Layout";
 
     var userId = userManager.GetUserId(User);
     User user = await userManager.FindByIdAsync(userId);
@@ -13,7 +12,6 @@
 
 <div class="container-fluid p-0">
     <h1 class="h3 mb-3">Profile</h1>
-
    
         <nav>
             <ol class="breadcrumb">

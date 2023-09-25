@@ -20,6 +20,8 @@ namespace rar.Models
         public IPasswordHasher<User> passwordHasher { get; set; }
         public CreateModel CreateModel { get; set; }
         public CreateAdminUserModel CreateAdminUserModel { get; set; }
+    
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList Roles { get; set; }
     }
 }
 

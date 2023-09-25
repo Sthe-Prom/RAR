@@ -25,7 +25,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -50,13 +50,14 @@ try
     //await context.Database.MigrateAsync();
     //context.Connections.RemoveRange(context.Connections);
     //await context.Database.ExecuteSqlRawAsync("Delete From [Connections]");
-    //await AppIdentityDbContext.CreateAdminAccount(userManager, roleManager, builder.Configuration);
+    //AppIdentityDbContext.CreateAdminAccount(userManager, roleManager, builder.Configuration).Wait();
 }
 catch (Exception ex)
 {
     var logger = services.GetService<ILogger<Program>>();
     logger.LogError(ex, "An error occurred during migration");
 }
+
 //AppIdentityDbContext.CreateAdminAccount(app.ApplicationServices, Configuration).Wait();
 
 app.Run();

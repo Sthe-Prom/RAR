@@ -11,10 +11,10 @@
             <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
               <div class="d-flex justify-content-center py-4">
-                <a href="index.html" class="logo d-flex align-items-center w-auto">
+                <div href="#" class="logo d-flex align-items-center w-auto">
                   <img src="assets/img/logo.png" alt="">
-                  <span style="text-decoration: none;" class="d-none d-lg-block">R.A.R</span>
-                </a>
+                  <span style="text-decoration: none;" class="h3 d-none d-lg-block">R.A.R</span>
+                </div>
               </div><!-- End Logo -->
 
               <div class="card mb-3">
@@ -25,14 +25,14 @@
                     <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
                   </div>
 
-                  <form asp-action="CreateAdmin" method="post" class="row g-3 needs-validation" novalidate>
+                  <form asp-action="CreateAdminUser" method="post" class="row g-3 needs-validation" novalidate>
                     <div class="col-12">
 
                       <div asp-validation-summary="All"></div>
 
                       <label asp-for="@Model.CreateModel.Name" class="form-label">Your Name</label>
                       <input asp-for="@Model.CreateModel.Name" type="text" class="form-control" id="yourName" required>
-                      <div class="invalid-feedback">Please, enter your name!</div>
+                      <div class="invalid-feedback">Please enter your name!</div>
 
                     </div>
 
@@ -49,16 +49,15 @@
                       <div class="invalid-feedback">Please enter your password!</div>
                     </div>
 
-                     <div class="row mb-3">
-                                <label class="col-form-label">Admin Roles</label>
-                                <div class="col-sm-12">
-                                    <select class="form-select">
-                                        <option selected>Select Admin Role</option>
-                                        <option value="DistrictAdmin">DistrictAdmin</option>
-                                        <option value="SchoolAdmin">StationAdmin</option>                                                                                
-                                    </select>
-                                </div>
-                            </div>
+                     <!-- <div class="row mb-3">
+                        <label class="col-form-label">Admin Roles</label>
+                        <div class="col-sm-12">
+                            <select class="form-select" asp-for="" asp-items="Model.Roles">
+                                <option selected>Select Admin Role</option>
+                                                                                                              
+                            </select>
+                        </div>
+                    </div> -->
 
                     <div class="col-12">
                       <div class="form-check">

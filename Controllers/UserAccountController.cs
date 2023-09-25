@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using rar.Models;
-using rar.Models.ViewModels;
+//using rar.Models.ViewModels;
 
 namespace rar.Controllers
 {
@@ -47,29 +47,43 @@ namespace rar.Controllers
                 {
                     //await signInManager.SignOutAsync();
 
-                    Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, loginModel.Password, false, false);
-
-                    if (result.Succeeded)
+                    try
                     {
-                        // if(await UserManager.IsInRoleAsync(user_id,"Applicant"))
+                        Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, loginModel.Password, false, false);
+                        //var result = await UserManager.CheckPasswordAsync(user, loginModel.Password);
+                        if (result.Succeeded)
+                        {
+                            return Redirect(ReturnUrl ?? "/AccidentReport/AddReport");
+                        }
+                        else
+                        {
+                            return Redirect(ReturnUrl ?? "/UserAccount/Login");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        return Content(ex.Message);
+                        // if (result.Succeeded)
                         // {
-                        //return Redirect(ReturnUrl ?? "/Home/Index");
+                        //     // if(await UserManager.IsInRoleAsync(user_id,"Applicant"))
+                        //     // {
+                        //     //return Redirect(ReturnUrl ?? "/Home/Index");
+                        //     // }
+                        //     // else
+                        //     //     return Redirect(ReturnUrl ?? "/Address/Address");
+
+                        //     // if(await UserManager.IsInRoleAsync(user_id,"Applicant"))
+                        //     // {
+                        //     //     return Redirect(ReturnUrl ?? "/Account/Profile");
+                        //     // }
+
+                        //     return Content("Logged In");
+                        //     //return Redirect(ReturnUrl ?? "/Home/Index"); 
                         // }
                         // else
-                        //     return Redirect(ReturnUrl ?? "/Address/Address");
-
-                        // if(await UserManager.IsInRoleAsync(user_id,"Applicant"))
-                        // {
-                        //     return Redirect(ReturnUrl ?? "/Account/Profile");
-                        // }
-
-                        //return Content("Logged In");
-                        return Redirect(ReturnUrl ?? "/Home/Index"); 
+                        //     //return Redirect(ReturnUrl ?? "/UserAccount/Login");
+                        //     return Content("Not logged In");
                     }
-                    else
-                        return Redirect(ReturnUrl ?? "/UserAccount/Login");
-                        //Content("Not logged In");
-
 
                     //var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
                     // switch (result)

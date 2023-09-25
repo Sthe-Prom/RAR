@@ -9,7 +9,11 @@ using Microsoft.Extensions.DependencyInjection;
 using rar.Infrastructure;
 using rar.Interfaces;
 using rar.Models;
+//using rar.Models.EF;
 using rar.Models.Repositories;
+using RAR.Interfaces;
+using RAR.Models.EF;
+
 
 namespace rar.Extensions
 {
@@ -20,8 +24,9 @@ namespace rar.Extensions
         {
             services.AddDbContext<AppIdentityDbContext>(opt =>
             {
-                //opt.UseSqlite(config.GetConnectionString("UserDB"));
-                opt.UseSqlServer(config.GetConnectionString("UserDB"));           
+                //opt.UseSqlite(config.GetConnectionString("DevDB"));
+                //opt.UseSqlServer(config.GetConnectionString("DevDB"));
+                opt.UseSqlServer(config.GetConnectionString("ProdDB"));           
 
                 //Register Custom Password (Validation) Services + (built-in validation)
                 //services.AddTransient<IPasswordValidator<User>, CustomPasswordValidator>();
@@ -50,7 +55,8 @@ namespace rar.Extensions
             services.AddDbContext<AppDbContext >(opt =>
             {
                 //opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
-                opt.UseSqlServer(config.GetConnectionString("UserDB"));
+                //opt.UseSqlServer(config.GetConnectionString("DevDB"));
+                opt.UseSqlServer(config.GetConnectionString("ProdDB"));
             });
 
             //MVC - Route Config
@@ -58,7 +64,10 @@ namespace rar.Extensions
 
             //Application Service Registration
             services.AddTransient<IAccount, EFAccount>();
-            services.AddTransient<IAddress, EFAddress>();          
+            services.AddTransient<IAddress, EFAddress>();
+            services.AddTransient<IPoliceStation, EFPoliceStation>();
+            services.AddTransient<IAccidentType, EFAccidentType>();
+            services.AddTransient<IAccidentReport, EFAccidentReport>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
       
             return services;
