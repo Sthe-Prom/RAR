@@ -14,7 +14,6 @@ using rar.Models.Repositories;
 using RAR.Interfaces;
 using RAR.Models.EF;
 
-
 namespace rar.Extensions
 {
     public static class ApplicationServiceExtensions
