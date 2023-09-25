@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
+//#nullable disable
 
 namespace rar.Migrations
 {

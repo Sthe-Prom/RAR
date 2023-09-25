@@ -8,5 +8,6 @@ namespace rar.Models.Repositories
         [Key]
         public int WeatherTypeID { get; set; } 
         public string TypeOfWeather{ get; set; }
+        
     }
 }

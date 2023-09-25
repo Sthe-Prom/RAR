@@ -177,26 +177,7 @@ namespace rar.Controllers
                 }
             }
             
-            // var AccidentReport = context.AccidentReports.FirstOrDefault(r => r.AccidentReportID == 15); 
             
-            // if (AccidentReport != null)//default(AccidentReport))
-            // {
-            //     AccidentReport.AccidentID = vm.AccidentReport.AccidentID;
-            //     //AccidentReport.AccidentTime = vm.AccidentReport.AccidentTime;
-            //     AccidentReport.AccidentLocation = vm.AccidentReport.AccidentLocation;        
-            //     //AccidentReport.AccidentDate = vm.AccidentReport.AccidentDate;
-            //     AccidentReport.AccidentDescription = vm.AccidentReport.AccidentDescription;
-            //     AccidentReport.NrPeopleKilled = vm.AccidentReport.NrPeopleKilled;
-            //     AccidentReport.NrPeopleInjured = vm.AccidentReport.NrPeopleInjured;
-            //     AccidentReport.AccountID = vm.AccidentReport.AccountID;
-            //     AccidentReport.PoliceStationID = vm.AccidentReport.PoliceStationID;
-            //     AccidentReport.CollisionID = vm.AccidentReport.CollisionID;
-            //     AccidentReport.WeatherTypeID = vm.AccidentReport.WeatherTypeID;
-            //     AccidentReport.AreaCodeID = vm.AccidentReport.AreaCodeID;
-            //     AccidentReport.AccidentTypeID = vm.AccidentReport.AccidentTypeID;
-            // }
-            // else
-            // {
                 var AccidentReport = new AccidentReport
                 {                   
                     AccidentID = RAR,
@@ -213,7 +194,7 @@ namespace rar.Controllers
                     AreaCodeID = vm.AccidentReport.AreaCodeID,
                     AccidentTypeID = vm.AccidentReport.AccidentTypeID
                 };
-            // }
+            //}
             // if (ModelState.IsValid)
             // {
                 try
@@ -232,7 +213,8 @@ namespace rar.Controllers
                 {
                     return Content("Not Added." + ex.Message);
                 }
-            //}
+                //return Content("Valid");
+            // }
             // else
             // {
             //     return Content("Invalid Model");
@@ -246,7 +228,6 @@ namespace rar.Controllers
             
             if (AccidentReport != default(AccidentReport))
             { 
-
                 //return Content("Something's right");
                 //AccidentReport.AccidentReportID = vm.AccidentReport.AccidentReportID;              
                 // AccidentReport.AccidentID = vm.AccidentReport.AccidentID;

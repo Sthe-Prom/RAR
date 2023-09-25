@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using rar.Models;
 
-#nullable disable
+//#nullable disable
 
 namespace rar.Migrations
 {

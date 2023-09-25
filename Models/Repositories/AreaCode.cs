@@ -9,6 +9,7 @@ namespace rar.Models.Repositories
         public int AreaCodeID { get; set; }
         public string AreaName { get; set; }
 
-       
+        /*Ref. by*/
+        public virtual ICollection<AccidentReport> AccidentReport { get; set; }
     }
 }
