@@ -1,0 +1,19 @@
+@model AccidentReportViewModel
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@{
+    ViewData["Title"] = "Edit Report";
+    Layout = "_Layout";
+
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<div class="row">
+                                       
+    <div class="card-body">                            
+        @await Component.InvokeAsync("AccidentReportDetails")
+    </div> 
+
+</div> 

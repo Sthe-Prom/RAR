@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using rar.Models;
 using rar.Models.Repositories;
 
-
 namespace rar.Interfaces
 {
     public interface IAddress

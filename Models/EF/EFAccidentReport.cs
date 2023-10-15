@@ -13,6 +13,7 @@ namespace RAR.Models.EF
         public AppDbContext context;
 
         public IEnumerable<AccidentReport> AccidentReports => context.AccidentReport;
+        
         public EFAccidentReport(AppDbContext ctx)
         {
             context = ctx;
@@ -41,16 +42,24 @@ namespace RAR.Models.EF
                     // dbEntry.AccountID = AccidentReport.AccountID;
                     dbEntry.PoliceStationID = AccidentReport.PoliceStationID;
                     dbEntry.CollisionID = AccidentReport.CollisionID;
-                    dbEntry.AreaCodeID = AccidentReport.AreaCodeID;
+                    
                     dbEntry.AccidentTypeID = AccidentReport.AccidentTypeID;
                     dbEntry.WeatherTypeID = AccidentReport.WeatherTypeID;
                     dbEntry.Confirmed = AccidentReport.Confirmed;
+                    dbEntry.AccidentPicture = AccidentReport.AccidentPicture;
+                    dbEntry.AccidentSketch = AccidentReport.AccidentSketch;
+                    dbEntry.HitAndRun = AccidentReport.HitAndRun;
                     
                 }
             }
 
-            context.SaveChangesAsync(); //commit to db
+             await context.SaveChangesAsync(); //commit to db
 
+        }
+
+        public async Task<AccidentReport> GetAccidentReport(int AccidentReportID)
+        {
+            return await context.AccidentReport.FindAsync(AccidentReportID);
         }
 
         public AccidentReport DeleteAccidentReport(int AccidentReportID)
@@ -66,7 +75,6 @@ namespace RAR.Models.EF
 
             return dbEntry;
         }
-
 
     }
 }

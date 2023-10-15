@@ -1,0 +1,426 @@
+@model AccidentReportViewModel
+
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@{
+    ViewData["Title"] = "List Reports";
+    Layout = "_Layout";
+    
+    var userId = userManager.GetUserId(User);
+    User user_id = await userManager.FindByIdAsync(userId);
+}
+
+<style>
+    #newreport{
+        text-decoration: none;
+    }
+
+    #newreport:hover{
+        margin-top: 4px;
+        transition: 0.3s ease;        
+    }
+   
+   .scroll {
+        height:400px;
+        overflow-y: scroll;
+        background-color: #F5F7FB;
+    }
+
+      .itemfooter{
+        visibility: hidden;
+        opacity: 0.0;
+        transition: visibility .3; /*Animation*/
+        transition: opacity .3;    
+    }
+
+    .bc_hover:hover .itemfooter{
+        visibility: visible; /*SHOW ITEM*/
+        opacity: 1;           
+
+    }
+
+</style>
+
+<div class="container-fluid p-0">
+ 
+    <div class="d-flex flex-row justify-content-between">  
+        <div class="col-auto">                                                
+            <h1 class="h3 mb-3" style="line-height:40px;">Accident Reporting</h1>              
+        </div> 
+        <div class="col-auto">
+            <div class="d-flex">                                   
+                <a href="#" onclick="addreport()" id="newreport" class="col-auto"> 
+                    <div class="col-auto stat text-primary">                                    
+                        <i class="align-middle" data-feather="plus"></i>                         
+                    </div>
+                </a>
+                <div class="col-auto">
+                    <h1 class="h3 mb-3" style="line-height:40px;padding-left:5px;">New Report</h1>
+                </div>                
+            </div>     
+        </div>  
+          
+    </div>
+    
+    <div class="row" id="LatestReports">
+        <div class="d-flex flex-row justify-content-between" >
+            <div class="col-12">
+            
+                <div class="card" >                    
+                
+                    <div class="card-header" >
+                        
+                        <div class="col-auto">    
+                          
+                            <div class="d-flex flex-row justify-content-between" >
+                                <div class="col-auto">    
+                                    <h2 class="card-title">Latest Accidents</h2>
+                                </div>
+                                                                       
+                                <div class="col-auto">                                    
+                                    Filter By: @await Component.InvokeAsync("AccidentType")
+                                </div>
+                                <div  class="col-auto">                                    
+                                    @Html.ActionLink("Accident Date", "List", new { sortOrder = ViewBag.DateSortParm })
+                                </div>
+                                <div  class="col-auto">                                    
+                                    @Html.ActionLink("Sort By User", "List", new { sortUser = ViewBag.UserSortParm })
+                                </div>
+                            </div>
+                        
+                        </div>
+                        
+                        
+                    </div>
+
+                    @{
+                        int AccountID_ = 0;
+
+                        if((signInManager.IsSignedIn(User)))                                                
+                        {
+                            if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                            {
+                                foreach (var item in Model.Accounts.Where(c => c.Id == user_id.Id))
+                                {
+                                    AccountID_ = item.AccountID;
+                                }
+                            }
+                        }
+                    } 
+
+                    @{
+                         var Reps = from reps in Model.AccidentReports                                                                      
+                                    join pols in Model.PoliceStations
+                                    on reps.PoliceStationID equals pols.PoliceStationID
+                                    join acc_t in Model.AccidentTypes
+                                    on reps.AccidentTypeID equals acc_t.AccidentTypeID  
+                                    join acc in Model.Accounts
+                                    on reps.AccountID equals acc.AccountID  
+                                    //orderby reps.AccidentDate descending
+                                    //and reps.AccountID equals AccidentID_     //Logged in users see their reports only                     
+                                    select new {
+                                        reps.AccidentReportID,
+                                        reps.AccidentID,
+                                        reps.AccidentDate,
+                                        pols.PoliceStationName,
+                                        acc_t.TypeOfAccident,
+                                        reps.AccountID,
+                                        reps.Confirmed,   
+                                        acc.Name,
+                                        acc.Surname                                                                          
+                                    };
+                    }
+
+                    <div class="card-body scroll">
+
+                        <div class="d-flex flex-row justify-content-center">                        
+                            <div class="row">
+                                @if(Model.AccidentReports.Count() > 0)
+                                {
+                                    @foreach (var item in Model.AccidentReports) //.Where(r => r.Confirmed == true))
+                                    {                                            
+                                        <div class="col-sm-4 bc_hover" style="padding-right:4px;" >                                            
+                                            <div class="row" style="margin: 5px;">                         
+                                                <div class="card" style="background-color; #F5F7FB; border: 1px solid #D3E2F7;" >
+                                                    <div class="card-body" >
+                                                         <div class="row">
+                                                            
+                                                                @if(item.Confirmed)
+                                                                {
+                                                                    <div class="col-sm-12">
+                                                                         <div class="col-sm-10">
+                                                                            <div class="d-flex flex-row justify-content-between"> 
+                                                                                <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Confirmed">
+                                                                                    <i class="align-middle" style="color:green;" data-feather="alert-circle" aria-hidden="true"></i>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <h4 class="card-title"><span class="h4">Accident ID: </span>@item.AccidentID</h4>
+                                                                       
+
+                                                                        @if(@item.AccountID == AccountID_) //Officers can only edit/delete reports that they've created.
+                                                                        {   
+                                                                            <div class="col-sm-12 itemfooter">
+                                                                                @if((await userManager.IsInRoleAsync(user_id,"Officer")))
+                                                                                {
+                                                                                        
+                                                                                    <form asp-action="Delete" method="post" id="frm1">                                                                                 
+                                                                                        <div class="d-flex flex-row justify-content-between">  
+                                                                                            <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+                                                                                        
+                                                                                            <a asp-action="EditReport" class="col-auto btn btn-sm btn-outline-info" asp-route-AccidentReportID="@item.AccidentReportID">
+                                                                                                <i class="align-middle" data-feather="edit"></i>&nbsp;
+                                                                                            </a>
+                                                                                            
+                                                                                            <a class="btn btn-sm btn-outline-danger col-auto" onclick="del()">
+                                                                                                <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                            </a>                                                                                  
+                                                                                        </div>
+
+                                                                                    </form>                                     
+                                                                                        
+                                                                                }
+                                                                            </div>
+                                                                        }
+                                                                            <div class="col-sm-12 itemfooter">
+                                                                                @if((await userManager.IsInRoleAsync(user_id,"Data Manager")))
+                                                                                {
+                                                                                @*<form asp-action="ConfirmReport" method="post">
+                                                                                    <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="col-auto btn btn-sm btn-outline-info" style="padding: 2px;">
+                                                                                        <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                                                    </a>
+
+                                                                                    <input type="hidden" asp-for="@item.AccidentReportID" value="@item.AccidentReportID" name="AccidentReportID" />
+                                                                                                                        
+                                                                                    <button style="padding: 2px;" type="submit" class="col-auto btn btn-sm btn-outline-success">
+                                                                                        <i class="align-middle" data-feather="check-square"></i>&nbsp;
+                                                                                    </button>                                                 
+
+                                                                                </form>      *@                                                                           
+                                                                                }
+                                                                            </div>
+                                                                            <div class="col-sm-12 itemfooter">
+                                                                                @if((await userManager.IsInRoleAsync(user_id,"Admins")))
+                                                                                {
+                                                                                    <div class="row">
+                                                                                        <div class="col-sm-10">
+                                                                                            <div class="d-flex flex-row justify-content-between">                                                                                                                        
+                                                                                                        
+                                                                                                <form asp-action="Delete" method="post" id="frm1">                                                                                 
+                                                                                                    
+                                                                                                    <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+                                                                                                
+                                                                                                    <a class="btn btn-sm btn-outline-danger" onclick="del()">
+                                                                                                        <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                                    </a>                                                                                 
+                                                                                                
+                                                                                                </form>                                      
+                                                                                            
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                
+                                                                                }
+                                                                            </div>
+                                                                            
+                                                                       
+                                                                    </div>
+
+                                                                   
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div class="col-sm-12">
+                                                                        <div class="col-sm-10">
+                                                                            <div class="d-flex flex-row justify-content-between"> 
+                                                                                <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Unonfirmed">
+                                                                                    
+                                                                                    <i class="align-middle" style="color:red;" data-feather="alert-circle" aria-hidden="true"></i>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <h4 class="card-title"><span class="h4">Accident ID: </span>@item.AccidentID</h4>
+                                                                        <h4 class="card-title"><span class="h4">Accident Date: </span>@item.AccidentDate</h4>
+                                                                        
+                                                                        @if(@item.AccountID == AccountID_) //Officers can only edit reports that they've created.
+                                                                        {   
+                                                                            <div class="col-sm-12 itemfooter">
+                                                                                @if((await userManager.IsInRoleAsync(user_id,"Officer")))
+                                                                                {
+                                                                                        
+                                                                                    <form asp-action="Delete" method="post" id="frm1">                                                                                 
+                                                                                        <div class="d-flex flex-row justify-content-between">  
+                                                                                            <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+                                                                                        
+                                                                                            <a asp-action="EditReport" class="col-auto btn btn-sm btn-outline-info" asp-route-AccidentReportID="@item.AccidentReportID">
+                                                                                                <i class="align-middle" data-feather="edit"></i>&nbsp;
+                                                                                            </a>
+                                                                                            
+                                                                                            <a class="btn btn-sm btn-outline-danger col-auto" onclick="del()">
+                                                                                                <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                            </a>                                                                                  
+                                                                                        </div>
+
+                                                                                    </form>                                     
+                                                                                        
+                                                                                }
+                                                                            </div>
+                                                                        }
+                                                                            <div class="col-sm-12 itemfooter">
+                                                                                @if((await userManager.IsInRoleAsync(user_id,"Data Manager")))
+                                                                                {
+                                                                                <form asp-action="ConfirmReport" method="post">
+                                                                                    <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="col-auto btn btn-sm btn-outline-info" style="padding: 2px;">
+                                                                                        <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                                                    </a>
+
+                                                                                    <input type="hidden" asp-for="@item.AccidentReportID" value="@item.AccidentReportID" name="AccidentReportID" />
+                                                                                                                        
+                                                                                    <button style="padding: 2px;" type="submit" class="col-auto btn btn-sm btn-outline-success">
+                                                                                        <i class="align-middle" data-feather="check-square"></i>&nbsp;
+                                                                                    </button>                                                 
+
+                                                                                </form>                                                                                 
+                                                                                }
+                                                                            </div>
+                                                                            <div class="col-sm-12 itemfooter">
+                                                                                @if((await userManager.IsInRoleAsync(user_id,"Admins")))
+                                                                                {
+                                                                                    <div class="row">
+                                                                                        <div class="col-sm-10">
+                                                                                            <div class="d-flex flex-row justify-content-between">                                                                                                                        
+                                                                                                        
+                                                                                                <form asp-action="Delete" method="post" id="frm1">                                                                                 
+                                                                                                    
+                                                                                                    <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+                                                                                                
+                                                                                                    <a class="btn btn-sm btn-outline-danger" onclick="del()">
+                                                                                                        <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                                    </a>                                                                                 
+                                                                                                
+                                                                                                </form>                                      
+                                                                                            
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                
+                                                                                }
+                                                                            </div>
+                                                                            
+
+
+                                                                    </div>
+                                                                }
+                                                                
+                                                               
+                                                                   
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+
+                                        <div class="text-center" style="float:none; margin: 0 auto;">
+                                            <div page-model="@Model.PaginationHeader" page-action="List" page-classes-enabled="true"
+                                                page-class="btn" page-class-normal="btn-secondary"
+                                                page-class-selected="btn-primary" page-url-collision="@Model.AccidentTypeID" class="btn-group text-center">
+                                            </div>
+                                        </div>                                                               
+                                    }  
+                                }         
+                                else
+                                {
+                                    <div class="text-center">
+                                        <h4 class="text-info">No Confirmed Accident Reports</h4>
+                                    </div>
+                                }
+                                
+                            </div>              
+                        
+                        </div>  
+                    
+                    </div>
+                            
+                </div>           
+                            
+            </div>
+        </div>
+
+    </div>
+    
+
+    <div class="row" id="add_report">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Add New Accident Report</h5>
+                    <hr />
+                </div>
+                <div class="card-body">
+                     
+                    @{
+                        if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                        {
+                            var v_id = Model.Accounts.Where(c => c.Id == userId).ToList();
+                           
+                            var s_id = "";
+                            foreach(var i in v_id)
+                            {
+                                s_id = i.Id;
+                            } //Check if a user has created an acount.
+
+                            if ((!String.IsNullOrEmpty(s_id) && await userManager.IsInRoleAsync(user_id,"Officer"))) //If there is an account for the logged in user.
+                            {                
+                                @await Component.InvokeAsync("AddReport")                                                         
+                            }
+                            else
+                            if((await userManager.IsInRoleAsync(user_id,"Data Manager")) )
+                            {
+                              @* <div id="data_managerInputs"> 
+                                    @await Component.InvokeAsync("AddReport")  
+                               </div>*@
+
+                                <div class="alert alert-warning">
+                                    <p><h4>(Data Managers) cannot add reports</h4></p>
+                                    <h5>Please use the <span class="text-info">Action Buttons</span> to confirm or edit reported accidents.</h5>
+                                </div>   
+                            }
+                            else
+                            {                            
+                                if(await userManager.IsInRoleAsync(user_id,"Admins"))
+                                {
+                                    <div class="alert alert-warning">
+                                        <h5>Admin Users cannot log accident report</h5>
+                                    </div>                                    
+                                }                            
+                                else
+                                if(String.IsNullOrEmpty(s_id) && await userManager.IsInRoleAsync(user_id,"Officer"))
+                                {   
+                                    <div class="alert alert-warning">
+                                        <h5>Please go to your <span><a href="~/Account/Profile">profile</a></span> to complete your account before logging an accident report</h5>
+                                    </div>
+                                }                                  
+                            }
+                            
+                        }
+                    }
+                       
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    document.getElementById("AccType").onchange = function() {
+        if (this.selectedIndex!==0) {
+            window.location.href = "List?accidentType="+ this.value + "&Page=1?";
+        }        
+    };
+</script>
+
+
+

@@ -9,10 +9,11 @@
     
     var userId = userManager.GetUserId(User);
     User user_id = await userManager.FindByIdAsync(userId);
+    
 }
 
 <style>
-    #newreport{
+    /* #newreport{
         text-decoration: none;
     }
 
@@ -30,15 +31,48 @@
       .itemfooter{
         visibility: hidden;
         opacity: 0.0;
-        transition: visibility .3; /*Animation*/
+        transition: visibility .3; 
         transition: opacity .3;    
     }
 
     .bc_hover:hover .itemfooter{
-        visibility: visible; /*SHOW ITEM*/
+        visibility: visible; 
         opacity: 1;           
 
+    } */
+
+    #newreport{
+        text-decoration: none;
+        transition: 0.1s ease;  
     }
+
+    #newreport:hover{
+        margin-top: 4px;
+        transition: 0.3s ease;        
+    }
+
+    #reportDetails{
+        transition: transform .2s;
+    }
+
+    #reportDetails:hover{
+        margin: 2px;
+        
+        border: 1px solid red;
+    }
+   
+   .scroll {
+        height:400px;
+        overflow-y: scroll;
+        background-color: #F5F7FB;
+    }
+    
+   .swal-text{
+        max-height: 6em; 
+        overflow-y: scroll;
+        width: 100%;
+    };
+    
 
 </style>
 
@@ -46,7 +80,7 @@
  
     <div class="d-flex flex-row justify-content-between">  
         <div class="col-auto">                                                
-            <h1 class="h3 mb-3" style="line-height:40px;">Accident Reporting</h1>              
+            <h1 class="h3 mb-3" style="line-height:40px;">Accident Reporting</h1>                       
         </div> 
         <div class="col-auto">
             <div class="d-flex">                                   
@@ -63,6 +97,17 @@
           
     </div>
     
+    <div class="d-flex flex-row justify-content-between"> 
+        @if(!string.IsNullOrEmpty(ViewBag.Result))
+        {
+            <div class="alert alert-success" role="alert">
+                <p>Success Banner: @ViewBag.Result</p>
+            </div>
+           
+        }
+         <!-- Success Banner: @ViewBag.Result -->
+    </div>
+
     <div class="row" id="LatestReports">
         <div class="d-flex flex-row justify-content-between" >
             <div class="col-12">
@@ -70,8 +115,50 @@
                 <div class="card" >                    
                 
                     <div class="card-header" >
-                        <h2 class="card-title">Latest Accidents</h2>
+                        <div class="row">
+                            <div class="col-sm-3" >
+                                <h2 class="card-title col-form-label">Latest Accidents</h2>
+                            </div>
+                            <div class="col-sm-9" style="margin:0 auto; float: none;">
+                                
+                                <div class="row">
+                                    <div class="col-sm-2" style="margin:0 auto; float: right;">
+                                        <h2 class="text-right col-form-label card-title">
+                                            Filter / Sort: 
+                                            <!-- @using (Html.BeginForm("AddReport","AccidentReport", System.Web.Mvc.FormMethod.Get))
+                                            {
+                                                <p>
+                                                    Find By Location: @Html.TextBox("SearchString")  
+                                                    <input type="submit" value="Search" />
+                                                </p>
+
+                                            } -->
+                                        </h2>
+                                    </div>
+                                    <div class="col-sm-3" >
+                                        <select class="form-select mb-3" id="sortOrder">                                                         
+                                            <option selected>Sort By Date</option> 
+                                            <option value="Newest">@Html.ActionLink("Newest", "AddReport", new { sortOrder = "Newest" })</option>
+                                            <option value="Oldest">@Html.ActionLink("Oldest", "AddReport", new { sortOrder = "Oldest" })</option>                                    
+                                        </select>                           
+                                    </div>
+                                    <div class="col-sm-3" >                                                                   
+                                        <select class="form-select mb-3" id="sortUser">                                                         
+                                            <option selected>Filter By User</option> 
+                                            <option value="LoggedIn">@Html.ActionLink("Logged In", "AddReport", new { sortUser = "LoggedIn" })</option>
+                                            <option value="AllUsers">@Html.ActionLink("All Users", "AddReport", new { sortUser = "AllUsers" })</option>                                            
+                                        </select>
+                                    </div>                                    
+                                    <div class="col-sm-4" >
+                                        @await Component.InvokeAsync("AccidentType")                                      
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>                           
+                        
                         <hr />
+                        
                     </div>
 
                     @{
@@ -97,6 +184,7 @@
                                     on reps.AccidentTypeID equals acc_t.AccidentTypeID  
                                     join acc in Model.Accounts
                                     on reps.AccountID equals acc.AccountID  
+                                    //orderby reps.AccidentDate descending
                                     //and reps.AccountID equals AccidentID_     //Logged in users see their reports only                     
                                     select new {
                                         reps.AccidentReportID,
@@ -105,7 +193,9 @@
                                         pols.PoliceStationName,
                                         acc_t.TypeOfAccident,
                                         reps.AccountID,
-                                        reps.Confirmed                                                                           
+                                        reps.Confirmed,   
+                                        acc.Name,
+                                        acc.Surname                                                                          
                                     };
 
                     }
@@ -114,20 +204,34 @@
 
                         <div class="d-flex flex-row justify-content-center">                        
                             <div class="row">
-                                @if(Reps.Where(r => r.Confirmed).Count() > 0)
+                                @if(Reps.Count() > 0)
                                 {
                                     @foreach (var item in Reps) //.Where(r => r.Confirmed == true))
-                                    {                                            
-                                        <div class="col-sm-4 bc_hover" style="padding-right:4px;" >                                            
-                                            <div class="row" style="margin: 5px;">                         
-                                                <div class="card" style="background-color; #F5F7FB; border: 1px solid #D3E2F7;" >
-                                                    <div class="card-body" >
-                                                         <div class="row">
-                                                            
+                                    {                    
+
+                                        string sAccDet = "<div class=\"text-left\"><h4>" + item.AccidentID.ToString() + " | Reported By: " + item.Name + "" + item.Surname + "</h4>"  
+                                              + "<hr />"                                                                                       
+                                            + "<h5 class=\"text-left\">Police Station: " + item.PoliceStationName + "</h5>"
+                                            + "<h5 class=\"text-left\">Type of Accident: " + item.TypeOfAccident + "</h5>"
+                                            + "<h5 class=\"text-left\">Accident Time " + item.AccidentDate.ToString("HH:mm:ss") + "</h5>"
+                                            + "<h5 class=\"text-left\">Accident Date " + item.AccidentDate.ToShortDateString() + "</h5>"
+                                            + "<h5 class=\"text-left\">Confirmd " + item.Confirmed.ToString() + "</h5>"
+                                            + "<hr /></div>";
+                                        
+                                                                                         
+                                          
+                                        <div class="col-sm-4" style="padding-right:4px;" >                                            
+                                            <div class="row" style="margin: 5px;"> 
+                                              
+                                                <a style="text-decoration: none;" id="mylink" onclick="getReportDetail(this);" value="@sAccDet">   @*asp-route-AccidentReportID="@item.AccidentReportID">*@
+                                                    <div class="card" style="background-color; #F5F7FB; border: 1px solid #D3E2F7;" id="reportDetails" >
+                                                        <div class="card-body" >
+                                                            <div class="row">
+                                                                
                                                                 @if(item.Confirmed)
                                                                 {
                                                                     <div class="col-sm-12">
-                                                                         <div class="col-sm-10">
+                                                                        <div class="col-sm-10">
                                                                             <div class="d-flex flex-row justify-content-between"> 
                                                                                 <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Confirmed">
                                                                                     <i class="align-middle" style="color:green;" data-feather="alert-circle" aria-hidden="true"></i>
@@ -141,29 +245,38 @@
 
                                                                         @if(@item.AccountID == AccountID_) //Officers can only edit/delete reports that they've created.
                                                                         {   
-                                                                            <div class="col-sm-12 itemfooter">
+                                                                            <div class="col-sm-12">
                                                                                 @if((await userManager.IsInRoleAsync(user_id,"Officer")))
                                                                                 {
-                                                                                        
-                                                                                    <form asp-action="Delete" method="post" id="frm1">                                                                                 
-                                                                                        <div class="d-flex flex-row justify-content-between">  
-                                                                                            <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
-                                                                                        
-                                                                                            <a asp-action="EditReport" class="col-auto btn btn-sm btn-outline-info" asp-route-AccidentReportID="@item.AccidentReportID">
-                                                                                                <i class="align-middle" data-feather="edit"></i>&nbsp;
-                                                                                            </a>
-                                                                                            
-                                                                                            <a class="btn btn-sm btn-outline-danger col-auto" onclick="del()">
-                                                                                                <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
-                                                                                            </a>                                                                                  
-                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                        <div class="col-sm-12">
+                                                                                            <form asp-action="Delete" method="post" id="frm1">                                                                                 
+                                                                                                <div class="d-flex flex-row justify-content-between">  
 
-                                                                                    </form>                                     
+                                                                                                    <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+                                                                                                
+                                                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
+                                                                                                        <a asp-action="EditReport" class="col-auto btn btn-sm btn-outline-info" asp-route-AccidentReportID="@item.AccidentReportID">
+                                                                                                            <i class="align-middle" data-feather="edit"></i>&nbsp;
+                                                                                                        </a>
+                                                                                                    </span>
+                                                                                                    
+                                                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Report">
+                                                                                                        <a class="btn btn-sm btn-outline-danger col-auto" onclick="del()">
+                                                                                                            <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                                        </a>  
+                                                                                                    </span>
+
+                                                                                                </div>
+
+                                                                                            </form>   
+                                                                                        </div>
+                                                                                    </div>                                                                                                            
                                                                                         
                                                                                 }
                                                                             </div>
                                                                         }
-                                                                            <div class="col-sm-12 itemfooter">
+                                                                            <div class="col-sm-12">
                                                                                 @if((await userManager.IsInRoleAsync(user_id,"Data Manager")))
                                                                                 {
                                                                                 @*<form asp-action="ConfirmReport" method="post">
@@ -177,25 +290,55 @@
                                                                                         <i class="align-middle" data-feather="check-square"></i>&nbsp;
                                                                                     </button>                                                 
 
-                                                                                </form>      *@                                                                           
+                                                                                </form>      *@   
+
+                                                                                    <div class="row">
+                                                                                        <div class="col-sm-12">
+                                                                                            <form asp-action="ConfirmReport" method="post" id="frm1">
+                                                                                                <div class="d-flex flex-row justify-content-between"> 
+                                                                                                    <div class="col-auto">
+                                                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
+                                                                                                            <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="btn btn-sm btn-outline-info" >
+                                                                                                                <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                                                                            </a>
+                                                                                                        </span>
+                                                                                                    </div>
+                                                                                                    
+                                                                                                    <input type="hidden" asp-for="@item.AccidentReportID" value="@item.AccidentReportID" name="AccidentReportID" />
+                                                                                                        
+                                                                                                    <div class="col-auto">
+                                                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Report">
+                                                                                                            <a class="btn btn-sm btn-outline-danger" onclick="del()">
+                                                                                                                <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                                            </a>
+                                                                                                        </span> 
+                                                                                                    </div>
+
+                                                                                                </div>
+
+                                                                                            </form>                                                                                 
+                                                                                        </div>
+                                                                                    </div>                                                                        
                                                                                 }
                                                                             </div>
-                                                                            <div class="col-sm-12 itemfooter">
+                                                                            <div class="col-sm-12">
                                                                                 @if((await userManager.IsInRoleAsync(user_id,"Admins")))
                                                                                 {
                                                                                     <div class="row">
                                                                                         <div class="col-sm-10">
                                                                                             <div class="d-flex flex-row justify-content-between">                                                                                                                        
                                                                                                         
-                                                                                                <form asp-action="Delete" method="post" id="frm1">                                                                                 
+                                                                                                @*<form asp-action="Delete" method="post" id="frm1">                                                                                 
                                                                                                     
                                                                                                     <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+
+                                                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Report">
+                                                                                                        <a class="btn btn-sm btn-outline-danger" onclick="del()">
+                                                                                                            <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                                        </a> 
+                                                                                                    </span>                                                                                
                                                                                                 
-                                                                                                    <a class="btn btn-sm btn-outline-danger" onclick="del()">
-                                                                                                        <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
-                                                                                                    </a>                                                                                 
-                                                                                                
-                                                                                                </form>                                      
+                                                                                                </form>  *@                                    
                                                                                             
                                                                                             </div>
                                                                                         </div>
@@ -204,84 +347,116 @@
                                                                                 }
                                                                             </div>
                                                                             
-                                                                       
+                                                                    
                                                                     </div>
 
-                                                                   
+                                                                
                                                                 }
                                                                 else
                                                                 {
+                                                                    
                                                                     <div class="col-sm-12">
-                                                                        <div class="col-sm-10">
-                                                                            <div class="d-flex flex-row justify-content-between"> 
-                                                                                <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Unonfirmed">
-                                                                                    
-                                                                                    <i class="align-middle" style="color:red;" data-feather="alert-circle" aria-hidden="true"></i>
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <h4 class="card-title"><span class="h4">Accident ID: </span>@item.AccidentID</h4>
-                                                                        <h5><span class="fw-bold">Date of Accident: </span>@item.AccidentDate.ToShortDateString()</h5>
-                                                                        <h5><span class="fw-bold">Police Station:</span> @item.PoliceStationName</h5>
-                                                                        <h5><span class="fw-bold">Type of Accident: </span>@item.TypeOfAccident</h5>
                                                                         
-                                                                        @if(@item.AccountID == AccountID_) //Officers can only edit reports that they've created.
-                                                                        {   
-                                                                            <div class="col-sm-12 itemfooter">
-                                                                                @if((await userManager.IsInRoleAsync(user_id,"Officer")))
-                                                                                {
-                                                                                        
-                                                                                    <form asp-action="Delete" method="post" id="frm1">                                                                                 
-                                                                                        <div class="d-flex flex-row justify-content-between">  
-                                                                                            <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
-                                                                                        
-                                                                                            <a asp-action="EditReport" class="col-auto btn btn-sm btn-outline-info" asp-route-AccidentReportID="@item.AccidentReportID">
-                                                                                                <i class="align-middle" data-feather="edit"></i>&nbsp;
-                                                                                            </a>
                                                                                             
-                                                                                            <a class="btn btn-sm btn-outline-danger col-auto" onclick="del()">
-                                                                                                <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
-                                                                                            </a>                                                                                  
-                                                                                        </div>
+                                                                                <div class="col-sm-10">
+                                                                                    <div class="d-flex flex-row justify-content-between"> 
+                                                                                        <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Unonfirmed">                                                                                    
+                                                                                            <i class="align-middle" style="color:red;" data-feather="alert-circle" aria-hidden="true"></i>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <h4 class="card-title"><span class="h4">Accident ID: </span>@item.AccidentID</h4>
+                                                                                <h5><span class="fw-bold">Date of Accident: </span>@item.AccidentDate.ToShortDateString()</h5>
+                                                                                <h5><span class="fw-bold">Police Station:</span> @item.PoliceStationName</h5>
+                                                                                <h5><span class="fw-bold">Type of Accident: </span>@item.TypeOfAccident</h5>
+                                                                            
+                                                                        
+                                                                            @if(@item.AccountID == AccountID_) //Officers can only edit reports that they've created.
+                                                                            {   
+                                                                                <div class="col-sm-12">
+                                                                                    @if((await userManager.IsInRoleAsync(user_id,"Officer")))
+                                                                                    {  
+                                                                                        <div class="row">
+                                                                                            <div class="col-sm-12">
+                                                                                                <form asp-action="Delete" method="post" id="frm1">                                                                                 
+                                                                                                    <div class="d-flex flex-row justify-content-between">  
+                                                                                                        <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+                                                                                                        <div class="col-auto">
+                                                                                                            <a asp-action="EditReport" class="btn btn-sm btn-outline-info" asp-route-AccidentReportID="@item.AccidentReportID">
+                                                                                                                <i class="align-middle" data-feather="edit"></i>&nbsp;
+                                                                                                            </a>
+                                                                                                        </div>
+                                                                                                        <div class="col-auto">
+                                                                                                            <a class="btn btn-sm btn-outline-danger" onclick="del()">
+                                                                                                                <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                                            </a>   
+                                                                                                        </div>                                                                               
+                                                                                                    </div>
 
-                                                                                    </form>                                     
-                                                                                        
-                                                                                }
-                                                                            </div>
-                                                                        }
-                                                                            <div class="col-sm-12 itemfooter">
+                                                                                                </form>  
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    
+                                                                                    }
+                                                                                </div>
+                                                                            }
+                                                                            <div class="col-sm-12">
                                                                                 @if((await userManager.IsInRoleAsync(user_id,"Data Manager")))
                                                                                 {
-                                                                                <form asp-action="ConfirmReport" method="post">
-                                                                                    <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="col-auto btn btn-sm btn-outline-info" style="padding: 2px;">
-                                                                                        <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
-                                                                                    </a>
+                                                                                    <div class="row">
+                                                                                        <div class="col-sm-12">
+                                                                                            <form asp-action="ConfirmReport" method="post" id="frm1">
+                                                                                                <div class="d-flex flex-row justify-content-between"> 
+                                                                                                    <div class="col-auto">
+                                                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
+                                                                                                            <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="btn btn-sm btn-outline-info" >
+                                                                                                                <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                                                                            </a>
+                                                                                                        </span>
+                                                                                                    </div>
+                                                                                                    
+                                                                                                    <input type="hidden" asp-for="@item.AccidentReportID" value="@item.AccidentReportID" name="AccidentReportID" />
+                                                                                                        
+                                                                                                    <div class="col-auto">
+                                                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Report">
+                                                                                                            <a class="btn btn-sm btn-outline-danger" onclick="del()">
+                                                                                                                <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                                            </a>
+                                                                                                        </span> 
+                                                                                                    </div>
 
-                                                                                    <input type="hidden" asp-for="@item.AccidentReportID" value="@item.AccidentReportID" name="AccidentReportID" />
-                                                                                                                        
-                                                                                    <button style="padding: 2px;" type="submit" class="col-auto btn btn-sm btn-outline-success">
-                                                                                        <i class="align-middle" data-feather="check-square"></i>&nbsp;
-                                                                                    </button>                                                 
+                                                                                                    <div class="col-auto">
+                                                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Confirm Report">                                                                                                                        
+                                                                                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                                                                                <i class="align-middle" data-feather="check-square"></i>&nbsp;
+                                                                                                            </button>                                                 
+                                                                                                        </span>
+                                                                                                    </div>
+                                                                                                </div>
 
-                                                                                </form>                                                                                 
+                                                                                            </form>                                                                                 
+                                                                                        </div>
+                                                                                    </div>
                                                                                 }
                                                                             </div>
-                                                                            <div class="col-sm-12 itemfooter">
+                                                                            <div class="col-sm-12">
                                                                                 @if((await userManager.IsInRoleAsync(user_id,"Admins")))
                                                                                 {
                                                                                     <div class="row">
                                                                                         <div class="col-sm-10">
                                                                                             <div class="d-flex flex-row justify-content-between">                                                                                                                        
                                                                                                         
-                                                                                                <form asp-action="Delete" method="post" id="frm1">                                                                                 
+                                                                                                @* <form asp-action="Delete" method="post" id="frm1">                                                                                 
                                                                                                     
                                                                                                     <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
+
+                                                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Report">
+                                                                                                        <a class="btn btn-sm btn-outline-danger" onclick="del()">
+                                                                                                            <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                                                                        </a>
+                                                                                                    </span>                                                                                 
                                                                                                 
-                                                                                                    <a class="btn btn-sm btn-outline-danger" onclick="del()">
-                                                                                                        <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
-                                                                                                    </a>                                                                                 
-                                                                                                
-                                                                                                </form>                                      
+                                                                                                </form> *@                                     
                                                                                             
                                                                                             </div>
                                                                                         </div>
@@ -293,21 +468,26 @@
 
 
                                                                     </div>
-                                                                }
+                                                            
+                                                                }                                                                   
                                                                 
-                                                               
-                                                                   
+                                                                    
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </div>
+                                                    </div> 
+    
+
+                                                </a>
+                                                
                                             </div>
-                                        </div>                                                                    
+                                        </div>     
+                                                                                                                                                           
                                     }  
                                 }         
                                 else
                                 {
                                     <div class="text-center">
-                                        <h4 class="text-info">No Confirmed Accident Reports</h4>
+                                        <h4 class="text-info">No Accident Reports Logged</h4>
                                     </div>
                                 }
                                 
@@ -315,6 +495,14 @@
                         
                         </div>  
                     
+                    </div>
+                    <div class="row">
+                        <div class="text-center" style="float:none; margin: 0 auto;">
+                            <div page-model="@Model.PaginationHeader" page-action="AccidentReport" page-classes-enabled="true"
+                                page-class="btn" page-class-normal="btn-secondary"
+                                page-class-selected="btn-primary" page-url-accidentTypeID="@Model.AccidentTypeID" class="btn-group text-center">
+                            </div>
+                        </div>     
                     </div>
                             
                 </div>           
@@ -378,8 +566,7 @@
         </div>
     </div>
     *@
-
-                    
+           
 
     <div class="row" id="add_report">
         <div class="col-12">
@@ -403,14 +590,14 @@
 
                             if ((!String.IsNullOrEmpty(s_id) && await userManager.IsInRoleAsync(user_id,"Officer"))) //If there is an account for the logged in user.
                             {                
-                                @await Component.InvokeAsync("AddReport")                                                         
+                                @await Component.InvokeAsync("AddReport")
                             }
                             else
                             if((await userManager.IsInRoleAsync(user_id,"Data Manager")) )
                             {
-                              @* <div id="data_managerInputs"> 
-                                    @await Component.InvokeAsync("AddReport")  
-                               </div>*@
+                                @*<div id="data_managerInputs"> 
+                                        @await Component.InvokeAsync("AddReport")  
+                                </div>*@
 
                                 <div class="alert alert-warning">
                                     <p><h4>(Data Managers) cannot add reports</h4></p>
@@ -441,8 +628,46 @@
             </div>
         </div>
     </div>
-
+   
 </div>
+
+<script>
+
+    var firstTime = localStorage.getItem("first_time");
+
+    if(!firstTime) {
+        window.onload = function() {
+            document.getElementById('add_report').style.display = 'none';     
+        };
+    }else{
+        addreport();
+    };
+        
+        localStorage.setItem("first_time","1");
+    
+
+    document.getElementById("AccType").onchange = function() {
+        if (this.selectedIndex!==0) {
+            window.location.href = "AddReport?accidentType="+ this.value + "&Page=1?";
+        }        
+    };
+
+    document.getElementById("sortUser").onchange = function() {
+        if (this.selectedIndex!==0) {
+            window.location.href = "AddReport?sortUser="+ this.value;
+        }        
+    };
+
+     document.getElementById("sortOrder").onchange = function() {
+        if (this.selectedIndex!==0) {
+            window.location.href = "AddReport?sortOrder="+ this.value;
+        }        
+    };
+
+</script>
+
+
+
 
 
 

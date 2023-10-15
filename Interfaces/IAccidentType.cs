@@ -1,6 +1,6 @@
 using rar.Models.Repositories;
 
-namespace RAR.Interfaces
+namespace rar.Interfaces
 {
     public interface IAccidentType
     {

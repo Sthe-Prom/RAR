@@ -9,9 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using rar.Infrastructure;
 using rar.Interfaces;
 using rar.Models;
-//using rar.Models.EF;
+using rar.Models.EF;
 using rar.Models.Repositories;
-using RAR.Interfaces;
+//using RAR.Interfaces;
 using RAR.Models.EF;
 
 namespace rar.Extensions
@@ -23,7 +23,7 @@ namespace rar.Extensions
         {
             services.AddDbContext<AppIdentityDbContext>(opt =>
             {
-                //opt.UseSqlite(config.GetConnectionString("DevDB"));
+                //opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
                 //opt.UseSqlServer(config.GetConnectionString("DevDB"));
                 opt.UseSqlServer(config.GetConnectionString("ProdDB"));           
 
@@ -60,13 +60,18 @@ namespace rar.Extensions
 
             //MVC - Route Config
             services.AddMvc(options => options.EnableEndpointRouting = false);
+            
 
             //Application Service Registration
             services.AddTransient<IAccount, EFAccount>();
             services.AddTransient<IAddress, EFAddress>();
             services.AddTransient<IPoliceStation, EFPoliceStation>();
             services.AddTransient<IAccidentType, EFAccidentType>();
-            services.AddTransient<IAccidentReport, EFAccidentReport>();
+            services.AddTransient<ICollision, EFCollision>();            
+            services.AddTransient<IAccidentReport, EFAccidentReport>();  
+            services.AddTransient<IRoadFactor, EFRoadFactor>();
+            services.AddTransient<IVehicle, EFVehicle>();
+            services.AddTransient<IDriverInformation, EFDriverInformation>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
       
             return services;

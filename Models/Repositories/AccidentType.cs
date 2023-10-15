@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using rar.Models.Repositories;
 
 namespace rar.Models.Repositories
 {

@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.SqlClient;
 using System.Data.Odbc;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
-using RAR.Interfaces;
-
+using rar.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 
 namespace rar.Controllers
 {
@@ -20,14 +19,34 @@ namespace rar.Controllers
         private IAccidentReport context;
         private IPoliceStation pol_context;
         private IAccidentType acc_t_context;
+        private ICollision coll_context;
         private IAccount acc_context;
+        
         private IConfiguration Configuration;
         public BaseViewModel BaseViewModel { get; set; }
         private SignInManager<User> signInManager;
         private UserManager<User> userManager;
 
+        //Accident Factor
+        
+
+        //Road Factor
+        private IRoadFactor roadFac_context;
+
+        //Vehicle Factor
+        private IVehicle veh_context;
+
+        //Driver Infor Factor
+        private IDriverInformation drvFac_context;
+
+        private readonly IWebHostEnvironment HostEnvironment;
+
+        private int PageSize = 6;
+
         public AccidentReportController(IAccidentReport ctx, IAccount i_Acc, IConfiguration config,
-             SignInManager<User> s_man, UserManager<User> u_man, IPoliceStation pol_ctx, IAccidentType acc_t_ctx )
+            SignInManager<User> s_man, UserManager<User> u_man, IPoliceStation pol_ctx, IAccidentType acc_t_ctx,
+            ICollision coll_ctx, IRoadFactor roadFac_ctx, IVehicle veh_ctx, IDriverInformation drvFac_ctx,
+            IWebHostEnvironment he)
         {
             context = ctx;
             acc_context = i_Acc;
@@ -36,41 +55,27 @@ namespace rar.Controllers
             userManager = u_man;
             pol_context = pol_ctx;
             acc_t_context = acc_t_ctx;
-        }
+            coll_context = coll_ctx;
+            HostEnvironment = he;
+                        
+            //Road Factors
+            roadFac_context = roadFac_ctx;
 
+            //Vehicle Factors
+            veh_context = veh_ctx;
+
+            //DriverInfor Factors
+            drvFac_context = drvFac_ctx;
+        }
               
         public ViewResult UnconfirmedReports() =>
             View(context.AccidentReports.Where(ar => !ar.Confirmed));
 
         //Confirm Reports
         [HttpPost] 
-        public IActionResult ConfirmReport(int AccidentReportID)
+        public Microsoft.AspNetCore.Mvc.IActionResult ConfirmReport(int AccidentReportID)
         {
-            // var AccidentReport = new AccidentReport
-            // {
-            //     AccidentReportID = vm.AccidentReport.AccidentReportID
-            // };
-
-            //  var AccidentReport = new AccidentReport
-            //     {                   
-            //         AccidentID = RAR,
-            //         AccidentTime = vm.AccidentReport.AccidentTime,
-            //         AccidentLocation = vm.AccidentReport.AccidentLocation,           
-            //         AccidentDate = vm.AccidentReport.AccidentDate,
-            //         AccidentDescription = vm.AccidentReport.AccidentDescription,
-            //         NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
-            //         NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
-            //         AccountID = AccountID_,
-            //         PoliceStationID = vm.AccidentReport.PoliceStationID,
-            //         CollisionID = vm.AccidentReport.CollisionID,
-            //         WeatherTypeID = vm.AccidentReport.WeatherTypeID,
-            //         AreaCodeID = vm.AccidentReport.AreaCodeID,
-            //         AccidentTypeID = vm.AccidentReport.AccidentTypeID
-            //     };
-
-           // if(AccidentReportID == 0) 
-            //   AccidentReportID = vm.AccidentReport.AccidentReportID; //Convert.ToInt32(Request.Query["AccidentReportID"]);
-
+            
             var AR = context.AccidentReports
                 .FirstOrDefault(r => r.AccidentReportID == AccidentReportID);//Convert.ToInt32(Request.Query["AccidentReportID"]));
                 
@@ -105,11 +110,11 @@ namespace rar.Controllers
             vm.Users = getUsers();
             vm.Accounts = acc_context.Accounts;
             vm.PoliceStations_Select = getPoliceStations();
-            vm.AreaCodes = getAreaCodes();
+            vm.Provinces_Select = getProvinces();
             vm.WeatherTypes = getWeatherTypes();
             vm.Collisions = getCollisions();
             vm.AccidentTypes_Select = getAccidentTypes();
-            vm. AccidentReports = context.AccidentReports;
+            vm.AccidentReports = context.AccidentReports;
           
             AccidentReport AccidentReport = context.AccidentReports
                 .FirstOrDefault(r => r.AccidentReportID == AccidentReportID);
@@ -119,7 +124,7 @@ namespace rar.Controllers
             vm.AccidentReport.AccidentDescription = AccidentReport.AccidentDescription;           
             vm.AccidentReport.NrPeopleInjured = AccidentReport.NrPeopleInjured;
             vm.AccidentReport.NrPeopleKilled = AccidentReport.NrPeopleKilled;
-            vm.AccidentReport.AreaCodeID = AccidentReport.AreaCodeID;
+            vm.AccidentReport.HitAndRun = AccidentReport.HitAndRun;
             vm.AccidentReport.WeatherTypeID = AccidentReport.WeatherTypeID;
             vm.AccidentReport.AccidentTypeID = AccidentReport.AccidentTypeID;
             vm.AccidentReport.CollisionID = AccidentReport.CollisionID;
@@ -134,38 +139,57 @@ namespace rar.Controllers
         }  
 
         [HttpGet]
-        public ViewResult AddReport()
-        {
-            AccidentReportViewModel vm = new AccidentReportViewModel()
+        public ViewResult AddReport(int accidentType, string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
+        {        
+            //Filter - Sort
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.DateSortParm = sortOrder == "Oldest" ? "Newest" : "Oldest";
+            ViewBag.UserSortParm = sortUser == "AllUsers" ? "LoggedIn" : "AllUsers";
+            
+            AccidentReportViewModel vm = new AccidentReportViewModel();
+                      
+            if (searchString != null)
             {
-                Users = getUsers(),
-                Accounts = acc_context.Accounts,
-                AccidentReports = context.AccidentReports,
-                PoliceStations = pol_context.PoliceStations,
-                AccidentTypes = acc_t_context.AccidentTypes,
-                AccidentReport = new AccidentReport(),
-                PoliceStations_Select = getPoliceStations(),
-                AreaCodes = getAreaCodes(),
-                WeatherTypes = getWeatherTypes(),
-                Collisions = getCollisions(),
-                AccidentTypes_Select = getAccidentTypes()
-                
-            };
+                Page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
 
-            return View(vm);
-        }
+            ViewBag.CurrentFilter = searchString;
 
-        [HttpPost]
-        public IActionResult AddReport(AccidentReportViewModel vm)
-        {
+             //Search
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                vm.AccidentReports = context.AccidentReports.Where(r => r.AccidentLocation.Contains(searchString)
+                                    || r.AccidentDescription.Contains(searchString));
+            }
+    
+            //vm.AccidentReports = context.AccidentReports;
+            vm.AccidentReports = context.AccidentReports
+                .Where(c => accidentType == 0 || c.AccidentTypeID == accidentType)
+                .OrderBy(c => c.AccidentReportID)
+                .Skip((Page - 1) * PageSize)
+                .Take(PageSize);
+
+            switch (sortOrder)
+                {                   
+                    case "Oldest":
+                        vm.AccidentReports = vm.AccidentReports.OrderBy(r => r.AccidentDate);
+                        break;
+                    case "Newest":
+                        vm.AccidentReports = vm.AccidentReports.OrderByDescending(r => r.AccidentDate);
+                        break;
+                    default:
+                        vm.AccidentReports = vm.AccidentReports.OrderBy(r => r.AccidentDate);
+                        break;
+                }
+
             int AccountID_ = 0;
-            string RAR = "";
 
             if (signInManager.IsSignedIn(User))
             {
-                if(vm.AccidentReport.AccidentDate.ToShortDateString().Length > 0 && vm.AccidentReport.AccidentLocation.Length > 0)
-                    RAR = "RAR-" + DateTime.Now.ToShortDateString().Substring(0, 4) + "-" + vm.AccidentReport.AccidentLocation.Substring(0, 3).ToUpper();
-
                 var userId = userManager.GetUserId(User);
 
                 if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
@@ -176,38 +200,255 @@ namespace rar.Controllers
                     }
                 }
             }
+
+            switch (sortUser)
+                {                   
+                    case "AllUsers":
+                        vm.AccidentReports = vm.AccidentReports;
+                        break;
+                    case "LoggedIn":
+                        vm.AccidentReports = vm.AccidentReports.Where(r => r.AccountID == AccountID_);
+                        break;
+                    default:
+                        vm.AccidentReports = vm.AccidentReports;
+                        break;
+                }
+                
+
+            vm.PaginationHeader = new PaginationHeader
+                {
+                    CurrentPage = Page,
+                    ItemPerPage = PageSize,
+                    TotalItems = accidentType == 0 ?
+                        context.AccidentReports.Count() :
+                        context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
+
+                };
+
+                //AccidentReport(c => c.CollisionID = collision)
+            vm.AccidentTypeID = accidentType;
+
+                //Get values
+            vm.Users = getUsers();
+            vm.Accounts = acc_context.Accounts;
+                //AccidentReports = context.AccidentReports,
+            vm.PoliceStations = pol_context.PoliceStations;
+            vm.AccidentTypes = acc_t_context.AccidentTypes;
+            vm.CollisionTypes = coll_context.CollisionTypes;
+            vm.AccidentReport = new AccidentReport();
+            vm.PoliceStations_Select = getPoliceStations();
+            vm.Provinces_Select = getProvinces();
+            vm.WeatherTypes = getWeatherTypes();
+            vm.Collisions = getCollisions();
+            vm.AccidentTypes_Select = getAccidentTypes();
+                            
+                //Road Factor Tables
+            vm.RoadFactor = new RoadFactor();
+            vm.RoadType_Select = getRoadTypes();
+            vm.RoadSurface_Select = getRoadSurfaceNames();
+            vm.RoadSurfaceQuality_Select = getRoadSurfaceQuality();
+            vm.SurfaceCondition_Select = getSurfaceConditions();
+            vm.SpeedLimit_Select = getSpeedLimit();
+            vm.Lane_Select = getLanes();
+            vm.RoadFeature_Select = getRoadFeatures();
+
             
+            var reps = from r in context.AccidentReports
+                        where r.AccountID == AccountID_
+                        select new {
+                            r.AccidentReportID,
+                            r.AccidentID
+                        };
+
+            ViewBag.UserAccidentReports = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(reps, "AccidentReportID", "AccidentID"); 
+
+            vm.UserAccidentReports_select = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(reps, "AccidentReportID", "AccidentID");
+
+                //Vehicle Factor Tables
+            vm.Vehicle = new Vehicle();
+            vm.VehicleOwner = new VehicleOwner();               
+            vm.VehicleType_Select = getVehicleType();
+            vm.VehicleOwner_Select = getVehicleOwner();
+            vm.LoadCondition_Select = getLoadConditions();
+            vm.LoadType_Select = getLoadTypes();
+
+                //DriverInfor Tables               
+            vm.DriverInfor = new DriverInformation();
+            vm.TrafficViolation_Select = getTrafficViolation();
+            vm.Licence_Select = getLicenceTypes();
+            vm.VehicleDriverOwner_Select = getVehicleDriverOwner();
+
+            return View(vm);
+                                
+        }
+                   
+       
+        [HttpGet]
+        public ViewResult AddRoadFactors()
+        {
+            AccidentReportViewModel vm = new AccidentReportViewModel()
+            {
+                Users = getUsers(),
+                Accounts = acc_context.Accounts,
+                AccidentReports = context.AccidentReports,
+              
+                //AddAccidentFactors Tables
+                AccidentReport = new AccidentReport(),
+                RoadFactor = new RoadFactor(),
+               
+                RoadType_Select = getRoadTypes(),
+                RoadSurface_Select = getRoadSurfaceNames(),
+                RoadSurfaceQuality_Select = getRoadSurfaceQuality(),
+                SurfaceCondition_Select = getSurfaceConditions(),   
+                SpeedLimit_Select = getSpeedLimit(),
+                Lane_Select = getLanes(),
+                RoadFeature_Select = getRoadFeatures()
+
+            };
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public ViewResult AddVehicle()
+        {
+            AccidentReportViewModel vm = new AccidentReportViewModel()
+            {
+                Users = getUsers(),
+                Accounts = acc_context.Accounts,
+                AccidentReports = context.AccidentReports,
+              
+                //Vehicle Tables
+                AccidentReport = new AccidentReport(),
+                Vehicle = new Vehicle(),
+               
+                VehicleType_Select = getVehicleType(),
+                LoadCondition_Select = getLoadConditions(),
+                LoadType_Select = getLoadTypes(),
+                VehicleOwner_Select = getVehicleOwner()
+               
+            };
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public ViewResult AddDriverInformation()
+        {
+            AccidentReportViewModel vm = new AccidentReportViewModel()
+            {
+                Users = getUsers(),
+                Accounts = acc_context.Accounts,
+                AccidentReports = context.AccidentReports,
+              
+                //DriverInfor Tables
+                AccidentReport = new AccidentReport(),                
+                DriverInfor = new DriverInformation(),
+               
+                TrafficViolation_Select = getTrafficViolation(),               
+                Licence_Select = getLicenceTypes()
+
+            };
+
+            return View(vm);
+        }
+
+        //[ChildActionOnly]
+        [HttpGet]
+        public IActionResult GetAccidentReport(int id)
+        {
+            //AccidentReportViewModel vm = new AccidentReportViewModel();
+                          
+            // vm.AccidentReport = new AccidentReport();
+
+            // AccidentReport AccidentReport = context.AccidentReports
+            //     .FirstOrDefault(r => r.AccidentReportID == AccidentReportID);
+                            
+            // vm.AccidentReport.AccidentReportID = AccidentReport.AccidentReportID;
+            // vm.AccidentReport.AccidentID = AccidentReport.AccidentID;
+            // vm.AccidentReport.AccidentLocation = AccidentReport.AccidentLocation;
+            // vm.AccidentReport.NrPeopleInjured = AccidentReport.NrPeopleInjured;
             
+            //return View(vm); 
+
+            // AccidentReportViewModel vm = new AccidentReportViewModel
+            // {
+            //     AccidentReport.AccidentReportID = AccidentReportID;
+            // };                 
+            // ViewBag.Message = "GetAccidentReport";
+
+            // if(vm.AccidentReport.AccidentReportID == AccidentReportID)
+            //     return PartialView("",vm);
+
+            // return PartialView(vm);
+
+            return PartialView(id);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddReport(AccidentReportViewModel vm)
+        {
+            int AccountID_ = 0;
+            string RAR = "";
+
+            if (signInManager.IsSignedIn(User))
+            {
+                if(vm.AccidentReport.AccidentLocation.Length > 0)
+                     RAR = "RAR-" + DateTime.UtcNow.ToString("HH:mm:ss").Substring(0, 3) + "-" + vm.AccidentReport.AccidentLocation.Substring(0, 3).ToUpper();
+                
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
+            string uploadedAPImage = UploadedAccidentPicture(vm);
+     
+            if (uploadedAPImage == null)
+            {
+                uploadedAPImage = "Upload is null";
+            }
+                        
                 var AccidentReport = new AccidentReport
                 {                   
-                    AccidentID = RAR,
-                    AccidentTime = vm.AccidentReport.AccidentTime,
+                    AccidentID = RAR,//"RAR-GAM-4312",
+                    AccidentTime = System.DateTime.UtcNow,//vm.AccidentReport.AccidentTime,
                     AccidentLocation = vm.AccidentReport.AccidentLocation,           
-                    AccidentDate = vm.AccidentReport.AccidentDate,
+                    AccidentDate = System.DateTime.UtcNow,//vm.AccidentReport.AccidentDate,
                     AccidentDescription = vm.AccidentReport.AccidentDescription,
                     NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
                     NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
                     AccountID = AccountID_,
                     PoliceStationID = vm.AccidentReport.PoliceStationID,
                     CollisionID = vm.AccidentReport.CollisionID,
-                    WeatherTypeID = vm.AccidentReport.WeatherTypeID,
-                    AreaCodeID = vm.AccidentReport.AreaCodeID,
-                    AccidentTypeID = vm.AccidentReport.AccidentTypeID
+                    WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
+                    AccidentTypeID = vm.AccidentReport.AccidentTypeID,
+                    AccidentPicture = uploadedAPImage,//vm.AccidentReport.AccidentPicture,
+                    AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
+                    HitAndRun = vm.AccidentReport.HitAndRun
                 };
             //}
             // if (ModelState.IsValid)
             // {
                 try
                 {
-                    if (signInManager.IsSignedIn(User))
-                    {
-                        context.SaveAccidentReport(AccidentReport);
+                //     if (signInManager.IsSignedIn(User))
+                //     {   
+                       
+                        await context.SaveAccidentReport(AccidentReport);
+                        ViewBag.Result = "Success";
                         return RedirectToAction("AddReport"); //return Content("Added");//
-                    }
-                    else
-                    {
-                        return Content("Please go to your profile to create an account before you can report accident");
-                    }
+                        //return Content("Added");
+                //     }
+                //     else
+                //     {
+                //         return Content("Please go to your profile to create an account before you can report accident");
+                //     }
                 }
                 catch (Exception ex)
                 {
@@ -221,8 +462,282 @@ namespace rar.Controllers
             // }
         }
         
+        #region AddAccidentFactor Deleted Code
+        // [HttpPost]
+        // public IActionResult AddAccidentFactor(AccidentReportViewModel vm)
+        // {
+        //     int AccountID_ = 0;
+
+        //     if (signInManager.IsSignedIn(User))
+        //     {                
+        //         var userId = userManager.GetUserId(User);
+
+        //         if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+        //         {
+        //             foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+        //             {
+        //                 AccountID_ = item.AccountID;
+        //             }
+        //         }
+        //     }
+            
+        //     var AR_ID = context.AccidentReports
+        //         .FirstOrDefault(r => r.AccountID == AccountID_);
+
+        //     var AccidentFactor = new AccidentFactor
+        //     {                   
+        //         //HumanFactorID = vm.HumanFactor.HumanFactorID,
+        //         //VehicleFactorID = vm.VehicleFactor.VehicleFactorID,
+        //         //AccidentReportID = vm.AccidentReport.AccidentReportID //AR_ID
+        //     };
+           
+        //     // if(String.IsNullOrEmpty(vm.HumanFactor.HumanFactorID))
+        //     // {
+        //     //     ModelState.AddModelError("HumanFactorID", "This field is a required field.");                
+        //     // }
+
+        //     // if(ModelState.IsValid)
+        //     // {
+        //         try
+        //         {
+        //             // if (signInManager.IsSignedIn(User))
+        //             // {
+        //                 accFac_context.SaveAccidentFactor(AccidentFactor);
+        //                 return RedirectToAction("AddReport"); //return Content("Added");//
+        //             // }
+        //             // else
+        //             // {
+        //             //     return Content("Error: Account not created or user not signed-in.");
+        //             // }
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             return Content("Accident Factors Not Added." + ex.Message);
+        //         }
+
+        //         //return Content("Valid AccidentFactor Model");
+        //     //}
+        //     // else
+        //     // {
+        //     //     return Content("Invalid AccidentFactor Model");
+        //     // }
+        // }
+        #endregion
+
+
         [HttpPost]
-        public IActionResult EditReport(AccidentReportViewModel vm)
+        public async Task<IActionResult> AddRoadFactors(AccidentReportViewModel vm)
+        {
+            int AccountID_ = 0;
+
+            if (signInManager.IsSignedIn(User))
+            {                
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
+            var AR_ID = context.AccidentReports
+                .OrderBy(r => r.AccountID)
+                .FirstOrDefault(r => r.AccountID == AccountID_);
+           
+            var RoadFactor = new RoadFactor
+            {                   
+                RoadName = vm.RoadFactor.RoadName,
+                RoadNumber = vm.RoadFactor.RoadNumber,
+                Landmark = vm.RoadFactor.Landmark,
+                PhysicalDivider = vm.RoadFactor.PhysicalDivider,
+                OnGoingRoadWorks = vm.RoadFactor.OnGoingRoadWorks,
+                SurfaceConditionID = vm.RoadFactor.SurfaceConditionID,
+                RoadTypeID = vm.RoadFactor.RoadTypeID,
+                RoadFeatureID = vm.RoadFactor.RoadFeatureID,
+                RoadSurfaceID = vm.RoadFactor.RoadSurfaceID,                
+                RoadSurfaceQualityID = vm.RoadFactor.RoadSurfaceQualityID,       
+                SpeedLimitID = vm.RoadFactor.SpeedLimitID,
+                LaneID = vm.RoadFactor.LaneID,
+                AccidentReportID = AR_ID.AccidentReportID//vm.RoadFactor.AccidentReportID  //AR_ID//AR_ID.AccidentReportID//
+               
+            };
+           
+           
+            // if(ModelState.IsValid)
+            // {
+                try
+                {
+                    // if (signInManager.IsSignedIn(User))
+                    // {
+                        await roadFac_context.SaveRoadFactor(RoadFactor);
+                        return RedirectToAction("AddReport"); // return Content("Added");//
+                    // }
+                    // else
+                    // {
+                    //     return Content("Error: Account not created or user not signed-in.");
+                    // }
+                }
+                catch (Exception ex)
+                {
+                    return Content("Road Factors Not Added." + ex.Message);
+                }
+
+                //return Content("Valid Road factor Model");
+            // }
+            // else
+            // {
+            //     return Content("Invalid Road factor Model");
+            // }
+        }
+      
+
+        [HttpPost]
+        public async Task<IActionResult> AddVehicle(AccidentReportViewModel vm)
+        {
+            int AccountID_ = 0;
+
+            if (signInManager.IsSignedIn(User))
+            {                
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
+            var AR_ID = context.AccidentReports
+                .OrderBy(r => r.AccountID)
+                .FirstOrDefault(r => r.AccountID == AccountID_);
+
+            var reps = from r in context.AccidentReports
+                        where r.AccountID == AccountID_
+                        select new {
+                            r.AccidentReportID,
+                            r.AccidentID
+                        };
+
+            ViewBag.UserAccidentReports = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(reps, "AccidentReportID", "AccidentID"); 
+
+            var Vehicle = new Vehicle
+            {                   
+                RegistrationNumber = vm.Vehicle.RegistrationNumber,
+                MechanicalFailure = vm.Vehicle.MechanicalFailure,
+                VehicleTypeID = vm.Vehicle.VehicleTypeID,
+                LoadTypeID = vm.Vehicle.LoadTypeID,
+                LoadConditionID = vm.Vehicle.LoadConditionID,
+                VehicleOwnerID = vm.Vehicle.VehicleOwnerID,
+                AccidentReportID = AR_ID.AccidentReportID //vm.Vehicle.AccidentReportID  //AR_ID            
+            };
+           
+            if(ModelState.IsValid)
+            {
+                try
+                {
+                    if (signInManager.IsSignedIn(User))
+                    {
+                        await veh_context.SaveVehicle(Vehicle);
+                        return RedirectToAction("AddReport"); //return Content("Added");//
+                    }
+                    else
+                    {
+                        return Content("Error: Account not created or user not signed-in.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Content("Road Factors Not Added." + ex.Message);
+                }
+
+                return Content("Valid Vehicle Model");
+            }
+            else
+            {
+                return Content("Invalid Vehicle Model");
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddDriverInformation(AccidentReportViewModel vm)
+        {
+            int AccountID_ = 0;
+
+            if (signInManager.IsSignedIn(User))
+            {                
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            };
+
+            var AR = context.AccidentReports
+                .FirstOrDefault(r => r.AccountID == AccountID_);
+
+            int AR_ID = AR.AccidentReportID;
+
+            var Vehicle = veh_context.Vehicles
+                .FirstOrDefault(r => r.AccidentReportID == AR_ID);
+
+            int Vehicle_ID = Vehicle.VehicleID;
+
+            var DriverInfor = new DriverInformation
+            {                   
+                Name = vm.DriverInfor.Name,
+                Surname = vm.DriverInfor.Surname,
+                Age = vm.DriverInfor.Age,
+                Gender = vm.DriverInfor.Gender,
+                Race = vm.DriverInfor.Race,
+                PhoneNumber = vm.DriverInfor.PhoneNumber,
+                Address = vm.DriverInfor.Address,
+                SafetyDevice = vm.DriverInfor.SafetyDevice,
+                AlcoholTested = vm.DriverInfor.AlcoholTested,
+                AlcoholSuspected = vm.DriverInfor.AlcoholSuspected,
+                LicenceNumber = vm.DriverInfor.LicenceNumber,
+                LicenceID = vm.DriverInfor.LicenceID,
+                TrafficViolationID = vm.DriverInfor.TrafficViolationID,               
+                VehicleID = Vehicle_ID//vm.DriverInfo.VehicleID                
+            };
+           
+            if(ModelState.IsValid)
+            {
+                try
+                {
+                    if (signInManager.IsSignedIn(User))
+                    {
+                        await drvFac_context.SaveDriverInformation(DriverInfor);
+                        return Content("DriverInfor Added");//return RedirectToAction("AddReport"); //
+                    }
+                    else
+                    {
+                        return Content("Error: Account not created or user not signed-in.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Content("Road Factors Not Added." + ex.Message);
+                }
+
+                return Content("Valid DriverInfor Model");
+            }
+            else
+            {
+                return Content("Invalid DriverInfor Model");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditReport(AccidentReportViewModel vm)
         {             
             var AccidentReport = context.AccidentReports.FirstOrDefault(r => r.AccidentReportID == vm.AccidentReport.AccidentReportID); //Convert.ToInt32(Request.Query["AccidentReportID"]));//8);//
             
@@ -242,7 +757,7 @@ namespace rar.Controllers
                 AccidentReport.AccidentTypeID = vm.AccidentReport.AccidentTypeID;
                 AccidentReport.CollisionID = vm.AccidentReport.CollisionID;
                 AccidentReport.WeatherTypeID = vm.AccidentReport.WeatherTypeID;
-                AccidentReport.AreaCodeID = vm.AccidentReport.AreaCodeID;
+              
                 AccidentReport.Confirmed = vm.AccidentReport.Confirmed;
 
                 //var userId = userManager.GetUserId(User);
@@ -270,7 +785,7 @@ namespace rar.Controllers
                 {
             //         // if (signInManager.IsSignedIn(User))
             //         // {
-                        context.SaveAccidentReport(AccidentReport);
+                        await context.SaveAccidentReport(AccidentReport);
                         return RedirectToAction("AddReport"); //return Content("Added");//
             //             // return Content("PS: " + PoliceStationID   
             //             //         + "\nCol: " + CollisionID
@@ -299,13 +814,92 @@ namespace rar.Controllers
 
         }        
 
-        public IActionResult Delete(int AccidentReportID)
+        public Microsoft.AspNetCore.Mvc.IActionResult Delete(int AccidentReportID)
         {
             AccidentReport AccidentReport = context.DeleteAccidentReport(AccidentReportID);
 
             return Redirect("~/AccidentReport/AddReport");
-        }    
+        }
 
+        //Filter        
+        [HttpGet]
+        public ViewResult List(string sortOrder, string sortUser)
+        { 
+            ViewBag.DateSortParm = sortOrder == "Oldest" ? "Newest" : "Oldest";
+            ViewBag.UserSortParm = sortUser == "AllUsers" ? "LoggedIn" : "AllUsers";
+
+            AccidentReportViewModel vm = new AccidentReportViewModel();
+        
+            vm.AccidentReports = context.AccidentReports;
+
+            switch (sortOrder)
+                {                   
+                    case "Oldest":
+                        vm.AccidentReports = vm.AccidentReports.OrderBy(r => r.AccidentDate);
+                        break;
+                    case "Newest":
+                        vm.AccidentReports = vm.AccidentReports.OrderByDescending(r => r.AccidentDate);
+                        break;
+                    default:
+                        vm.AccidentReports = vm.AccidentReports.OrderBy(r => r.AccidentDate);
+                        break;
+                }
+
+            int AccountID_ = 0;
+
+            if (signInManager.IsSignedIn(User))
+            {
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
+            switch (sortUser)
+                {                   
+                    case "AllUsers":
+                        vm.AccidentReports = vm.AccidentReports;
+                        break;
+                    case "LoggedIn":
+                        vm.AccidentReports = vm.AccidentReports.Where(r => r.AccountID == AccountID_);
+                        break;
+                    default:
+                        vm.AccidentReports = vm.AccidentReports;
+                        break;
+                }
+
+                // AccidentReports = context.AccidentReports
+                //     .Where(c => accidentType == 0 || c.AccidentTypeID == accidentType)
+                //     .OrderBy(c => c.AccidentReportID)
+                //     .Skip((Page - 1) * PageSize)
+                //     .Take(PageSize),
+                // PaginationHeader = new PaginationHeader
+                // {
+                //     CurrentPage = Page,
+                //     ItemPerPage = PageSize,
+                //     TotalItems = accidentType == 0 ?
+                //         context.AccidentReports.Count() :
+                //         context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
+
+                // },
+
+                // //AccidentReport(c => c.CollisionID = collision)
+                // AccidentTypeID = accidentType
+
+                return View(vm);
+
+        }
+
+       
+        /*Drop Downs / Chechboxes / Radio*/
+
+        //Accident Information
+        #region Accident Information
         public Microsoft.AspNetCore.Mvc.Rendering.SelectList getUsers()
         {
             //string c = Configuration.GetValue<string>("Data:DevDB2:ConnectionString");
@@ -373,29 +967,27 @@ namespace rar.Controllers
             return userSelect;
         }
 
-        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getAreaCodes()
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getProvinces()
         {
-            //string c = Configuration.GetValue<string>("Data:DevDB2:ConnectionString");
-            //string c = Configuration.GetConnectionString("DevDB");
             string c = Configuration.GetConnectionString("ProdDB");
 
-            List<AreaCode> models = new List<AreaCode>();
+            List<Province> models = new List<Province>();
 
             using (SqlConnection connection = new SqlConnection(c))
             {
                 using (SqlCommand cmd = new SqlCommand("", connection))
                 {
                     connection.Open();
-                    cmd.CommandText = "Select AreaCodeID, AreaName from [AreaCode]";
+                    cmd.CommandText = "Select ProvinceID, ProvinceName from [Province]";
                     using (var reader = cmd.ExecuteReader())
                     {
                         if (reader.HasRows)
                         {
                             while (reader.Read())
                             {
-                                var m = new AreaCode();
-                                m.AreaCodeID = reader.GetInt32(reader.GetOrdinal("AreaCodeID"));
-                                m.AreaName = reader.GetString(reader.GetOrdinal("AreaName"));
+                                var m = new Province();
+                                m.ProvinceID = reader.GetInt32(reader.GetOrdinal("ProvinceID"));
+                                m.ProvinceName = reader.GetString(reader.GetOrdinal("ProvinceName"));
                                 models.Add(m);
                             }
                         }
@@ -403,7 +995,7 @@ namespace rar.Controllers
                 }
             };
 
-            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "AreaCodeID", "AreaName");
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "ProvinceID", "ProvinceName");
             return userSelect;
         }
 
@@ -508,6 +1100,490 @@ namespace rar.Controllers
             Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "CollisionID", "ColiisionType");
             return userSelect;
         }
+        #endregion
+
+        //Accident Factors
+        #region Accident Factors
+      
+        #endregion
+
+        //Road Factors
+        #region Road Factors
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getRoadTypes()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<RoadType> models = new List<RoadType>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select RoadTypeID, RoadTypeName from [RoadType]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new RoadType();
+                                m.RoadTypeID = reader.GetInt32(reader.GetOrdinal("RoadTypeID"));
+                                m.RoadTypeName = reader.GetString(reader.GetOrdinal("RoadTypeName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "RoadTypeID", "RoadTypeName");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getRoadSurfaceNames()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<RoadSurface> models = new List<RoadSurface>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select RoadSurfaceID, RoadSurfaceName from [RoadSurface]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new RoadSurface();
+                                m.RoadSurfaceID = reader.GetInt32(reader.GetOrdinal("RoadSurfaceID"));
+                                m.RoadSurfaceName = reader.GetString(reader.GetOrdinal("RoadSurfaceName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "RoadSurfaceID", "RoadSurfaceName");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getSurfaceConditions()
+        {           
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<SurfaceCondition> models = new List<SurfaceCondition>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select SurfaceConditionID, SurfaceConditionName from [SurfaceCondition]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new SurfaceCondition();
+                                m.SurfaceConditionID = reader.GetInt32(reader.GetOrdinal("SurfaceConditionID"));
+                                m.SurfaceConditionName = reader.GetString(reader.GetOrdinal("SurfaceConditionName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "SurfaceConditionID", "SurfaceConditionName");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getRoadSurfaceQuality()
+        {           
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<RoadSurfaceQuality> models = new List<RoadSurfaceQuality>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select RoadSurfaceQualityID, RoadSurfaceQualityName from [RoadSurfaceQuality]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new RoadSurfaceQuality();
+                                m.RoadSurfaceQualityID = reader.GetInt32(reader.GetOrdinal("RoadSurfaceQualityID"));
+                                m.RoadSurfaceQualityName = reader.GetString(reader.GetOrdinal("RoadSurfaceQualityName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "RoadSurfaceQualityID", "RoadSurfaceQualityName");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getSpeedLimit()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<SpeedLimit> models = new List<SpeedLimit>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select SpeedLimitID, SpeedLimitNumber from [SpeedLimit]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new SpeedLimit();
+                                m.SpeedLimitID = reader.GetInt32(reader.GetOrdinal("SpeedLimitID"));
+                                m.SpeedLimitNumber = reader.GetString(reader.GetOrdinal("SpeedLimitNumber"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "SpeedLimitID", "SpeedLimitNumber");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getLanes()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<Lane> models = new List<Lane>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select LaneID, LaneName from [Lane]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new Lane();
+                                m.LaneID = reader.GetInt32(reader.GetOrdinal("LaneID"));
+                                m.LaneName = reader.GetString(reader.GetOrdinal("LaneName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "LaneID", "LaneName");
+            return userSelect;
+        }
+
+         public Microsoft.AspNetCore.Mvc.Rendering.SelectList getRoadFeatures()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<RoadFeature> models = new List<RoadFeature>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select RoadFeatureID, RoadFeatureName from [RoadFeature]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new RoadFeature();
+                                m.RoadFeatureID = reader.GetInt32(reader.GetOrdinal("RoadFeatureID"));
+                                m.RoadFeatureName = reader.GetString(reader.GetOrdinal("RoadFeatureName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "RoadFeatureID", "RoadFeatureName");
+            return userSelect;
+        }
+        #endregion
+
+        //Driver Information
+        #region Driver Information        
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getVehicleType()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<VehicleType> models = new List<VehicleType>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select VehicleTypeID, VehicleTypeName from [VehicleType]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new VehicleType();
+                                m.VehicleTypeID = reader.GetInt32(reader.GetOrdinal("VehicleTypeID"));
+                                m.VehicleTypeName = reader.GetString(reader.GetOrdinal("VehicleTypeName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "VehicleTypeID", "VehicleTypeName");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getVehicleOwner()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<VehicleOwner> models = new List<VehicleOwner>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select VehicleOwnerID, VehicleOwnerType from [VehicleOwner]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new VehicleOwner();
+                                m.VehicleOwnerID = reader.GetInt32(reader.GetOrdinal("VehicleOwnerID"));
+                                m.VehicleOwnerType = reader.GetString(reader.GetOrdinal("VehicleOwnerType"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "VehicleOwnerID", "VehicleOwnerType");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getLoadConditions()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<LoadCondition> models = new List<LoadCondition>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select LoadConditionID, LoadConditionName from [LoadCondition]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new LoadCondition();
+                                m.LoadConditionID = reader.GetInt32(reader.GetOrdinal("LoadConditionID"));
+                                m.LoadConditionName = reader.GetString(reader.GetOrdinal("LoadConditionName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "LoadConditionID", "LoadConditionName");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getLoadTypes()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<LoadType> models = new List<LoadType>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select LoadTypeID, LoadTypeName from [LoadType]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new LoadType();
+                                m.LoadTypeID = reader.GetInt32(reader.GetOrdinal("LoadTypeID"));
+                                m.LoadTypeName = reader.GetString(reader.GetOrdinal("LoadTypeName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "LoadTypeID", "LoadTypeName");
+            return userSelect;
+        }
+      
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getLicenceTypes()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<Licence> models = new List<Licence>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select LicenceID, TypeOfLicence from [Licence]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new Licence();
+                                m.LicenceID = reader.GetInt32(reader.GetOrdinal("LicenceID"));
+                                m.TypeOfLicence = reader.GetString(reader.GetOrdinal("TypeOfLicence"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "LicenceID", "TypeOfLicence");
+            return userSelect;
+        }
+
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getTrafficViolation()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<TypeOfTrafficViolation> models = new List<TypeOfTrafficViolation>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select TypeOfTrafficViolationID, TypeOfTrafficViolationName from [TypeOfTrafficViolation]";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new TypeOfTrafficViolation();
+                                m.TypeOfTrafficViolationID = reader.GetInt32(reader.GetOrdinal("TypeOfTrafficViolationID"));
+                                m.TypeOfTrafficViolationName = reader.GetString(reader.GetOrdinal("TypeOfTrafficViolationName"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "TypeOfTrafficViolationID", "TypeOfTrafficViolationName");
+            return userSelect;
+        }
+
+         public Microsoft.AspNetCore.Mvc.Rendering.SelectList getVehicleDriverOwner()
+        {
+            string c = Configuration.GetConnectionString("ProdDB");
+
+            List<Vehicle> models = new List<Vehicle>();
+
+            using (SqlConnection connection = new SqlConnection(c))
+            {
+                using (SqlCommand cmd = new SqlCommand("", connection))
+                {
+                    connection.Open();
+                    cmd.CommandText = "Select VehicleID, concat(v.RegistrationNumber, '/', vo.VehicleOwnerType) as [RegistrationNumber] from [Vehicle] v join VehicleOwner vo on v.VehicleOwnerID = vo.VehicleOwnerID";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var m = new Vehicle();
+                                m.VehicleID = reader.GetInt32(reader.GetOrdinal("VehicleID"));
+                                m.RegistrationNumber = reader.GetString(reader.GetOrdinal("RegistrationNumber"));
+                                models.Add(m);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Microsoft.AspNetCore.Mvc.Rendering.SelectList userSelect = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(models, "VehicleID", "RegistrationNumber");
+            return userSelect;
+        }
+
+        #endregion
+
+        #region Picture Methods
+        private string UploadedAccidentPicture(AccidentReportViewModel model)
+        {
+            string uniqueFileName = null;
+
+            if (model.AccidentPicture != null)
+            {
+                string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "users/profiles");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.AccidentPicture.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.AccidentPicture.CopyTo(fileStream);
+                }
+            }
+
+            return uniqueFileName;
+        }
+        #endregion
+       
+
 
     }
 }

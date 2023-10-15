@@ -1,0 +1,28 @@
+@model List<AccidentType>
+
+<select class="form-select mb-3" id="AccType">
+
+        <option selected>
+            Filter By Accident Type
+        </option>    
+        
+        @foreach (var item in Model)
+        {            
+            <a class="btn btn-block text-center @(item.AccidentTypeID == ViewBag.SelectedType ? "btn-outline-primary": "btn-outline-danger")"
+                asp-action="AddReport"
+                asp-controller="AccidentReport"
+                asp-route-accidentType="@item.AccidentTypeID" 
+                asp-route-Page="1">
+
+                <option value="@item.AccidentTypeID">
+                    @item.TypeOfAccident
+                </option>   
+
+
+            </a>           
+        }
+
+</select>
+
+
+

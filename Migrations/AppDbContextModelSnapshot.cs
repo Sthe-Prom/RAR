@@ -64,6 +64,34 @@ namespace rar.Migrations
                     b.ToTable("Address");
                 });
 
+            modelBuilder.Entity("rar.Models.Repositories.AccidentFactor", b =>
+                {
+                    b.Property<int>("AccidentFactorID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AccidentFactorID"));
+
+                    b.Property<int>("AccidentReportID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HumanFactorID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VehicleFactorID")
+                        .HasColumnType("int");
+
+                    b.HasKey("AccidentFactorID");
+
+                    b.HasIndex("AccidentReportID");
+
+                    b.HasIndex("HumanFactorID");
+
+                    b.HasIndex("VehicleFactorID");
+
+                    b.ToTable("AccidentFactor");
+                });
+
             modelBuilder.Entity("rar.Models.Repositories.AccidentReport", b =>
                 {
                     b.Property<int>("AccidentReportID")
@@ -87,6 +115,12 @@ namespace rar.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AccidentPicture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AccidentSketch")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("AccidentTime")
                         .HasColumnType("datetime2");
 
@@ -96,13 +130,13 @@ namespace rar.Migrations
                     b.Property<int>("AccountID")
                         .HasColumnType("int");
 
-                    b.Property<int>("AreaCodeID")
-                        .HasColumnType("int");
-
                     b.Property<int>("CollisionID")
                         .HasColumnType("int");
 
                     b.Property<bool>("Confirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HitAndRun")
                         .HasColumnType("bit");
 
                     b.Property<int>("NrPeopleInjured")
@@ -122,8 +156,6 @@ namespace rar.Migrations
                     b.HasIndex("AccidentTypeID");
 
                     b.HasIndex("AccountID");
-
-                    b.HasIndex("AreaCodeID");
 
                     b.HasIndex("CollisionID");
 
@@ -171,8 +203,7 @@ namespace rar.Migrations
 
                     b.Property<string>("Id")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("IdentityDoc")
                         .IsRequired()
@@ -201,22 +232,6 @@ namespace rar.Migrations
                     b.HasIndex("Id");
 
                     b.ToTable("Account");
-                });
-
-            modelBuilder.Entity("rar.Models.Repositories.AreaCode", b =>
-                {
-                    b.Property<int>("AreaCodeID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AreaCodeID"));
-
-                    b.Property<string>("AreaName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AreaCodeID");
-
-                    b.ToTable("AreaCode");
                 });
 
             modelBuilder.Entity("rar.Models.Repositories.Collision", b =>
@@ -249,6 +264,155 @@ namespace rar.Migrations
                     b.HasKey("DistrictID");
 
                     b.ToTable("District");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.DriverInformation", b =>
+                {
+                    b.Property<int>("DriverInformationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DriverInformationID"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("AlcoholSuspected")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AlcoholTested")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LicenceID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LicenceNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Race")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SafetyDevice")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TrafficViolationID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VehicleID")
+                        .HasColumnType("int");
+
+                    b.HasKey("DriverInformationID");
+
+                    b.HasIndex("LicenceID");
+
+                    b.HasIndex("TrafficViolationID");
+
+                    b.HasIndex("VehicleID");
+
+                    b.ToTable("DriverInformation");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.HumanFactor", b =>
+                {
+                    b.Property<int>("HumanFactorID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HumanFactorID"));
+
+                    b.Property<string>("HumanFactorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("HumanFactorID");
+
+                    b.ToTable("HumanFactor");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.Lane", b =>
+                {
+                    b.Property<int>("LaneID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LaneID"));
+
+                    b.Property<string>("LaneName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LaneID");
+
+                    b.ToTable("Lane");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.Licence", b =>
+                {
+                    b.Property<int>("LicenceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LicenceID"));
+
+                    b.Property<string>("TypeOfLicence")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LicenceID");
+
+                    b.ToTable("Licence");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.LoadCondition", b =>
+                {
+                    b.Property<int>("LoadConditionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoadConditionID"));
+
+                    b.Property<string>("LoadConditionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LoadConditionID");
+
+                    b.ToTable("LoadCondition");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.LoadType", b =>
+                {
+                    b.Property<int>("LoadTypeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoadTypeID"));
+
+                    b.Property<string>("LoadTypeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LoadTypeID");
+
+                    b.ToTable("LoadType");
                 });
 
             modelBuilder.Entity("rar.Models.Repositories.PoliceStation", b =>
@@ -292,6 +456,280 @@ namespace rar.Migrations
                     b.HasKey("ProvinceID");
 
                     b.ToTable("Province");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.RoadFactor", b =>
+                {
+                    b.Property<int>("RoadFactorID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoadFactorID"));
+
+                    b.Property<int>("AccidentReportID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Landmark")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LaneID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("OnGoingRoadWorks")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PhysicalDivider")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("RoadFeatureID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoadName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoadNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RoadSurfaceID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoadSurfaceQualityID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoadTypeID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpeedLimitID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SurfaceConditionID")
+                        .HasColumnType("int");
+
+                    b.HasKey("RoadFactorID");
+
+                    b.HasIndex("AccidentReportID");
+
+                    b.HasIndex("LaneID");
+
+                    b.HasIndex("RoadFeatureID");
+
+                    b.HasIndex("RoadSurfaceID");
+
+                    b.HasIndex("RoadSurfaceQualityID");
+
+                    b.HasIndex("RoadTypeID");
+
+                    b.HasIndex("SpeedLimitID");
+
+                    b.HasIndex("SurfaceConditionID");
+
+                    b.ToTable("RoadFactor");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.RoadFeature", b =>
+                {
+                    b.Property<int>("RoadFeatureID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoadFeatureID"));
+
+                    b.Property<string>("RoadFeatureName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RoadFeatureID");
+
+                    b.ToTable("RoadFeature");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.RoadSurface", b =>
+                {
+                    b.Property<int>("RoadSurfaceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoadSurfaceID"));
+
+                    b.Property<string>("RoadSurfaceName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RoadSurfaceID");
+
+                    b.ToTable("RoadSurface");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.RoadSurfaceQuality", b =>
+                {
+                    b.Property<int>("RoadSurfaceQualityID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoadSurfaceQualityID"));
+
+                    b.Property<string>("RoadSurfaceQualityName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RoadSurfaceQualityID");
+
+                    b.ToTable("RoadSurfaceQuality");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.RoadType", b =>
+                {
+                    b.Property<int>("RoadTypeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoadTypeID"));
+
+                    b.Property<string>("RoadTypeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RoadTypeID");
+
+                    b.ToTable("RoadType");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.SpeedLimit", b =>
+                {
+                    b.Property<int>("SpeedLimitID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SpeedLimitID"));
+
+                    b.Property<string>("SpeedLimitNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SpeedLimitID");
+
+                    b.ToTable("SpeedLimit");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.SurfaceCondition", b =>
+                {
+                    b.Property<int>("SurfaceConditionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SurfaceConditionID"));
+
+                    b.Property<string>("SurfaceConditionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SurfaceConditionID");
+
+                    b.ToTable("SurfaceCondition");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.TypeOfTrafficViolation", b =>
+                {
+                    b.Property<int>("TypeOfTrafficViolationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeOfTrafficViolationID"));
+
+                    b.Property<string>("TypeOfTrafficViolationName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TypeOfTrafficViolationID");
+
+                    b.ToTable("TypeOfTrafficViolation");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.Vehicle", b =>
+                {
+                    b.Property<int>("VehicleID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleID"));
+
+                    b.Property<int>("AccidentReportID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LoadConditionID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LoadTypeID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("MechanicalFailure")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RegistrationNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehicleOwnerID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VehicleTypeID")
+                        .HasColumnType("int");
+
+                    b.HasKey("VehicleID");
+
+                    b.HasIndex("AccidentReportID");
+
+                    b.HasIndex("LoadConditionID");
+
+                    b.HasIndex("LoadTypeID");
+
+                    b.HasIndex("VehicleOwnerID");
+
+                    b.HasIndex("VehicleTypeID");
+
+                    b.ToTable("Vehicle");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.VehicleFactor", b =>
+                {
+                    b.Property<int>("VehicleFactorID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleFactorID"));
+
+                    b.Property<string>("VehicleFactorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("VehicleFactorID");
+
+                    b.ToTable("VehicleFactor");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.VehicleOwner", b =>
+                {
+                    b.Property<int>("VehicleOwnerID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleOwnerID"));
+
+                    b.Property<string>("VehicleOwnerType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("VehicleOwnerID");
+
+                    b.ToTable("VehicleOwner");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.VehicleType", b =>
+                {
+                    b.Property<int>("VehicleTypeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleTypeID"));
+
+                    b.Property<string>("VehicleTypeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("VehicleTypeID");
+
+                    b.ToTable("VehicleType");
                 });
 
             modelBuilder.Entity("rar.Models.Repositories.Weather", b =>
@@ -373,6 +811,33 @@ namespace rar.Migrations
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("rar.Models.Repositories.AccidentFactor", b =>
+                {
+                    b.HasOne("rar.Models.Repositories.AccidentReport", "AccidentReport")
+                        .WithMany("AccidentFactor")
+                        .HasForeignKey("AccidentReportID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.HumanFactor", "HumanFactor")
+                        .WithMany()
+                        .HasForeignKey("HumanFactorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.VehicleFactor", "VehicleFactor")
+                        .WithMany()
+                        .HasForeignKey("VehicleFactorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AccidentReport");
+
+                    b.Navigation("HumanFactor");
+
+                    b.Navigation("VehicleFactor");
+                });
+
             modelBuilder.Entity("rar.Models.Repositories.AccidentReport", b =>
                 {
                     b.HasOne("rar.Models.Repositories.AccidentType", "AccidentType")
@@ -384,12 +849,6 @@ namespace rar.Migrations
                     b.HasOne("rar.Models.Repositories.Account", "Account")
                         .WithMany("AccidentReport")
                         .HasForeignKey("AccountID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("rar.Models.Repositories.AreaCode", "AreaCode")
-                        .WithMany()
-                        .HasForeignKey("AreaCodeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -415,8 +874,6 @@ namespace rar.Migrations
 
                     b.Navigation("Account");
 
-                    b.Navigation("AreaCode");
-
                     b.Navigation("Collision");
 
                     b.Navigation("PoliceStation");
@@ -435,10 +892,37 @@ namespace rar.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("rar.Models.Repositories.DriverInformation", b =>
+                {
+                    b.HasOne("rar.Models.Repositories.Licence", "Licence")
+                        .WithMany()
+                        .HasForeignKey("LicenceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.TypeOfTrafficViolation", "TypeOfTrafficViolation")
+                        .WithMany()
+                        .HasForeignKey("TrafficViolationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Licence");
+
+                    b.Navigation("TypeOfTrafficViolation");
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("rar.Models.Repositories.PoliceStation", b =>
                 {
                     b.HasOne("rar.Models.Repositories.District", "District")
-                        .WithMany("PoliceStation")
+                        .WithMany()
                         .HasForeignKey("DistrictID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -454,6 +938,125 @@ namespace rar.Migrations
                     b.Navigation("Province");
                 });
 
+            modelBuilder.Entity("rar.Models.Repositories.RoadFactor", b =>
+                {
+                    b.HasOne("rar.Models.Repositories.AccidentReport", "AccidentReport")
+                        .WithMany("RoadFactor")
+                        .HasForeignKey("AccidentReportID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.Lane", "Lane")
+                        .WithMany()
+                        .HasForeignKey("LaneID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.RoadFeature", "RoadFeature")
+                        .WithMany()
+                        .HasForeignKey("RoadFeatureID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.RoadSurface", "RoadSurface")
+                        .WithMany()
+                        .HasForeignKey("RoadSurfaceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.RoadSurfaceQuality", "RoadSurfaceQuality")
+                        .WithMany()
+                        .HasForeignKey("RoadSurfaceQualityID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.RoadType", "RoadType")
+                        .WithMany()
+                        .HasForeignKey("RoadTypeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.SpeedLimit", "SpeedLimit")
+                        .WithMany()
+                        .HasForeignKey("SpeedLimitID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.SurfaceCondition", "SurfaceCondition")
+                        .WithMany()
+                        .HasForeignKey("SurfaceConditionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AccidentReport");
+
+                    b.Navigation("Lane");
+
+                    b.Navigation("RoadFeature");
+
+                    b.Navigation("RoadSurface");
+
+                    b.Navigation("RoadSurfaceQuality");
+
+                    b.Navigation("RoadType");
+
+                    b.Navigation("SpeedLimit");
+
+                    b.Navigation("SurfaceCondition");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.Vehicle", b =>
+                {
+                    b.HasOne("rar.Models.Repositories.AccidentReport", "AccidentReport")
+                        .WithMany("Vehicle")
+                        .HasForeignKey("AccidentReportID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.LoadCondition", "LoadCondition")
+                        .WithMany()
+                        .HasForeignKey("LoadConditionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.LoadType", "LoadType")
+                        .WithMany()
+                        .HasForeignKey("LoadTypeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.VehicleOwner", "VehicleOwner")
+                        .WithMany("Vehicle")
+                        .HasForeignKey("VehicleOwnerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("rar.Models.Repositories.VehicleType", "VehicleType")
+                        .WithMany()
+                        .HasForeignKey("VehicleTypeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AccidentReport");
+
+                    b.Navigation("LoadCondition");
+
+                    b.Navigation("LoadType");
+
+                    b.Navigation("VehicleOwner");
+
+                    b.Navigation("VehicleType");
+                });
+
+            modelBuilder.Entity("rar.Models.Repositories.AccidentReport", b =>
+                {
+                    b.Navigation("AccidentFactor");
+
+                    b.Navigation("RoadFactor");
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("rar.Models.Repositories.Account", b =>
                 {
                     b.Navigation("AccidentReport");
@@ -461,14 +1064,14 @@ namespace rar.Migrations
                     b.Navigation("Address");
                 });
 
-            modelBuilder.Entity("rar.Models.Repositories.District", b =>
+            modelBuilder.Entity("rar.Models.Repositories.Province", b =>
                 {
                     b.Navigation("PoliceStation");
                 });
 
-            modelBuilder.Entity("rar.Models.Repositories.Province", b =>
+            modelBuilder.Entity("rar.Models.Repositories.VehicleOwner", b =>
                 {
-                    b.Navigation("PoliceStation");
+                    b.Navigation("Vehicle");
                 });
 #pragma warning restore 612, 618
         }

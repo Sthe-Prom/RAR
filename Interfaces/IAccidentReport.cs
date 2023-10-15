@@ -13,6 +13,8 @@ namespace rar.Interfaces
 
         Task SaveAccidentReport(AccidentReport AccidentReport);
 
+        Task<AccidentReport> GetAccidentReport(int AccidentReportID);
+
         AccidentReport DeleteAccidentReport(int AccidentReportID);
     }
 }

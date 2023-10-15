@@ -40,7 +40,7 @@ namespace rar.Models.Repositories
            FKs         
         */
         [Required(ErrorMessage = "Please enter user id")]
-        [StringLength(50)]
+        // [StringLength(50)]
         public string Id { get; set; }
 
         /* Ref Nav Properties */
@@ -50,6 +50,8 @@ namespace rar.Models.Repositories
         /* Ref. by */
         public virtual ICollection<Address> Address { get; set; }
         public virtual ICollection<AccidentReport> AccidentReport { get; set; }
+        
+        
 
     }
 }

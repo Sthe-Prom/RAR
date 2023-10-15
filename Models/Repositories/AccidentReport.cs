@@ -13,13 +13,17 @@ namespace rar.Models.Repositories
         public string AccidentID { get; set; } 
 
         [Required(ErrorMessage = "Please Enter Accident Time")]
-        public DateTime AccidentTime { get; set; } = DateTime.UtcNow;
+        public DateTime AccidentTime { get; set; } =  DateTime.UtcNow;
 
         [Required(ErrorMessage = "Please Enter Accident Date")]
         public DateTime AccidentDate { get; set; } = DateTime.UtcNow;
 
         [Required(ErrorMessage = "Please Enter Accident Location")]
-        public string AccidentLocation{ get; set; }
+        public string AccidentLocation { get; set; }
+        
+        public string AccidentSketch { get; set; }
+
+        public string AccidentPicture { get; set; }
 
         [Required(ErrorMessage = "Please Enter Accident Description")]
         public string AccidentDescription { get; set; }
@@ -33,6 +37,9 @@ namespace rar.Models.Repositories
         [Required(ErrorMessage = "Please Enter Number of People Injured")]
         public bool Confirmed { get; set; } = false;
 
+        [Required(ErrorMessage = "Please Enter Indicate if it'a hit and run")]
+        public bool HitAndRun { get; set; } = false;
+
         /* Relationship
            FKs         
         */
@@ -42,8 +49,6 @@ namespace rar.Models.Repositories
         public int PoliceStationID { get; set; }
 
         public int AccidentTypeID { get; set; }
-
-        public int AreaCodeID { get; set; }
 
         public int WeatherTypeID { get; set; }
 
@@ -59,9 +64,6 @@ namespace rar.Models.Repositories
         [ForeignKey("AccidentTypeID")]
         public virtual AccidentType AccidentType { get; set; }
 
-        [ForeignKey("AreaCodeID")]
-        public virtual AreaCode AreaCode { get; set; }
-
         [ForeignKey("WeatherTypeID")]
         public virtual Weather Weather { get; set; }
 
@@ -69,8 +71,9 @@ namespace rar.Models.Repositories
         public virtual Collision Collision { get; set; }
 
         /* Ref. by */
-        //public virtual ICollection<AccidentFactor> AccidentFactor { get; set; }
-        //public virtual ICollection<Vehicle> Vehicle { get; set; }
+        public virtual ICollection<AccidentFactor> AccidentFactor { get; set; }
+        public virtual ICollection<RoadFactor> RoadFactor { get; set; }
+        public virtual ICollection<Vehicle> Vehicle { get; set; }
 
 
     }

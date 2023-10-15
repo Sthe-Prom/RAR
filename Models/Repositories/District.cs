@@ -11,6 +11,6 @@ namespace rar.Models.Repositories
         public string DistrictName { get; set; }
 
         /* Ref. by */
-        public virtual ICollection<PoliceStation> PoliceStation { get; set; }
+        //public virtual ICollection<PoliceStation> PoliceStation { get; set; }
     }
 }

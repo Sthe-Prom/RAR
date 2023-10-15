@@ -53,7 +53,7 @@ namespace rar.Controllers
                         //var result = await UserManager.CheckPasswordAsync(user, loginModel.Password);
                         if (result.Succeeded)
                         {
-                            return Redirect(ReturnUrl ?? "/AccidentReport/AddReport");
+                            return Redirect(ReturnUrl ?? "/Home/Index");
                         }
                         else
                         {

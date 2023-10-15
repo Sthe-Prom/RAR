@@ -63,17 +63,19 @@
                                                 <td>@user.Email</td>
                                                 @*<td>@User.Identity.Name</td>*@
                                                 <td>
-                                                    <form asp-action="Delete" asp-route-id="@user.Id" method="post">
-                                                        
-                                                        <a asp-action="Edit" class="btn btn-sm btn-outline-info" asp-route-Id="@user.Id">
-                                                            <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
-                                                        </a>
-                                                        <button type="submit"
-                                                                class="btn btn-sm btn-outline-danger">
-                                                            <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
-                                                        </button>
+                                                    <form asp-action="Delete"  asp-route-id="@user.Id" method="post" id="frm1">
+                                                        <div class="text-center">
+                                                            <a asp-action="Edit" class="btn btn-sm btn-outline-info" asp-route-Id="@user.Id">
+                                                                <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                            </a>
+                                                           
+                                                            <a type="submit" class="btn btn-sm btn-outline-danger" onclick="delUser()">
+                                                                <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                            </a>
+                                                        </div>
                                                     </form>
-                                                    
+
+                                                                                                       
                                                 </td>
                                                 
                                                 </tr>

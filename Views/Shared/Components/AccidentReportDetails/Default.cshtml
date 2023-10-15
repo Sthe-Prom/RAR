@@ -1,0 +1,43 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model AccidentReportViewModel
+
+@{
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<div class="container-fluid p-0">
+ 
+    <div class="d-flex flex-row justify-content-between">  
+        
+        <div class="row">
+             <div class="row mb-3">
+                <h2 class="text-center">Accident Details</h2>
+                <label class="col-md-4 col-lg-3 col-form-label">AccidentReport ID</label>
+                <div class="col-md-8 col-lg-9">
+                    <input asp-for="@Model.AccidentReport.AccidentReportID" type="text" class="form-control" disabled >
+                </div>
+
+                <label class="col-md-4 col-lg-3 col-form-label">Accident ID</label>
+                <div class="col-md-8 col-lg-9">
+                    <input asp-for="@Model.AccidentReport.AccidentID" type="text" class="form-control" disabled >
+                </div>
+
+                <label class="col-md-4 col-lg-3 col-form-label">Accident Location</label>
+                <div class="col-md-8 col-lg-9">
+                    <input asp-for="@Model.AccidentReport.AccidentLocation" type="text" class="form-control" disabled >
+                </div>
+
+                <label class="col-md-4 col-lg-3 col-form-label">Accident NrPeopleInjured</label>
+                <div class="col-md-8 col-lg-9">
+                    <input asp-for="@Model.AccidentReport.NrPeopleInjured" type="text" class="form-control" disabled >
+                </div>
+            </div>
+        </div>
+        
+    </div>  
+
+</div>
+

@@ -28,13 +28,49 @@ if (!app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseMvcWithDefaultRoute();
+
 app.UseRouting();
 
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Home}/{id?}");
+    pattern: "{controller=Home}/{action=Home}/{id?}"
+);
+
+app.UseMvc(routes =>
+{
+    routes.MapRoute(
+    name: null,
+    template: "{AccidentTypeID}/Page{Page:int}",
+    defaults: new { controller = "AccidentReport", action = "AddReport" }
+    );
+
+    routes.MapRoute(
+        name:null,
+        template:"Page{Page:int}",
+        defaults: new { Controller = "AccidentReport", action="AddReport", Page=1}                   
+        );
+
+     routes.MapRoute(
+            name:null,
+            template:"{default2}",
+            defaults: new { Controller = "AccidentReport",
+                        action="AddReport", Page=1}
+            );
+
+    routes.MapRoute(
+        name: null,
+        template: "",
+        defaults: new { Controller = "AccidentReport", action = "AddReport", Page=1 });
+
+    routes.MapRoute(
+    name: null,
+    template: "",
+    defaults: new { Controller = "AccidentReport", action = "AddReport", Page=1 });
+
+});
 
 //Seed Data
 using var scope = app.Services.CreateScope();
@@ -50,7 +86,7 @@ try
     //await context.Database.MigrateAsync();
     //context.Connections.RemoveRange(context.Connections);
     //await context.Database.ExecuteSqlRawAsync("Delete From [Connections]");
-    //AppIdentityDbContext.CreateAdminAccount(userManager, roleManager, builder.Configuration).Wait();
+    AppIdentityDbContext.CreateAdminAccount(userManager, roleManager, builder.Configuration).Wait();
 }
 catch (Exception ex)
 {

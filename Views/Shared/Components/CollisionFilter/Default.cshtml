@@ -1,0 +1,24 @@
+@model List<Collision>
+
+<select id="ColType">
+    
+        @foreach (var item in Model)
+        {            
+            <a class="btn btn-block text-center @(item.CollisionID == ViewBag.SelectedCat ? "btn-outline-primary": "btn-outline-danger")"
+                asp-action="List"
+                asp-controller="AccidentReport"
+                asp-route-collision="@item.CollisionID" 
+                asp-route-Page="1">
+                                                
+                <option value="@item.CollisionID">
+                    @item.ColiisionType
+                </option>   
+
+
+            </a>           
+        }
+
+</select>
+
+
+
