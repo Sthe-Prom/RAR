@@ -34,16 +34,18 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Home}/{id?}"
-);
+// app.MapControllerRoute(
+//     name: "default",
+//     pattern: "{controller=Home}/{action=Home}/{id?}"
+// );
 
 app.UseMvc(routes =>
 {
+   
+
     routes.MapRoute(
     name: null,
-    template: "{AccidentTypeID}/Page{Page:int}",
+    template: "{accidentType}/Page{Page:int}",
     defaults: new { controller = "AccidentReport", action = "AddReport" }
     );
 
@@ -59,17 +61,15 @@ app.UseMvc(routes =>
             defaults: new { Controller = "AccidentReport",
                         action="AddReport", Page=1}
             );
-
+   
     routes.MapRoute(
         name: null,
-        template: "",
+        template: "accidentType",
         defaults: new { Controller = "AccidentReport", action = "AddReport", Page=1 });
 
-    routes.MapRoute(
-    name: null,
-    template: "",
-    defaults: new { Controller = "AccidentReport", action = "AddReport", Page=1 });
-
+     routes.MapRoute(
+        name: "default",
+        template: "{controller=Home}/{action=Home}/{id?}");
 });
 
 //Seed Data

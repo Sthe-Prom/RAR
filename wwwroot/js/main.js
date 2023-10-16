@@ -1,14 +1,5 @@
 
 
-var firstTime = localStorage.getItem("first_time");
-
-if(!firstTime) {
-    window.onload = function() {
-        document.getElementById('add_report').style.display = 'none';        
-    };
-    localStorage.setItem("first_time","1");
-}
-
 document.getElementById('AddVehicle').style.display = 'none';
 document.getElementById('addDriverInfor').style.display = 'none';
 document.getElementById('ARDetail').style.display = 'none';

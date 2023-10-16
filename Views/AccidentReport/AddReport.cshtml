@@ -213,12 +213,11 @@
                                               + "<hr />"                                                                                       
                                             + "<h5 class=\"text-left\">Police Station: " + item.PoliceStationName + "</h5>"
                                             + "<h5 class=\"text-left\">Type of Accident: " + item.TypeOfAccident + "</h5>"
-                                            + "<h5 class=\"text-left\">Accident Time " + item.AccidentDate.ToString("HH:mm:ss") + "</h5>"
-                                            + "<h5 class=\"text-left\">Accident Date " + item.AccidentDate.ToShortDateString() + "</h5>"
-                                            + "<h5 class=\"text-left\">Confirmd " + item.Confirmed.ToString() + "</h5>"
+                                            + "<h5 class=\"text-left\">Accident Time: " + item.AccidentDate.ToString("HH:mm:ss") + "</h5>"
+                                            + "<h5 class=\"text-left\">Accident Date: " + item.AccidentDate.ToShortDateString() + "</h5>"
+                                            + "<h5 class=\"text-left\">Confirmd: " + item.Confirmed.ToString() + "</h5>"
                                             + "<hr /></div>";
-                                        
-                                                                                         
+                                                                                                                                 
                                           
                                         <div class="col-sm-4" style="padding-right:4px;" >                                            
                                             <div class="row" style="margin: 5px;"> 
@@ -498,9 +497,9 @@
                     </div>
                     <div class="row">
                         <div class="text-center" style="float:none; margin: 0 auto;">
-                            <div page-model="@Model.PaginationHeader" page-action="AccidentReport" page-classes-enabled="true"
+                            <div page-model="@Model.PaginationHeader" page-action="AddReport" page-classes-enabled="true"
                                 page-class="btn" page-class-normal="btn-secondary"
-                                page-class-selected="btn-primary" page-url-accidentTypeID="@Model.AccidentTypeID" class="btn-group text-center">
+                                page-class-selected="btn-primary" class="btn-group text-center">  @*page-url-accidentTypeID="@Model.AccidentTypeID"*@
                             </div>
                         </div>     
                     </div>
@@ -640,11 +639,22 @@
             document.getElementById('add_report').style.display = 'none';     
         };
     }else{
-        addreport();
+        document.getElementById('add_report').style.display = 'none'; 
     };
-        
-        localStorage.setItem("first_time","1");
+
     
+    localStorage.setItem("first_time","1");
+    
+
+    // let data=window.performance.getEntriesByType("navigation")[0].type;
+    // if(data === 'reload'){
+    //     document.getElementById('add_report').style.display = 'block';
+    // }
+    // else{
+    //     addreport();
+    // }
+
+        
 
     document.getElementById("AccType").onchange = function() {
         if (this.selectedIndex!==0) {
@@ -663,6 +673,8 @@
             window.location.href = "AddReport?sortOrder="+ this.value;
         }        
     };
+
+    
 
 </script>
 

@@ -139,7 +139,7 @@ namespace rar.Controllers
         }  
 
         [HttpGet]
-        public ViewResult AddReport(int accidentType, string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
+        public ViewResult AddReport(string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
         {        
             //Filter - Sort
             ViewBag.CurrentSort = sortOrder;
@@ -165,13 +165,25 @@ namespace rar.Controllers
                 vm.AccidentReports = context.AccidentReports.Where(r => r.AccidentLocation.Contains(searchString)
                                     || r.AccidentDescription.Contains(searchString));
             }
-    
+
             //vm.AccidentReports = context.AccidentReports;
             vm.AccidentReports = context.AccidentReports
-                .Where(c => accidentType == 0 || c.AccidentTypeID == accidentType)
+                //.Where(c => accidentType == 0 || c.AccidentTypeID == accidentType)
                 .OrderBy(c => c.AccidentReportID)
                 .Skip((Page - 1) * PageSize)
                 .Take(PageSize);
+
+             vm.PaginationHeader = new PaginationHeader
+                {
+                    CurrentPage = Page,
+                    ItemPerPage = PageSize,
+                    TotalItems = context.AccidentReports.Count()//0 ?
+                        //context.AccidentReports.Count() :
+                        //context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
+
+                };
+
+            vm.AccidentTypeID = 1;
 
             switch (sortOrder)
                 {                   
@@ -213,21 +225,7 @@ namespace rar.Controllers
                         vm.AccidentReports = vm.AccidentReports;
                         break;
                 }
-                
-
-            vm.PaginationHeader = new PaginationHeader
-                {
-                    CurrentPage = Page,
-                    ItemPerPage = PageSize,
-                    TotalItems = accidentType == 0 ?
-                        context.AccidentReports.Count() :
-                        context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
-
-                };
-
-                //AccidentReport(c => c.CollisionID = collision)
-            vm.AccidentTypeID = accidentType;
-
+           
                 //Get values
             vm.Users = getUsers();
             vm.Accounts = acc_context.Accounts;
@@ -417,9 +415,9 @@ namespace rar.Controllers
                 var AccidentReport = new AccidentReport
                 {                   
                     AccidentID = RAR,//"RAR-GAM-4312",
-                    AccidentTime = System.DateTime.UtcNow,//vm.AccidentReport.AccidentTime,
+                    AccidentTime = vm.AccidentReport.AccidentTime,
                     AccidentLocation = vm.AccidentReport.AccidentLocation,           
-                    AccidentDate = System.DateTime.UtcNow,//vm.AccidentReport.AccidentDate,
+                    AccidentDate = vm.AccidentReport.AccidentDate, //System.DateTime.UtcNow
                     AccidentDescription = vm.AccidentReport.AccidentDescription,
                     NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
                     NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,

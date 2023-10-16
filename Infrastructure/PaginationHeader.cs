@@ -14,6 +14,6 @@ namespace rar.Infrastructure
         public int CurrentPage { get; set; }
 
         //ReadOnly Property
-        public int TotalPages => (int)Math.Ceiling((decimal)TotalItems / ItemPerPage);
+        public int TotalPages => (int)Math.Ceiling((decimal)TotalItems / ItemPerPage) + 1;
     }
 }

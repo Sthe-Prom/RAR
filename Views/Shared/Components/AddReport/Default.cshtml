@@ -114,7 +114,7 @@
                                                 <h5 class="card-title mb-0">Accident Time</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="date" asp-for="@Model.AccidentReport.AccidentTime" class="form-control" placeholder="Accident Time">
+                                                <input type="time" asp-for="@Model.AccidentReport.AccidentTime" class="form-control" placeholder="Accident Time">
                                                 <div><span asp-validation-for="@Model.AccidentReport.AccidentTime" class="text-danger"></span></div>
                                             </div>
                                         </div>
@@ -122,11 +122,19 @@
 
                                     <div class="col-sm-4">
                                         <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title mb-0">Accident Location</h5>
+                                            <div class="card-header">                                                 
+                                                <h5 class="card-title mb-0">
+                                                    <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to get device's' current location.">
+                                                        Accident Location 
+                                                        <a onclick="getLocation()">
+                                                            <i class="align-middle" data-feather="map-pin"></i>    
+                                                        </a>
+                                                    </span>
+                                                </h5>
                                             </div>
-                                            <div class="card-body">
-                                                <input type="text" asp-for="@Model.AccidentReport.AccidentLocation" class="form-control" placeholder="Accident Location">
+                                            <div class="card-body">                                                                                                                                                  
+                                                <input type="text" id="AccLoc" asp-for="@Model.AccidentReport.AccidentLocation"  class="form-control" placeholder="Accident Location">
+                                                
                                                 <div><span asp-validation-for="@Model.AccidentReport.AccidentLocation" class="text-danger"></span></div>
                                             </div>
                                         </div>
@@ -1037,17 +1045,17 @@
                             <div class="">
                                 <div class="col-sm-12">
                                     <h4 class="mb-1 mt-1">Submit Report</h4>
-                                    <hr />
+                                    
                                 </div>  
                                 <div class="col-auto">
                                     <div class="" role="alert">
     
                                         <h5 class="text-center">
-                                            <span class="h3 mb-3" style="margin:10px;padding: 5px;">Complete Report Submission</span>
-                                            <p class="">Reports may take up to 24 Hours for review, you will receive 
-                                                feedback from from your report after review by data manager.
-                                            </p>
+                                            <span class="h3 mb-3" style="margin:3px;padding: 5px;">Complete Report Submission</span>                                           
                                         <h5>
+                                         <p class="">Reports may take up to 24 Hours for review, you will receive 
+                                            feedback from from your report after review by data manager.
+                                        </p>
                                     
                                     </div>
                                 </div>
@@ -1091,12 +1099,52 @@
         };
         localStorage.setItem("first_time","1");
     }
-
    
 
     // document.addEventListener("DOMContentLoaded", function() {
     //     Swal("Add Report", "Report added successfully!", "success")  
     // });
+
+    // const successCallback = (position) => {
+    //  console.log(position);
+    // };
+
+    // const errorCallback = (error) => {
+    // console.log(error);
+    // };
+
+    // navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+
+    const x = document.getElementById("AccLoc");
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else { 
+    x.value = "Geolocation is not supported by this browser.";
+  }
+}
+
+function showPosition(position) {
+  x.value = position.coords.latitude + "," + position.coords.longitude;
+}
+
+function showError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      x.innerHTML = "User denied the request for Geolocation."
+      break;
+    case error.POSITION_UNAVAILABLE:
+      x.innerHTML = "Location information is unavailable."
+      break;
+    case error.TIMEOUT:
+      x.innerHTML = "The request to get user location timed out."
+      break;
+    case error.UNKNOWN_ERROR:
+      x.innerHTML = "An unknown error occurred."
+      break;
+  }
+}
     
     
 </script>
