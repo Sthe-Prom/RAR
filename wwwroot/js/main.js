@@ -1,25 +1,29 @@
 
-
+document.getElementById('add_report').style.display = 'block';
+document.getElementById('LatestReports').style.display = 'none';
 document.getElementById('AddVehicle').style.display = 'none';
 document.getElementById('addDriverInfor').style.display = 'none';
 document.getElementById('ARDetail').style.display = 'none';
 
-function addreport(addReport, latestReport, unconfirmedReports) {
+function addreport(addReport, latestReport, unconfirmedReports, titlePage) {
       
     addReport = document.getElementById('add_report');
     latestReport = document.getElementById('LatestReports');
     unconfirmedReports = document.getElementById('UnconfirmedReports');
+
+    titlePage = document.getElementById('title_page');
 
     el_id2 = document.getElementById('data_managerInputs');
 
     if(addReport.style.display !== 'none'){
         addReport.style.display = 'none';
         latestReport.style.display = 'block';
-        unconfirmedReports.style.display = 'block';
+        titlePage.InnerHTML = 'Latest Report';
     }else{
         addReport.style.display = 'block';
         latestReport.style.display = 'none';
         unconfirmedReports.style.display = 'none';
+        titlePage.InnerHTML = 'Add Report';
     };
 
     data_managerInputs(el_id2);
@@ -158,18 +162,7 @@ function ReportDetails(rep_detail) {
 
 function getReportDetail(el) {
 
-    // var AccDet = el.getAttribute('value');
-    
-    // el = AccDet + 1;
-    // var PVContainer = document.getElementById(AccDet).value;
-    // alert(PVContainer);
-
-    // if(PVContainer.style.display !== 'none'){
-    //     PVContainer.style.display = 'none';        
-    // }else{
-    //     PVContainer.style.display = 'block';        
-    // };
-    
+   
      swal({
         title: "Report Details",
         text: el.getAttribute('value'),
@@ -190,7 +183,7 @@ function ReportComplete() {
         title: "<small>Accident Report Submitted</small>!",
         text: "<h3>Your accident report has been submitted for data review </h3><br /><span style=\"color: #222E3C\">Next, you will receive notification via E-mail"
             + " once review is complete</span> <br />"
-            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"/AccidentReport/AddReport\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Done" + "</a>",
+            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"/AccidentReport/LatestAccidents\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Done" + "</a>",
         type: "success",
         html: true,
         showCancelButton: false,
@@ -211,5 +204,8 @@ function ReportAdded(msg) {
     });   
      
 }
+
+
+
 
 

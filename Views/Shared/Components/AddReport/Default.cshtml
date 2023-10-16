@@ -37,6 +37,31 @@
         text-decoration: none;
 	}
 
+
+    .canvas_body {
+   background: #e74c3c;
+}
+
+    #canvas {
+    position: relative;
+    left: calc(50% - 390px);
+    top: 50px;
+    border: 1px solid black;
+    cursor: crosshair;
+    background: #ecf0f1;
+    }
+
+    .canvas-container{
+        border: 2px solid #ccc;
+    }
+
+    .canvas{
+        border: 1px solid #fff;
+        display: block;
+    }
+
+
+
 </style>
 
 <div class="container-fluid p-0">
@@ -164,20 +189,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-4 text-center center">
-                                        <div class="card">    
+                                     <div class="col-sm-4">
+                                        <div class="card">
                                             <div class="card-header">
-                                                <h5 class="card-title mb-0">Accident Sketch</h5>
-                                            </div>   
-                                            <div class="card-body">                                               
-                                                <div class="col-md-8 col-lg-9 custom-file">
-                                                    <input asp-for="@Model.AccidentSketch" accept="image/gif, image/jpeg" class="custom-file-input form-control" id="customFile" type="file" />                                
-                                                    <span asp-validation-for="@Model.AccidentSketch" class="text-danger"></span>
-                                                </div>
+                                                <h5 class="card-title mb-0">Type of Collision</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <select class="form-select mb-3" asp-for="@Model.AccidentReport.CollisionID" asp-items="Model.Collisions"  >
+                                                    <option selected>Select Collision Type</option>
+                                                </select>
+                                                <div><span asp-validation-for="@Model.AccidentReport.CollisionID" class="text-danger"></span></div>
                                             </div>
                                         </div>
                                     </div>
-
+                                    
                                     <div class="col-sm-4">
                                         <div class="card">
                                             <div class="card-header">
@@ -258,7 +283,6 @@
                                         </div>
                                     </div>
                                   
-
                                     <div class="col-sm-4">
                                         <div class="card">
                                             <div class="card-header">
@@ -321,20 +345,27 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="col-sm-4">
-                                        <div class="card">
+
+                                    <div class="col-sm-12 text-center center">
+                                        <div class="card">    
                                             <div class="card-header">
-                                                <h5 class="card-title mb-0">Type of Collision</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <select class="form-select mb-3" asp-for="@Model.AccidentReport.CollisionID" asp-items="Model.Collisions"  >
-                                                    <option selected>Select Collision Type</option>
-                                                </select>
-                                                <div><span asp-validation-for="@Model.AccidentReport.CollisionID" class="text-danger"></span></div>
+                                                <h5 class="card-title mb-0">Accident Sketch</h5>
+                                            </div>   
+                                            <div class="card-body">                                               
+                                                <div class="col-md-12 col-lg-12">
+                                                    
+                                                    <div class="form-group">
+                                                        <div class="canvas-container"> 
+                                                            <canvas class="canvas" id="drawingCanvas" width="800" height="400"></canvas>
+                                                        </div>
+                                                    </div>
+                                                    <button id="clearButton" class="btn btn-secondary">Clear</button>
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                   
 
                                 </div>
 
@@ -366,7 +397,7 @@
                                     <div class="d-flex flex-row justify-content-between row">
                                         
                                         <!-- User Accidents -->
-                                        <div class="row">
+                                        <!-- <div class="row">
                                             <div class="col-sm-8 text-center" style="margin: 0 auto; float:none;" >
                                                 
                                                 <div class="card">
@@ -380,7 +411,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
 
                                         <div class="col-sm-4">
                                             <div class="card">
@@ -620,7 +651,7 @@
                                 <form asp-action="AddVehicle" method="post">
 
                                       <!-- User Accidents -->
-                                    <div class="row">
+                                    <!-- <div class="row">
                                         <div class="col-sm-8 text-center" style="margin: 0 auto; float:none;" >
                                             
                                             <div class="card">
@@ -634,7 +665,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     <div class="d-flex flex-row justify-content-center row">
                                         <div class="col-sm-4">
@@ -939,8 +970,8 @@
                                                         <option selected>Select Device Used</option>
                                                         <option value="Seatbelt">Seatbelt</option>
                                                         <option value="Helmet">Helmet</option>   
-                                                        <option value="Unknown">Helmet</option>   
-                                                        <option value="None">Helmet</option>                                        
+                                                        <option value="Unknown">Unknown</option>   
+                                                        <option value="None">None</option>                                        
                                                     </select>
                                                 </div>
                                             </div>      
@@ -1053,7 +1084,7 @@
                                         <h5 class="text-center">
                                             <span class="h3 mb-3" style="margin:3px;padding: 5px;">Complete Report Submission</span>                                           
                                         <h5>
-                                         <p class="">Reports may take up to 24 Hours for review, you will receive 
+                                         <p class="text-center">Reports may take up to 24 Hours for review, you will receive 
                                             feedback from from your report after review by data manager.
                                         </p>
                                     
@@ -1080,26 +1111,7 @@
 
 
 <script>
-    
-    // $(document).addEventListener("load", function(){        
-    //     alert("Add Report", "Your report was added successfully!", "success")         
-    // });
-
-    // $(document).on('click', '.SwalBtn1', function() {
-       
-    //     window.location.href = "AddReport"
-    //     swal.clickConfirm();
-    // });
-
-    var firstTime = localStorage.getItem("first_time");
-
-    if(!firstTime) {
-        window.onload = function() {
-            document.getElementById('add_report').style.display = 'none';     
-        };
-        localStorage.setItem("first_time","1");
-    }
-   
+      
 
     // document.addEventListener("DOMContentLoaded", function() {
     //     Swal("Add Report", "Report added successfully!", "success")  
@@ -1115,8 +1127,9 @@
 
     // navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
 
-    const x = document.getElementById("AccLoc");
+const x = document.getElementById("AccLoc");
 
+//Geo-Location [HTML5 JS] - API
 function getLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -1125,6 +1138,7 @@ function getLocation() {
   }
 }
 
+//Get LAt. and Long.
 function showPosition(position) {
   x.value = position.coords.latitude + "," + position.coords.longitude;
 }
@@ -1145,6 +1159,45 @@ function showError(error) {
       break;
   }
 }
-    
+   
+   
+
+   document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById("drawingCanvas");
+    const context = canvas.getContext("2d");
+    let isDrawing = false;
+
+    // Adjust the coordinates to be relative to the canvas
+    function getMousePosition(event) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
+        };
+    }
+
+    canvas.addEventListener("mousedown", (event) => {
+        isDrawing = true;
+        const pos = getMousePosition(event);
+        context.beginPath();
+        context.moveTo(pos.x, pos.y);
+    });
+
+    canvas.addEventListener("mousemove", (event) => {
+        if (!isDrawing) return;
+        const pos = getMousePosition(event);
+        context.lineTo(pos.x, pos.y);
+        context.stroke();
+    });
+
+    canvas.addEventListener("mouseup", () => {
+        isDrawing = false;
+    });
+
+    document.getElementById("clearButton").addEventListener("click", () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        event.preventDefault();
+    });
+});
     
 </script>

@@ -139,9 +139,25 @@ namespace rar.Controllers
 
         }  
 
-        [HttpGet]        
-        public ViewResult AddReport(string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
-        {        
+         [HttpGet]        
+        public ViewResult LatestAccidents(int accidentType, string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
+        {       
+            //Logged in User
+            int AccountID_ = 0;
+
+            if (signInManager.IsSignedIn(User))
+            {
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
             //Filter - Sort
             ViewBag.CurrentSort = sortOrder;
             ViewBag.DateSortParm = sortOrder == "Oldest" ? "Newest" : "Oldest";
@@ -169,7 +185,7 @@ namespace rar.Controllers
 
             //vm.AccidentReports = context.AccidentReports;
             vm.AccidentReports = context.AccidentReports
-                //.Where(c => accidentType == 0 || c.AccidentTypeID == accidentType)
+                .Where(c => accidentType == 0 || c.AccidentTypeID == accidentType)
                 .OrderBy(c => c.AccidentReportID)
                 .Skip((Page - 1) * PageSize)
                 .Take(PageSize);
@@ -178,13 +194,69 @@ namespace rar.Controllers
                 {
                     CurrentPage = Page,
                     ItemPerPage = PageSize,
-                    TotalItems = context.AccidentReports.Count()//0 ?
-                        //context.AccidentReports.Count() :
-                        //context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
+                    TotalItems = accidentType == 0 ?
+                        context.AccidentReports.Count() :
+                        context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
+
+                    // if(accidentType == 0)
+                    // {
+                    //     TotalItems = context.AccidentReports.Count();
+                    // }
+                    // else{
+                    //     TotalItems = context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count();                        
+                    // }
+
+                    // if(sortUser = "")
+                    // {
+                    //     TotalItems = context.AccidentReports.Count();
+                    // }
+                    // else
+                    // {
+
+                    //     switch (sortUser)
+                    //     {                   
+                    //         case "AllUsers":
+                    //             TotalItems = context.AccidentReports;
+                    //             break;
+                    //         case "LoggedIn":
+                    //             TotalItems =  context.AccidentReports.Where(r => r.AccountID == AccountID_);
+                    //             break;
+                    //         default:
+                    //             vm.AccidentReports = context.AccidentReports;
+                    //             break;
+                    //     }
+                                               
+                    // }
+
+                    // if(sortOrder = "")
+                    // {
+                    //     TotalItems = context.AccidentReports.Count();
+                    // }
+                    // else
+                    // {
+                    //     switch (sortOrder)
+                    //     {                   
+                    //         case "Oldest":
+                    //             TotalItems = context.AccidentReports.AccidentReports.OrderBy(r => r.AccidentDate);
+                    //             break;
+                    //         case "Newest":
+                    //             TotalItems = context.AccidentReports.AccidentReports.OrderByDescending(r => r.AccidentDate);
+                    //             break;
+                    //         default:
+                    //             TotalItems = context.AccidentReports;
+                    //             break;
+                    //     }
+                                               
+                    // }
+                    
+
+                    // TotalItems = accidentType == 0 ?
+                    //     context.AccidentReports.Count() :
+                    //     context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
 
                 };
 
-            vm.AccidentTypeID = 1;
+            vm.AccidentTypeID = accidentType;
 
             switch (sortOrder)
                 {                   
@@ -195,10 +267,43 @@ namespace rar.Controllers
                         vm.AccidentReports = vm.AccidentReports.OrderByDescending(r => r.AccidentDate);
                         break;
                     default:
-                        vm.AccidentReports = vm.AccidentReports.OrderBy(r => r.AccidentDate);
+                        vm.AccidentReports = vm.AccidentReports;
                         break;
                 }
 
+           
+
+            switch (sortUser)
+                {                   
+                    case "AllUsers":
+                        vm.AccidentReports = vm.AccidentReports;
+                        break;
+                    case "LoggedIn":
+                        vm.AccidentReports =  vm.AccidentReports
+                            .Where(r => r.AccountID == AccountID_ )
+                            .OrderBy(c => c.AccidentReportID)
+                            .Skip((Page - 1) * PageSize)
+                            .Take(PageSize);
+                        
+                        break;
+                    default:
+                        vm.AccidentReports = vm.AccidentReports;
+                        break;
+                }
+            
+            vm.Accounts = acc_context.Accounts;
+            vm.PoliceStations = pol_context.PoliceStations;
+            vm.AccidentTypes = acc_t_context.AccidentTypes;
+            vm.CollisionTypes = coll_context.CollisionTypes;
+         
+            return View(vm);
+                                
+        }
+
+        [HttpGet]        
+        public ViewResult AddReport(int accidentType, string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
+        {       
+            //Logged in User
             int AccountID_ = 0;
 
             if (signInManager.IsSignedIn(User))
@@ -214,18 +319,139 @@ namespace rar.Controllers
                 }
             }
 
+            //Filter - Sort
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.DateSortParm = sortOrder == "Oldest" ? "Newest" : "Oldest";
+            ViewBag.UserSortParm = sortUser == "AllUsers" ? "LoggedIn" : "AllUsers";
+            
+            AccidentReportViewModel vm = new AccidentReportViewModel();
+                      
+            if (searchString != null)
+            {
+                Page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+             //Search
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                vm.AccidentReports = context.AccidentReports.Where(r => r.AccidentLocation.Contains(searchString)
+                                    || r.AccidentDescription.Contains(searchString));
+            }
+
+            //vm.AccidentReports = context.AccidentReports;
+            vm.AccidentReports = context.AccidentReports
+                .Where(c => accidentType == 0 || c.AccidentTypeID == accidentType)
+                .OrderBy(c => c.AccidentReportID)
+                .Skip((Page - 1) * PageSize)
+                .Take(PageSize);
+
+             vm.PaginationHeader = new PaginationHeader
+                {
+                    CurrentPage = Page,
+                    ItemPerPage = PageSize,
+                    TotalItems = accidentType == 0 ?
+                        context.AccidentReports.Count() :
+                        context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
+
+                    // if(accidentType == 0)
+                    // {
+                    //     TotalItems = context.AccidentReports.Count();
+                    // }
+                    // else{
+                    //     TotalItems = context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count();                        
+                    // }
+
+                    // if(sortUser = "")
+                    // {
+                    //     TotalItems = context.AccidentReports.Count();
+                    // }
+                    // else
+                    // {
+
+                    //     switch (sortUser)
+                    //     {                   
+                    //         case "AllUsers":
+                    //             TotalItems = context.AccidentReports;
+                    //             break;
+                    //         case "LoggedIn":
+                    //             TotalItems =  context.AccidentReports.Where(r => r.AccountID == AccountID_);
+                    //             break;
+                    //         default:
+                    //             vm.AccidentReports = context.AccidentReports;
+                    //             break;
+                    //     }
+                                               
+                    // }
+
+                    // if(sortOrder = "")
+                    // {
+                    //     TotalItems = context.AccidentReports.Count();
+                    // }
+                    // else
+                    // {
+                    //     switch (sortOrder)
+                    //     {                   
+                    //         case "Oldest":
+                    //             TotalItems = context.AccidentReports.AccidentReports.OrderBy(r => r.AccidentDate);
+                    //             break;
+                    //         case "Newest":
+                    //             TotalItems = context.AccidentReports.AccidentReports.OrderByDescending(r => r.AccidentDate);
+                    //             break;
+                    //         default:
+                    //             TotalItems = context.AccidentReports;
+                    //             break;
+                    //     }
+                                               
+                    // }
+                    
+
+                    // TotalItems = accidentType == 0 ?
+                    //     context.AccidentReports.Count() :
+                    //     context.AccidentReports.Where(e => e.AccidentTypeID == accidentType).Count()
+
+                };
+
+            vm.AccidentTypeID = accidentType;
+
+            switch (sortOrder)
+                {                   
+                    case "Oldest":
+                        vm.AccidentReports = vm.AccidentReports.OrderBy(r => r.AccidentDate);
+                        break;
+                    case "Newest":
+                        vm.AccidentReports = vm.AccidentReports.OrderByDescending(r => r.AccidentDate);
+                        break;
+                    default:
+                        vm.AccidentReports = vm.AccidentReports;
+                        break;
+                }
+
+           
+
             switch (sortUser)
                 {                   
                     case "AllUsers":
                         vm.AccidentReports = vm.AccidentReports;
                         break;
                     case "LoggedIn":
-                        vm.AccidentReports = vm.AccidentReports.Where(r => r.AccountID == AccountID_);
+                        vm.AccidentReports =  vm.AccidentReports
+                            .Where(r => r.AccountID == AccountID_ )
+                            .OrderBy(c => c.AccidentReportID)
+                            .Skip((Page - 1) * PageSize)
+                            .Take(PageSize);
+                        
                         break;
                     default:
                         vm.AccidentReports = vm.AccidentReports;
                         break;
                 }
+
            
                 //Get values
             vm.Users = getUsers();
@@ -612,15 +838,19 @@ namespace rar.Controllers
             }
 
             var AR_ID = context.AccidentReports
-                .OrderBy(r => r.AccountID)
+                .OrderByDescending(r => r.AccidentReportID)
                 .FirstOrDefault(r => r.AccountID == AccountID_);
 
             var reps = from r in context.AccidentReports
                         where r.AccountID == AccountID_
+                        orderby r.AccidentReportID descending
                         select new {
                             r.AccidentReportID,
-                            r.AccidentID
+                            r.AccidentID,
+                            r.AccountID
                         };
+
+            var accID = reps.FirstOrDefault(r => r.AccountID == AccountID_);
 
             ViewBag.UserAccidentReports = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(reps, "AccidentReportID", "AccidentID"); 
 
@@ -1527,8 +1757,24 @@ namespace rar.Controllers
             return userSelect;
         }
 
-         public Microsoft.AspNetCore.Mvc.Rendering.SelectList getVehicleDriverOwner()
+        public Microsoft.AspNetCore.Mvc.Rendering.SelectList getVehicleDriverOwner()
         {
+            int AccountID_ = 0;
+           
+            if (signInManager.IsSignedIn(User))
+            {
+               
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
             string c = Configuration.GetConnectionString("ProdDB");
 
             List<Vehicle> models = new List<Vehicle>();
@@ -1538,7 +1784,12 @@ namespace rar.Controllers
                 using (SqlCommand cmd = new SqlCommand("", connection))
                 {
                     connection.Open();
-                    cmd.CommandText = "Select VehicleID, concat(v.RegistrationNumber, '/', vo.VehicleOwnerType) as [RegistrationNumber] from [Vehicle] v join VehicleOwner vo on v.VehicleOwnerID = vo.VehicleOwnerID";
+                    cmd.CommandText = "Select top 1 VehicleID, concat(v.RegistrationNumber, '/', vo.VehicleOwnerType) as [RegistrationNumber]" 
+                                + " from [Vehicle] v join VehicleOwner vo on v.VehicleOwnerID = vo.VehicleOwnerID"
+                                + " join AccidentReport r on r.AccidentReportID = v.AccidentReportID"
+                                + " where r.AccountID = " +  AccountID_.ToString()
+                                + " order by r.AccidentReportID desc";
+
                     using (var reader = cmd.ExecuteReader())
                     {
                         if (reader.HasRows)

@@ -39,28 +39,40 @@ app.UseMvc(routes =>
    
 
     routes.MapRoute(
-    name: null,
-    template: "{accidentType}/Page{Page:int}",
-    defaults: new { controller = "AccidentReport", action = "AddReport" }
-    );
+        name: null,
+        template: "{accidentType}/Page{Page:int}",
+        defaults: new { controller = "AccidentReport", action = "LatestAccidents" }
+        );
+
+    routes.MapRoute(
+        name: null,
+        template: "{sortUser}/Page{Page:int}",
+        defaults: new { controller = "AccidentReport", action = "LatestAccidents" }
+        );
+
+    routes.MapRoute(
+        name: null,
+        template: "{sortOrder}/Page{Page:int}",
+        defaults: new { controller = "AccidentReport", action = "LatestAccidents" }
+        );
 
     routes.MapRoute(
         name:null,
         template:"Page{Page:int}",
-        defaults: new { Controller = "AccidentReport", action="AddReport", Page=1}                   
+        defaults: new { Controller = "AccidentReport", action="LatestAccidents", Page=1}                   
         );
 
      routes.MapRoute(
             name:null,
             template:"{default2}",
             defaults: new { Controller = "AccidentReport",
-                        action="AddReport", Page=1}
+                        action="LatestAccidents", Page=1}
             );
    
     routes.MapRoute(
         name: null,
         template: "accidentType",
-        defaults: new { Controller = "AccidentReport", action = "AddReport", Page=1 });
+        defaults: new { Controller = "AccidentReport", action = "LatestAccidents", Page=1 });
 
      routes.MapRoute(
         name: "default",

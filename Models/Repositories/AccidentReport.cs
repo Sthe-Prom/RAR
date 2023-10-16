@@ -13,7 +13,7 @@ namespace rar.Models.Repositories
         public string AccidentID { get; set; } 
 
         [Required(ErrorMessage = "Please Enter Accident Time")]
-        public DateTime AccidentTime { get; set; } =  DateTime.UtcNow;
+        public DateTime AccidentTime { get; set; } = DateTime.UtcNow;
 
         [Required(ErrorMessage = "Please Enter Accident Date")]
         public DateTime AccidentDate { get; set; } = DateTime.UtcNow;
