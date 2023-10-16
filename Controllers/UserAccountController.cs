@@ -53,7 +53,7 @@ namespace rar.Controllers
                         //var result = await UserManager.CheckPasswordAsync(user, loginModel.Password);
                         if (result.Succeeded)
                         {
-                            return Redirect(ReturnUrl ?? "/Home/Index");
+                            return Redirect(ReturnUrl ?? "/Home/Home");
                         }
                         else
                         {
@@ -111,7 +111,7 @@ namespace rar.Controllers
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-            return RedirectToAction("Login", "UserAccount");
+            return RedirectToAction("Index", "Home");
         }
 
         [AllowAnonymous]

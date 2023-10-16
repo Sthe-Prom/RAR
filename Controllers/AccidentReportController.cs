@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
 using rar.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace rar.Controllers
 {
@@ -138,7 +139,7 @@ namespace rar.Controllers
 
         }  
 
-        [HttpGet]
+        [HttpGet]        
         public ViewResult AddReport(string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
         {        
             //Filter - Sort
@@ -714,7 +715,7 @@ namespace rar.Controllers
                     if (signInManager.IsSignedIn(User))
                     {
                         await drvFac_context.SaveDriverInformation(DriverInfor);
-                        return Content("DriverInfor Added");//return RedirectToAction("AddReport"); //
+                        return RedirectToAction("AddReport"); //return Content("DriverInfor Added");//r
                     }
                     else
                     {

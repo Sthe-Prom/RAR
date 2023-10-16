@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace rar.Controllers;
 
@@ -26,21 +27,29 @@ public class HomeController : Controller
 
     }
 
+    
     public IActionResult Index()
     {
-        BaseViewModel vm = new BaseViewModel();
-        vm.Accounts = context.Accounts;
-        return View(vm);
+        return View();
     }
 
     public IActionResult Privacy()
     {
+        
         BaseViewModel vm = new BaseViewModel();
         vm.Accounts = context.Accounts;
         return View(vm);
     }
 
-    public IActionResult Home() => View();
+    //[Authorize(Roles="Admins")]
+    public IActionResult Home() 
+    {
+        
+        BaseViewModel vm = new BaseViewModel();
+        vm.Accounts = context.Accounts;
+        return View(vm);
+    }
+
     public IActionResult About()
     {
         BaseViewModel vm = new BaseViewModel();
