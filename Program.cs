@@ -69,11 +69,7 @@ app.UseMvc(routes =>
                         action="LatestAccidents", Page=1}
             );
    
-    routes.MapRoute(
-        name: null,
-        template: "accidentType",
-        defaults: new { Controller = "AccidentReport", action = "LatestAccidents", Page=1 });
-
+    
      routes.MapRoute(
         name: "default",
         template: "{controller=Home}/{action=Home}/{id?}");

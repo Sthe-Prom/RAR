@@ -218,11 +218,11 @@
 
                                                                                                 <input type="hidden" name="@item.AccidentReportID" id="@item.AccidentReportID" asp-for="@item.AccidentReportID" name="AccidentReportID"  class="form-control">
                                                                                             
-                                                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
+                                                                                                @*<span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
                                                                                                     <a asp-action="EditReport" class="col-auto btn btn-sm btn-outline-info" asp-route-AccidentReportID="@item.AccidentReportID">
                                                                                                         <i class="align-middle" data-feather="edit"></i>&nbsp;
                                                                                                     </a>
-                                                                                                </span>
+                                                                                                </span>*@
                                                                                                 
                                                                                                 <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Report">
                                                                                                     <a class="btn btn-sm btn-outline-danger col-auto" onclick="del()">
@@ -259,13 +259,14 @@
                                                                                     <div class="col-sm-12">
                                                                                         <form asp-action="ConfirmReport" method="post" id="frm1">
                                                                                             <div class="d-flex flex-row justify-content-between"> 
-                                                                                                <div class="col-auto">
+                                                                                                
+                                                                                                @*<div class="col-auto">
                                                                                                     <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
                                                                                                         <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="btn btn-sm btn-outline-info" >
                                                                                                             <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
                                                                                                         </a>
                                                                                                     </span>
-                                                                                                </div>
+                                                                                                </div>*@
                                                                                                 
                                                                                                 <input type="hidden" asp-for="@item.AccidentReportID" value="@item.AccidentReportID" name="AccidentReportID" />
                                                                                                     
@@ -460,12 +461,35 @@
                 
                 </div>
                 <div class="row">
+                    @{
+                        string sortUser = Context.Request.Query["sortUser"];
+                        string sortOrder = Context.Request.Query["sortOrder"];
+                    }
                     <div class="text-center" style="float:none; margin: 0 auto;">
-                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" page-classes-enabled="true"
+                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagersortUser" page-classes-enabled="true"
                             page-class="btn" page-class-normal="btn-secondary"
-                            page-class-selected="btn-primary" page-url-accidentTypeID="@Model.AccidentTypeID" class="btn-group text-center">  @*page-url-accidentTypeID="@Model.AccidentTypeID"*@
+                            page-class-selected="btn-primary" onclick="sortUserChange()" page-url-sortUser="@sortUser" class="btn-group text-center"> 
                         </div>
-                    </div>     
+                    </div>  
+                    <div class="text-center" style="float:none; margin: 0 auto;">
+                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagersortOrder" page-classes-enabled="true"
+                            page-class="btn" page-class-normal="btn-secondary"
+                            page-class-selected="btn-primary" onclick="sortOrderChange()" page-url-sortOrder="@sortOrder" class="btn-group text-center">  
+                        </div>
+                    </div>
+                    
+                    <div class="text-center" style="float:none; margin: 0 auto;">
+                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagerAccType" page-classes-enabled="true"
+                            page-class="btn" page-class-normal="btn-secondary"
+                            page-class-selected="btn-primary" onclick="accTypeChange()" page-url-accidentType="@Model.AccidentTypeID" class="btn-group text-center">  
+                        </div>
+                    </div> 
+                    <div class="text-center" style="float:none; margin: 0 auto;">
+                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagerDefault" page-classes-enabled="true"
+                            page-class="btn" page-class-normal="btn-secondary"
+                            page-class-selected="btn-primary" class="btn-group text-center"> 
+                        </div>
+                    </div> 
                 </div>
                         
             </div>           
@@ -476,25 +500,93 @@
 </div>
 
 <script>
-      document.getElementById("AccType").onchange = function() {
-        if (this.selectedIndex!==0) {
-            window.location.href = "LatestAccidents?accidentType="+ this.value + "&Page=1?";
-        }        
+    
+    var accType = document.getElementById('pagerAccType');
+    var sortOrder = document.getElementById('pagersortOrder');
+    var sortUser = document.getElementById('pagersortUser');
+    var pagerDef = document.getElementById('pagerDefault');
+
+  
+    const urlParams = new URLSearchParams(window.location.search);
+    const qs_sortUser = urlParams.get('sortUser');
+    const qs_sortOrder = urlParams.get('sortOrder');       
+    const qs_accidentType = urlParams.get('accidentType');   
+    sh();
+    // if(qs_sortUser !== ""){
+    //     sortUserChange();
+    // }else{
+    //     sh();
+    // }
+
+    // if(qs_sortOrder !== ""){
+    //     sortOrderChange();
+    // }else{
+    //     sh();
+    // }
+
+    // if(qs_accidentType !== ""){
+    //     accTypeChange();
+    // }else{
+    //     sh();
+    // }
+      
+  
+    function sh(){
+         sortOrder.style.display = 'none';
+        sortUser.style.display = 'none';
+        accType.style.display = 'none';      
+        pagerDef.style.display = 'block';
+        };    
+        
+   
+    function accTypeChange(){
+        sortOrder.style.display = 'none';
+        sortUser.style.display = 'none';
+        pagerDef.style.display = 'none';
+    }
+
+     function sortUserChange(){
+        sortOrder.style.display = 'none';
+        accType.style.display = 'none';
+        pagerDef.style.display = 'none';
+    }
+
+    function sortOrderChange(){
+        accType.style.display = 'none';
+        sortUser.style.display = 'none';
+        pagerDef.style.display = 'none';        
     };
 
-    document.getElementById("sortUser").onchange = function() {
-        if (this.selectedIndex!==0) {
-            window.location.href = "LatestAccidents?sortUser="+ this.value;
-        }        
-    };
+            
+        document.getElementById("AccType").onchange = function() {
+            if (this.selectedIndex!==0) {
+                window.location.href = "LatestAccidents?accidentType="+ this.value + "&Page=1?";                
+                accTypeChange();
+            }        
+        };
 
-     document.getElementById("sortOrder").onchange = function() {
-        if (this.selectedIndex!==0) {
-            window.location.href = "LatestAccidents?sortOrder="+ this.value;
-        }        
-    };
+        document.getElementById("sortUser").onchange = function() {
+            if (this.selectedIndex!==0) {
+                window.location.href = "LatestAccidents?sortUser="+ this.value + "&Page=1?";
+                const urlParams = new URLSearchParams(window.location.search);
+                const QS = urlParams.get('sortUser');   
+                if(QS !== ""){
+                    sortUserChange();
+                }else{
+                    sh();
+                }
+                    
+            }        
+        };
 
-
+        document.getElementById("sortOrder").onchange = function() {
+            if (this.selectedIndex!==0) {
+                window.location.href = "LatestAccidents?sortOrder="+ this.value + "&Page=1?";
+                sortOrderChange();
+            }        
+        };
+    
+    
 </script>
 
 

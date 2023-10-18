@@ -44,6 +44,8 @@ function addVehicle(el_veh, el_drv) {
     }
 };
 
+
+
 function addDriverInfor(el_veh, el_drv) {
 
     el_veh = document.getElementById('AddVehicle');
@@ -202,8 +204,22 @@ function ReportAdded(msg) {
         closeOnConfirm: false
            
     });   
-     
 }
+
+function ReportAddError(msg) {
+
+    swal({
+        title: "Error Adding Report",
+        text: "<h3>Please correct following fields: </h3><br />" + msg,
+        type: "error",
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Okay",
+        closeOnConfirm: false,
+        html: true
+           
+    });   
+}
+
 
 
 

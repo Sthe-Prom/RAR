@@ -102,7 +102,7 @@
                                 <hr />
                             </div>
 
-                            <form asp-action="AddReport" method="post" id="frmAddReport">                                
+                            <form asp-action="AddReport" name="frmAddReport" method="post" id="frmAddReport" onsubmit="return validateAddReportForm()">                                
                                                                 
                                 <!-- <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID" id="@Model.AccidentReport.AccidentReportID" name="AccidentReportID" /> -->
 
@@ -158,9 +158,9 @@
                                                 </h5>
                                             </div>
                                             <div class="card-body">                                                                                                                                                  
-                                                <input type="text" id="AccLoc" asp-for="@Model.AccidentReport.AccidentLocation"  class="form-control" placeholder="Accident Location">
+                                                <input type="text" id="AccLoc" name="input_AccLoc" asp-for="@Model.AccidentReport.AccidentLocation"  class="form-control" placeholder="Accident Location">
                                                 
-                                                <div><span asp-validation-for="@Model.AccidentReport.AccidentLocation" class="text-danger"></span></div>
+                                                <div><span id="valAccLoc" class="text-danger"></span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -171,7 +171,7 @@
                                                 <h5 class="card-title mb-0">Accident Description</h5>
                                             </div>
                                             <div class="card-body">
-                                                <textarea type="text" row="3" asp-for="@Model.AccidentReport.AccidentDescription" class="form-control" placeholder="Accident Description"></textarea>
+                                                <textarea type="text" name="input_AccDesc" row="3" asp-for="@Model.AccidentReport.AccidentDescription" class="form-control" placeholder="Accident Description"></textarea>
                                                 <div><span asp-validation-for="@Model.AccidentReport.AccidentDescription" class="text-danger"></span></div>
                                             </div>
                                         </div>
@@ -1199,5 +1199,24 @@ function showError(error) {
         event.preventDefault();
     });
 });
+
+function validateAddReportForm() {
+  let AccLocVal = document.forms["frmAddReport"]["input_AccLoc"].value;
+  let AccDescVal = document.forms["frmAddReport"]["input_AccDesc"].value;
+  var msg = "";
+    
+
+  if (AccLocVal == "" ) {
+        msg += "Location Cannot be Empty.<br />"
+    else{
+        if(AccDescVal == ""){
+              msg += "Accident Description Cannot be Empty."
+        }
+    }
+          
+        ReportAddError(msg);
+    return false;
+  }
+}
     
 </script>
