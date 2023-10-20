@@ -46,8 +46,8 @@ namespace RAR.Models.EF
                     dbEntry.AccidentTypeID = AccidentReport.AccidentTypeID;
                     dbEntry.WeatherTypeID = AccidentReport.WeatherTypeID;
                     dbEntry.Confirmed = AccidentReport.Confirmed;
-                    dbEntry.AccidentPicture = AccidentReport.AccidentPicture;
-                    dbEntry.AccidentSketch = AccidentReport.AccidentSketch;
+                    //dbEntry.AccidentPicture = AccidentReport.AccidentPicture;
+                    //dbEntry.AccidentSketch = AccidentReport.AccidentSketch;
                     dbEntry.HitAndRun = AccidentReport.HitAndRun;
                     
                 }

@@ -89,7 +89,7 @@
                 <!-- Accident Identification Details    -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="flush-headingOne1" >                   
-                        <button onclick="EnabAll()" class="accordion-button collapsed btn btn-lg btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse1" aria-expanded="false" aria-controls="flush-collapseOne"> 
+                        <button class="accordion-button collapsed btn btn-lg btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse1" aria-expanded="false" aria-controls="flush-collapseOne"> 
                             Accident Identification Details                        
                         </button>                                        
                     </h2>                
@@ -104,7 +104,7 @@
 
                                                               
                                 <!-- <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID" id="@Model.AccidentReport.AccidentReportID" name="AccidentReportID" /> -->
-
+                                <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID"  />
                                 <div asp-validation-summary="All"></div>
 
                                 @* <div class="col-sm-6" style="margin:0 auto; float: none;">
@@ -157,7 +157,7 @@
                                                 </h5>
                                             </div>
                                             <div class="card-body">                                                                                                                                                  
-                                                <input type="text" id="AccLoc" name="input_AccLoc" asp-for="@Model.AccidentReport.AccidentLocation"  class="form-control" placeholder="Accident Location">
+                                                <input type="text" id="AccLoc" asp-for="@Model.AccidentReport.AccidentLocation"  class="form-control" placeholder="Accident Location">
                                                 
                                                 <div><span id="valAccLoc" class="text-danger"></span></div>
                                             </div>
@@ -170,7 +170,7 @@
                                                 <h5 class="card-title mb-0">Accident Description</h5>
                                             </div>
                                             <div class="card-body">
-                                                <textarea type="text" name="input_AccDesc" row="3" asp-for="@Model.AccidentReport.AccidentDescription" class="form-control" placeholder="Accident Description"></textarea>
+                                                <textarea type="text" row="3" asp-for="@Model.AccidentReport.AccidentDescription" class="form-control" placeholder="Accident Description"></textarea>
                                                 <div><span asp-validation-for="@Model.AccidentReport.AccidentDescription" class="text-danger"></span></div>
                                             </div>
                                         </div>
@@ -344,27 +344,7 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="col-sm-12 text-center center">
-                                        <div class="card">    
-                                            <div class="card-header">
-                                                <h5 class="card-title mb-0">Accident Sketch</h5>
-                                            </div>   
-                                            <div class="card-body">                                               
-                                                <div class="col-md-12 col-lg-12">
-                                                    
-                                                    <div class="form-group">
-                                                        <div class="canvas-container"> 
-                                                            <canvas class="canvas" id="drawingCanvas" width="800" height="400"></canvas>
-                                                        </div>
-                                                    </div>
-                                                    <button id="clearButton" class="btn btn-secondary">Clear</button>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                   
+                                    
 
                                 </div>
 
@@ -1103,112 +1083,98 @@
 
 
 <script>
-      
-
-    // document.addEventListener("DOMContentLoaded", function() {
-    //     Swal("Add Report", "Report added successfully!", "success")  
-    // });
-
-    // const successCallback = (position) => {
-    //  console.log(position);
-    // };
-
-    // const errorCallback = (error) => {
-    // console.log(error);
-    // };
-
-    // navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-
-const x = document.getElementById("AccLoc");
-
-//Geo-Location [HTML5 JS] - API
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
-  } else { 
-    x.value = "Geolocation is not supported by this browser.";
-  }
-}
-
-//Get LAt. and Long.
-function showPosition(position) {
-  x.value = position.coords.latitude + "," + position.coords.longitude;
-}
-
-function showError(error) {
-  switch(error.code) {
-    case error.PERMISSION_DENIED:
-      x.innerHTML = "User denied the request for Geolocation."
-      break;
-    case error.POSITION_UNAVAILABLE:
-      x.innerHTML = "Location information is unavailable."
-      break;
-    case error.TIMEOUT:
-      x.innerHTML = "The request to get user location timed out."
-      break;
-    case error.UNKNOWN_ERROR:
-      x.innerHTML = "An unknown error occurred."
-      break;
-  }
-}
-   
    
 
-   document.addEventListener("DOMContentLoaded", function () {
-    const canvas = document.getElementById("drawingCanvas");
-    const context = canvas.getContext("2d");
-    let isDrawing = false;
+        const x = document.getElementById("AccLoc");
 
-    // Adjust the coordinates to be relative to the canvas
-    function getMousePosition(event) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top
-        };
-    }
+        //Geo-Location [HTML5 JS] - API
+        function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else { 
+            x.value = "Geolocation is not supported by this browser.";
+        }
+        }
 
-    canvas.addEventListener("mousedown", (event) => {
-        isDrawing = true;
-        const pos = getMousePosition(event);
-        context.beginPath();
-        context.moveTo(pos.x, pos.y);
-    });
+        //Get LAt. and Long.
+        function showPosition(position) {
+        x.value = position.coords.latitude + "," + position.coords.longitude;
+        }
 
-    canvas.addEventListener("mousemove", (event) => {
-        if (!isDrawing) return;
-        const pos = getMousePosition(event);
-        context.lineTo(pos.x, pos.y);
-        context.stroke();
-    });
+        function showError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+            x.innerHTML = "User denied the request for Geolocation."
+            break;
+            case error.POSITION_UNAVAILABLE:
+            x.innerHTML = "Location information is unavailable."
+            break;
+            case error.TIMEOUT:
+            x.innerHTML = "The request to get user location timed out."
+            break;
+            case error.UNKNOWN_ERROR:
+            x.innerHTML = "An unknown error occurred."
+            break;
+        }
+        }
+        
+        
 
-    canvas.addEventListener("mouseup", () => {
-        isDrawing = false;
-    });
+        document.addEventListener("DOMContentLoaded", function () {
+            const canvas = document.getElementById("drawingCanvas");
+            const context = canvas.getContext("2d");
+            let isDrawing = false;
 
-    document.getElementById("clearButton").addEventListener("click", () => {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        event.preventDefault();
-    });
-});
+            // Adjust the coordinates to be relative to the canvas
+            function getMousePosition(event) {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: event.clientX - rect.left,
+                    y: event.clientY - rect.top
+                };
+            }
 
-function validateAddReportForm() {
-  let AccLocVal = document.forms["frmAddReport"]["input_AccLoc"].value;
-  let AccDescVal = document.forms["frmAddReport"]["input_AccDesc"].value;
-  var msg = "";
-    
+            canvas.addEventListener("mousedown", (event) => {
+                isDrawing = true;
+                const pos = getMousePosition(event);
+                context.beginPath();
+                context.moveTo(pos.x, pos.y);
+            });
 
-  if (AccLocVal == "" ) {
-        msg += "Location Cannot be Empty.<br />"
-    else{
-        if(AccDescVal == ""){
-              msg += "Accident Description Cannot be Empty."
+            canvas.addEventListener("mousemove", (event) => {
+                if (!isDrawing) return;
+                const pos = getMousePosition(event);
+                context.lineTo(pos.x, pos.y);
+                context.stroke();
+            });
+
+            canvas.addEventListener("mouseup", () => {
+                isDrawing = false;
+            });
+
+            document.getElementById("clearButton").addEventListener("click", () => {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                event.preventDefault();
+            });
+        });
+
+        function validateAddReportForm() {
+        let AccLocVal = document.forms["frmAddReport"]["input_AccLoc"].value;
+        let AccDescVal = document.forms["frmAddReport"]["input_AccDesc"].value;
+        var msg = "";
+            
+
+        if (AccLocVal == "" ) {
+                msg += "Location Cannot be Empty.<br />"
+            else{
+                if(AccDescVal == ""){
+                    msg += "Accident Description Cannot be Empty."
+                }
+            }
+                
+                ReportAddError(msg);
+            return false;
         }
     }
-          
-        ReportAddError(msg);
-    return false;
-  }
-}
     
 </script>

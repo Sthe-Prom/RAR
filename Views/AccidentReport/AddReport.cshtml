@@ -293,7 +293,7 @@
 
                                                                                     <div class="row">
                                                                                         <div class="col-sm-12">
-                                                                                            <form asp-action="ConfirmReport" method="post" id="frm1">
+                                                                                            <form asp-action="Delete" method="post" id="frm1">
                                                                                                 <div class="d-flex flex-row justify-content-between"> 
                                                                                                     @*<div class="col-auto">
                                                                                                         <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
@@ -404,15 +404,15 @@
                                                                                 {
                                                                                     <div class="row">
                                                                                         <div class="col-sm-12">
-                                                                                            <form asp-action="ConfirmReport" method="post" id="frm1">
+                                                                                            <form asp-action="Delete" method="post" id="frm1">
                                                                                                 <div class="d-flex flex-row justify-content-between"> 
-                                                                                                    <div class="col-auto">
+                                                                                                   @* <div class="col-auto">
                                                                                                         <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
                                                                                                             <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="btn btn-sm btn-outline-info" >
                                                                                                                 <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
                                                                                                             </a>
                                                                                                         </span>
-                                                                                                    </div>
+                                                                                                    </div>*@
                                                                                                     
                                                                                                     <input type="hidden" asp-for="@item.AccidentReportID" value="@item.AccidentReportID" name="AccidentReportID" />
                                                                                                         
@@ -424,11 +424,19 @@
                                                                                                         </span> 
                                                                                                     </div>
 
-                                                                                                    <div class="col-auto">
+                                                                                                    @*<div class="col-auto">
                                                                                                         <span data-bs-toggle="tooltip" data-bs-placement="top" title="Confirm Report">                                                                                                                        
                                                                                                             <button type="submit" class="btn btn-sm btn-outline-success">
                                                                                                                 <i class="align-middle" data-feather="check-square"></i>&nbsp;
                                                                                                             </button>                                                 
+                                                                                                        </span>
+                                                                                                    </div>*@
+
+                                                                                                    <div class="col-auto">
+                                                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Report">
+                                                                                                            <a asp-action="EditReport" asp-route-AccidentReportID="@item.AccidentReportID" class="btn btn-sm btn-outline-success" >
+                                                                                                                <i class="align-middle" data-feather="check-square" style="color: #00675A;"></i>&nbsp;
+                                                                                                            </a>
                                                                                                         </span>
                                                                                                     </div>
                                                                                                 </div>

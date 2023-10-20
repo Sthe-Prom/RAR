@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using rar.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
+
 
 namespace rar.Controllers
 {
@@ -609,11 +611,27 @@ namespace rar.Controllers
                         
                 var AccidentReport = new AccidentReport
                 {                   
-                    AccidentID = RAR,//"RAR-GAM-4312",
+                    // AccidentID = RAR,
+                    // AccidentTime = System.DateTime.UtcNow,//vm.AccidentReport.AccidentTime,
+                    // AccidentLocation = vm.AccidentReport.AccidentLocation,           
+                    // AccidentDate = System.DateTime.UtcNow,//vm.AccidentReport.AccidentDate, //System.DateTime.UtcNow
+                    // AccidentDescription = vm.AccidentReport.AccidentDescription,
+                    // NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
+                    // NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
+                    // AccountID = AccountID_,
+                    // PoliceStationID = vm.AccidentReport.PoliceStationID,
+                    // CollisionID = vm.AccidentReport.CollisionID,
+                    // WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
+                    // AccidentTypeID = vm.AccidentReport.AccidentTypeID,
+                    // AccidentPicture = vm.AccidentReport.AccidentPicture,
+                    // AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
+                    // HitAndRun = vm.AccidentReport.HitAndRun
+
+                    AccidentID = RAR,
                     AccidentTime = vm.AccidentReport.AccidentTime,
                     AccidentLocation = vm.AccidentReport.AccidentLocation,           
-                    AccidentDate = vm.AccidentReport.AccidentDate, //System.DateTime.UtcNow
-                    AccidentDescription = vm.AccidentReport.AccidentDescription,
+                    AccidentDate = vm.AccidentReport.AccidentDate,//System.DateTime.UtcNow,
+                    AccidentDescription =  vm.AccidentReport.AccidentDescription,
                     NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
                     NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
                     AccountID = AccountID_,
@@ -621,7 +639,7 @@ namespace rar.Controllers
                     CollisionID = vm.AccidentReport.CollisionID,
                     WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
                     AccidentTypeID = vm.AccidentReport.AccidentTypeID,
-                    AccidentPicture = uploadedAPImage,//vm.AccidentReport.AccidentPicture,
+                    AccidentPicture = uploadedAPImage,
                     AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
                     HitAndRun = vm.AccidentReport.HitAndRun
                 };
@@ -645,7 +663,7 @@ namespace rar.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return Content("Not Added." + ex.Message);
+                    return Content("Not Added. " + ex.Message);
                 }
                 //return Content("Valid");
             // }
@@ -654,7 +672,82 @@ namespace rar.Controllers
             //     return Content("Invalid Model");
             // }
         }
-        
+
+        [HttpPost]
+        public async Task<JsonResult> AddReportAjax(IFormCollection formcollection)
+        {
+            int AccountID_ = 0;
+            string RAR = "";
+            AccidentReportViewModel vm = new AccidentReportViewModel();
+
+            if (signInManager.IsSignedIn(User))
+            {
+                if (vm.AccidentReport.AccidentLocation.Length > 0)
+                    RAR = "RAR-" + DateTime.UtcNow.ToString("HH:mm:ss").Substring(0, 3) + "-" + vm.AccidentReport.AccidentLocation.Substring(0, 3).ToUpper();
+
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
+            string uploadedAPImage = UploadedAccidentPicture(vm);
+
+            if (uploadedAPImage == null)
+            {
+                uploadedAPImage = "Upload is null";
+            }
+
+            JsonViewModel model = new JsonViewModel();
+
+            var AccidentReport = new AccidentReport
+            {                 
+                AccidentID = "RAR-A987",
+                AccidentTime = Convert.ToDateTime(formcollection["AccDate"]),
+                AccidentLocation = formcollection["AccLoc"].ToString(),
+                AccidentDate = Convert.ToDateTime(formcollection["AccTime"]), 
+                AccidentDescription = formcollection["AccDesc"].ToString(),
+                NrPeopleKilled = Convert.ToInt32(formcollection["AccKilled"]),
+                NrPeopleInjured = Convert.ToInt32(formcollection["AccInjured"]),
+                AccountID = AccountID_,
+                PoliceStationID = Convert.ToInt32(formcollection["AccPoliceStation"]),
+                CollisionID = Convert.ToInt32(formcollection["AccColl"]),
+                WeatherTypeID = Convert.ToInt32(formcollection["AccWeather"]),
+                AccidentTypeID = Convert.ToInt32(formcollection["AccType"]),
+                AccidentPicture = uploadedAPImage,
+                AccidentSketch = uploadedAPImage,
+                HitAndRun = Convert.ToBoolean(formcollection["AccHitRun"])
+            };
+            
+            try
+            {           
+                await context.SaveAccidentReport(AccidentReport);                                                    
+            }
+            catch (Exception ex)
+            {
+                model.ResponseCode = 1;
+            }
+
+            if (AccidentReport != null)
+            {
+                model.ResponseCode = 0;
+                model.ResponseMessage = JsonConvert.SerializeObject(AccidentReport);
+            }
+            else
+            {
+                model.ResponseCode = 1;
+                model.ResponseMessage = "No record available";
+            }
+
+            return Json(model);
+
+        }
+
         #region AddAccidentFactor Deleted Code
         // [HttpPost]
         // public IActionResult AddAccidentFactor(AccidentReportViewModel vm)
@@ -673,7 +766,7 @@ namespace rar.Controllers
         //             }
         //         }
         //     }
-            
+
         //     var AR_ID = context.AccidentReports
         //         .FirstOrDefault(r => r.AccountID == AccountID_);
 
@@ -683,7 +776,7 @@ namespace rar.Controllers
         //         //VehicleFactorID = vm.VehicleFactor.VehicleFactorID,
         //         //AccidentReportID = vm.AccidentReport.AccidentReportID //AR_ID
         //     };
-           
+
         //     // if(String.IsNullOrEmpty(vm.HumanFactor.HumanFactorID))
         //     // {
         //     //     ModelState.AddModelError("HumanFactorID", "This field is a required field.");                
@@ -939,7 +1032,8 @@ namespace rar.Controllers
             var AccidentReport = context.AccidentReports.FirstOrDefault(r => r.AccidentReportID == vm.AccidentReport.AccidentReportID); //Convert.ToInt32(Request.Query["AccidentReportID"]));//8);//
             
             if (AccidentReport != default(AccidentReport))
-            { 
+            {     
+
                 //return Content("Something's right");
                 //AccidentReport.AccidentReportID = vm.AccidentReport.AccidentReportID;              
                 // AccidentReport.AccidentID = vm.AccidentReport.AccidentID;
@@ -956,6 +1050,7 @@ namespace rar.Controllers
                 AccidentReport.WeatherTypeID = vm.AccidentReport.WeatherTypeID;
               
                 AccidentReport.Confirmed = vm.AccidentReport.Confirmed;
+                AccidentReport.HitAndRun = vm.AccidentReport.HitAndRun;
 
                 //var userId = userManager.GetUserId(User);
                 //User user_id = userManager.FindByIdAsync(userId);
@@ -983,7 +1078,7 @@ namespace rar.Controllers
             //         // if (signInManager.IsSignedIn(User))
             //         // {
                         await context.SaveAccidentReport(AccidentReport);
-                        return RedirectToAction("AddReport"); //return Content("Added");//
+                        return RedirectToAction("LatestAccidents"); //return Content("Added");//
             //             // return Content("PS: " + PoliceStationID   
             //             //         + "\nCol: " + CollisionID
             //             //         + "\nAT: " + AccidentTypeID

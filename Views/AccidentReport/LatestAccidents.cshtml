@@ -464,32 +464,89 @@
                     @{
                         string sortUser = Context.Request.Query["sortUser"];
                         string sortOrder = Context.Request.Query["sortOrder"];
+                        string accidentType = Context.Request.Query["accidentType"];
                     }
-                    <div class="text-center" style="float:none; margin: 0 auto;">
-                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagersortUser" page-classes-enabled="true"
+
+
+                     <div class="text-center" style="float:none; margin: 0 auto;" id="pagersortUser">
+                       
+                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents"  page-classes-enabled="true"
                             page-class="btn" page-class-normal="btn-secondary"
-                            page-class-selected="btn-primary" onclick="sortUserChange()" page-url-sortUser="@sortUser" class="btn-group text-center"> 
-                        </div>
-                    </div>  
-                    <div class="text-center" style="float:none; margin: 0 auto;">
-                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagersortOrder" page-classes-enabled="true"
-                            page-class="btn" page-class-normal="btn-secondary"
-                            page-class-selected="btn-primary" onclick="sortOrderChange()" page-url-sortOrder="@sortOrder" class="btn-group text-center">  
+                            page-class-selected="btn-primary" page-url-sortUser="@sortUser" class="btn-group text-center"> 
                         </div>
                     </div>
+
                     
-                    <div class="text-center" style="float:none; margin: 0 auto;">
-                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagerAccType" page-classes-enabled="true"
+                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagersortOrder">
+                      
+                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents"  page-classes-enabled="true"
                             page-class="btn" page-class-normal="btn-secondary"
-                            page-class-selected="btn-primary" onclick="accTypeChange()" page-url-accidentType="@Model.AccidentTypeID" class="btn-group text-center">  
+                            page-class-selected="btn-primary" page-url-sortOrder="@sortOrder" class="btn-group text-center">  
                         </div>
                     </div> 
-                    <div class="text-center" style="float:none; margin: 0 auto;">
-                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagerDefault" page-classes-enabled="true"
+
+                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagerAccType">
+                      
+                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents"  page-classes-enabled="true"
+                            page-class="btn" page-class-normal="btn-secondary"
+                            page-class-selected="btn-primary" page-url-accidentType="@Model.AccidentTypeID" class="btn-group text-center">  
+                        </div>
+                    </div>
+
+                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagerDefault">
+                        
+                         <div page-model="@Model.PaginationHeader" page-action="LatestAccidents"  page-classes-enabled="true"
                             page-class="btn" page-class-normal="btn-secondary"
                             page-class-selected="btn-primary" class="btn-group text-center"> 
-                        </div>
+                        </div> 
                     </div> 
+                                      
+                    @*@if(sortOrder!= "")//  && sortUser == "" && accidentType=="")
+                    {                     
+                           
+                        <div class="text-center" style="float:none; margin: 0 auto;">
+                            <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagersortOrder" page-classes-enabled="true"
+                                page-class="btn" page-class-normal="btn-secondary"
+                                page-class-selected="btn-primary" page-url-sortOrder="@sortOrder" class="btn-group text-center">  
+                            </div>
+                        </div>                            
+                            
+                    }
+                    else
+                    @if(sortUser != "") // && sortOrder == "" && accidentType=="")
+                    {
+                        <div class="text-center" style="float:none; margin: 0 auto;">
+                            <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagersortUser" page-classes-enabled="true"
+                                page-class="btn" page-class-normal="btn-secondary"
+                                page-class-selected="btn-primary" page-url-sortUser="@sortUser" class="btn-group text-center"> 
+                            </div>
+                        </div> 
+                       
+                    }
+                    else
+                    @if(accidentType!= "")//  && sortOrder=="" && sortUser=="" )
+                    {                    
+                        <div class="text-center" style="float:none; margin: 0 auto;">
+                            <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagerAccType" page-classes-enabled="true"
+                                page-class="btn" page-class-normal="btn-secondary"
+                                page-class-selected="btn-primary" page-url-accidentType="@Model.AccidentTypeID" class="btn-group text-center">  
+                            </div>
+                        </div>
+                      
+                    }
+                    else
+                    @if(accidentType == "" && sortUser == "" && sortOrder == "")
+                    {
+                        <div class="text-center" style="float:none; margin: 0 auto;">
+                            <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" id="pagerDefault" page-classes-enabled="true"
+                                page-class="btn" page-class-normal="btn-secondary"
+                                page-class-selected="btn-primary" class="btn-group text-center"> 
+                            </div>
+                        </div> 
+                    
+                    }
+                    }*@
+
                 </div>
                         
             </div>           
@@ -507,82 +564,78 @@
     var pagerDef = document.getElementById('pagerDefault');
 
   
-    const urlParams = new URLSearchParams(window.location.search);
-    const qs_sortUser = urlParams.get('sortUser');
-    const qs_sortOrder = urlParams.get('sortOrder');       
-    const qs_accidentType = urlParams.get('accidentType');   
-    sh();
-    // if(qs_sortUser !== ""){
-    //     sortUserChange();
-    // }else{
-    //     sh();
-    // }
-
-    // if(qs_sortOrder !== ""){
-    //     sortOrderChange();
-    // }else{
-    //     sh();
-    // }
-
-    // if(qs_accidentType !== ""){
-    //     accTypeChange();
-    // }else{
-    //     sh();
-    // }
-      
+    var urlParams = new URLSearchParams(window.location.search);
+    var qs_sortUser = urlParams.get('sortUser');
+    var qs_sortOrder = urlParams.get('sortOrder');       
+    var qs_accidentType = urlParams.get('accidentType');   
+                   
+        if(qs_sortOrder =="Oldest" || qs_sortOrder=="Newest"){
+            sortOrderChange();
+            document.getElementById("sortOrder").value=qs_sortOrder;
+        }else{
+            if(qs_sortUser == "LoggedIn" || qs_sortUser == "AllUsers"){
+                sortUserChange();   
+                document.getElementById("sortUser").value=qs_sortUser;
+            }else{
+                if(qs_accidentType > 0){
+                    accTypeChange();
+                    document.getElementById("AccType").value=qs_accidentType;
+                }else{
+                    showDefault();
+                }
+            
+            }                      
+        } 
   
-    function sh(){
-         sortOrder.style.display = 'none';
+    function showDefault(){            
+        sortOrder.style.display = 'none';
         sortUser.style.display = 'none';
-        accType.style.display = 'none';      
         pagerDef.style.display = 'block';
-        };    
+        accType.style.display = 'none';
+    } 
         
    
     function accTypeChange(){
         sortOrder.style.display = 'none';
         sortUser.style.display = 'none';
         pagerDef.style.display = 'none';
+        accType.style.display = 'block';
+        
     }
 
      function sortUserChange(){
         sortOrder.style.display = 'none';
         accType.style.display = 'none';
         pagerDef.style.display = 'none';
+        sortUser.style.display = 'block';
     }
 
     function sortOrderChange(){
         accType.style.display = 'none';
         sortUser.style.display = 'none';
-        pagerDef.style.display = 'none';        
-    };
+        pagerDef.style.display = 'none';   
+        sortOrder.style.display = 'block';     
+    }
 
             
         document.getElementById("AccType").onchange = function() {
             if (this.selectedIndex!==0) {
-                window.location.href = "LatestAccidents?accidentType="+ this.value + "&Page=1?";                
-                accTypeChange();
+                window.location.href = "LatestAccidents?accidentType="+ this.value + "&Page=1?";       
             }        
         };
 
         document.getElementById("sortUser").onchange = function() {
             if (this.selectedIndex!==0) {
-                window.location.href = "LatestAccidents?sortUser="+ this.value + "&Page=1?";
-                const urlParams = new URLSearchParams(window.location.search);
-                const QS = urlParams.get('sortUser');   
-                if(QS !== ""){
-                    sortUserChange();
-                }else{
-                    sh();
-                }
-                    
+                window.location.href = "LatestAccidents?sortUser="+ this.value + "&Page=1?";               
+                document.getElementById("sortUser").value=this.value;
+               
             }        
         };
 
         document.getElementById("sortOrder").onchange = function() {
             if (this.selectedIndex!==0) {
                 window.location.href = "LatestAccidents?sortOrder="+ this.value + "&Page=1?";
-                sortOrderChange();
+                document.getElementById("sortOrder").value=this.value;
             }        
         };
     

@@ -189,7 +189,8 @@ function ReportComplete() {
         type: "success",
         html: true,
         showCancelButton: false,
-        showConfirmButton: false
+        showConfirmButton: false,
+        allowOutsideClick: false
         });
 }
 
@@ -206,10 +207,10 @@ function ReportAdded(msg) {
     });   
 }
 
-function ReportAddError(msg) {
+function ReportAddError(tit,msg) {
 
     swal({
-        title: "Error Adding Report",
+        title: tit ,
         text: "<h3>Please correct following fields: </h3><br />" + msg,
         type: "error",
         confirmButtonColor: "#DD6B55",
