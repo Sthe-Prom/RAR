@@ -1008,25 +1008,24 @@
                                                             <input
                                                                 class="form-check-input"
                                                                 type="checkbox"
-                                                                value="@Model.AccidentReport.AccidentReportID"
+                                                                value="True"
                                                               
                                                                  />
                                                             <span class="form-check-label">
                                                                 confirm that I have read the road accident data as recorded by the officer.
                                                             </span>
-                                                        </label>                                                      
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                Confirm Form Data
+                                                            </button>
+                                                        </label>   
+                                                                                                        
                                                     
                                                     </div>
                                                 </div>
                                             </div>      
                                         </div>  
                                        
-                                        <form asp-action="ConfirmReport" method="post">
-                                            <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID"  />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" disabled>
-                                                Confirm Form Data
-                                            </button>
-                                        </form>
+                                    
                                     </div>                                            
 
                                 </div>
@@ -1035,43 +1034,48 @@
                     }
                 }
 
-                <!-- Complete -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header " id="flush-headingOne2" >                   
-                        <button class="accordion-button collapsed btn btn-lg btn-outline-success" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse4" aria-expanded="false" aria-controls="flush-collapseOne"> 
-                            Complete Report                      
-                        </button>                                        
-                    </h2>  
+        
+                 <!-- Complete -->
+                @if(await userManager.IsInRoleAsync(user,"Officer"))
+                {
+               
+                    <div class="accordion-item">
+                        <h2 class="accordion-header " id="flush-headingOne2" >                   
+                            <button class="accordion-button collapsed btn btn-lg btn-outline-success" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse4" aria-expanded="false" aria-controls="flush-collapseOne"> 
+                                Complete Report                      
+                            </button>                                        
+                        </h2>  
 
-                    <div id="flush-collapse4" class="accordion-collapse collapse accordion-body" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample1">
-                        <div class="d-flex flex-row justify-content-between row " style="padding: 5px;maring:3px;">
-                            <div class="">
-                                <div class="col-sm-12">
-                                    <h4 class="mb-1 mt-1">Submit Report</h4>
-                                    
-                                </div>  
-                                <div class="col-auto">
-                                    <div class="" role="alert">
-    
-                                        <h5 class="text-center">
-                                            <span class="h3 mb-3" style="margin:3px;padding: 5px;">Complete Report Submission</span>                                           
-                                        <h5>
-                                         <p class="text-center">Reports may take up to 24 Hours for review, you will receive 
-                                            feedback from from your report after review by data manager.
-                                        </p>
-                                    
+                        <div id="flush-collapse4" class="accordion-collapse collapse accordion-body" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample1">
+                            <div class="d-flex flex-row justify-content-between row " style="padding: 5px;maring:3px;">
+                                <div class="">
+                                    <div class="col-sm-12">
+                                        <h4 class="mb-1 mt-1">Submit Report</h4>
+                                        
+                                    </div>  
+                                    <div class="col-auto">
+                                        <div class="" role="alert">
+        
+                                            <h5 class="text-center">
+                                                <span class="h3 mb-3" style="margin:3px;padding: 5px;">Complete Report Submission</span>                                           
+                                            </h5>
+                                            <p class="text-center">Reports may take up to 24 Hours for review, you will receive 
+                                                feedback from your report after review by data manager.
+                                            </p>
+                                        
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="text-center">
-                                    <a class="btn btn-md btn-success" onclick="ReportComplete()">
-                                        Save Report
-                                    </a>
-                                </div>
-                            </div>                                            
+                                    <div class="text-center">
+                                        <a class="btn btn-md btn-success" onclick="ReportComplete()">
+                                            Save Report
+                                        </a>
+                                    </div>
+                                </div>                                            
 
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
 
             </div>
 

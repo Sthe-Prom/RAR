@@ -221,6 +221,19 @@ function ReportAddError(tit,msg) {
     });   
 }
 
+function SectionAdd(tit,msg) {
+
+    swal({
+        title: tit ,
+        text: "<h3>Completing Your Report... </h3><br />" + msg,
+        type: "success",
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Okay",
+        closeOnConfirm: false,
+        html: true
+           
+    });   
+}
 
 
 

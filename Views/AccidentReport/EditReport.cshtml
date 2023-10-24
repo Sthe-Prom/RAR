@@ -44,12 +44,12 @@
             }
             if((await userManager.IsInRoleAsync(user,"Data Manager")) )
             {                    
-                <form asp-action="EditReport" class="col-auto" style="padding: 2px;" method="post">
+                 <form asp-action="EditReport" class="col-auto" style="padding: 2px;" method="post">  
                     <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID"  />                                  
-                    <div class="card-body" id="data_managerInputs">  
+                    <div class="card-body">                            
                         @await Component.InvokeAsync("EditReport")
-                    </div>                          
-                </form>
+                    </div> 
+                </form>    
                 
             }
             if((await userManager.IsInRoleAsync(user,"Officer")) )

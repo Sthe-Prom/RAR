@@ -65,66 +65,7 @@
 
 </style>
 
-
-  @section Scripts{
-                    <script>
-                        $(document).ready(function() {
-                            
-                            //SAVE
-                            $("#btn-addreport").on("click", function() {
-                                var formData = new FormData();
-                                formData.append("AccDate", $("#AccDate").val());
-                                formData.append("AccTime", $("#AccTime").val());
-                                formData.append("AccLoc", $("#AccLoc").val());
-                                formData.append("AccDesc", $("#AccDesc").val());
-                                formData.append("AccColl", $("#AccColl").val());
-                                formData.append("AccKilled", $("#AccKilled").val());
-                                formData.append("AccInjured", $("#AccInjured").val());
-                                formData.append("AccProvince", $("#AccProvince").val());
-                                formData.append("AccCity", $("#AccCity").val());
-                                formData.append("AccPoliceStation", $("#AccPoliceStation").val());
-                                formData.append("AccType", $("#AccType").val());
-                                formData.append("AccHitRun", $("#AccHitRun").val());
-                                formData.append("AccWeather", $("#AccWeather").val());
-                                
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '@Url.Action("AddReportAjax", "AccidentReport")',
-                                    contentType: false,
-                                    processData: false,
-                                    cache: false,
-                                    data: formData,
-                                    success: successCallback,
-                                    error: errorCallback
-                                });
-                            });
-                            
-                            
-                            function resetForm() {
-                                $("#AccDate").val("");
-                                $("#AccTime").val("");
-                                $("#AccLoc").val("");
-                            }
-
-                            function errorCallback() {
-                                alert("Something went wrong please contact admin.");
-                            }
-                            function successCallback(response) {
-                                if (response.responseCode == 0) {
-                                    resetForm();
-                                    alert(response.responseMessage, function() {
-
-                                        //PERFORM REMAINING LOGIC
-                                    });
-                                }
-                                else {
-                                    alert(response.ResponseMessage);
-                                }
-                            };
-                        });
-                    </script>
-                }
-
+ 
 <div class="container-fluid p-0">
  
     <div class="d-flex flex-row justify-content-between">  
@@ -135,14 +76,7 @@
            
     </div>
 
-     @if(!string.IsNullOrEmpty(ViewBag.Result))
-        {
-            <div class="alert alert-success" role="alert">
-                <p>Success Banner: @ViewBag.Result</p>
-            </div>
-
-        }
-    
+   
     <div class="row">
         <div class="col-12">
 
@@ -162,17 +96,9 @@
                                 <h4 class="mb-1 mt-1">Accident Identification Details </h4>
                                 <hr />
                             </div>
-
-
-
-                            <form asp-action="AddReport" method="post" id="frmAddReport" >                                
-                                                                
-                                <!-- <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID" id="@Model.AccidentReport.AccidentReportID" name="AccidentReportID" /> -->
-
-                                <div asp-validation-summary="All"></div>
-
-                             
-
+                            
+                            <form id="frmAddReport">                                
+                            
                                 <div class="row"> 
                                     <div class="col-sm-4">
                                         <div class="card">
@@ -180,8 +106,7 @@
                                                 <h5 class="card-title mb-0">Accident Date</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="date" id="AccDate" asp-for="@Model.AccidentReport.AccidentDate" class="form-control" placeholder="Accident Date">
-                                                <div><span asp-validation-for="@Model.AccidentReport.AccidentDate" class="text-danger"></span></div>
+                                                <input type="date" id="AccDate" class="form-control" placeholder="Accident Date">                                                
                                             </div>
                                         </div>
                                     </div>
@@ -192,8 +117,7 @@
                                                 <h5 class="card-title mb-0">Accident Time</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="time" id="AccTime" asp-for="@Model.AccidentReport.AccidentTime" class="form-control" placeholder="Accident Time">
-                                                <div><span asp-validation-for="@Model.AccidentReport.AccidentTime" class="text-danger"></span></div>
+                                                <input type="time" value="12:00" id="AccTime" class="form-control" placeholder="Accident Time">                                                
                                             </div>
                                         </div>
                                     </div>
@@ -202,7 +126,7 @@
                                         <div class="card">
                                             <div class="card-header">                                                 
                                                 <h5 class="card-title mb-0">
-                                                    <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to get device's' current location.">
+                                                    <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to get device's' current location." required="">
                                                         Accident Location 
                                                         <a onclick="getLocation()">
                                                             <i class="align-middle" data-feather="map-pin"></i>    
@@ -211,9 +135,7 @@
                                                 </h5>
                                             </div>
                                             <div class="card-body">                                                                                                                                                  
-                                                <input type="text" id="AccLoc" asp-for="@Model.AccidentReport.AccidentLocation"  class="form-control" placeholder="Accident Location">
-                                                
-                                                <div><span id="valAccLoc" class="text-danger"></span></div>
+                                                <input type="text" id="AccidentLocation" class="form-control" placeholder="Accident Location" required>                                      
                                             </div>
                                         </div>
                                     </div>
@@ -224,8 +146,7 @@
                                                 <h5 class="card-title mb-0">Accident Description</h5>
                                             </div>
                                             <div class="card-body">
-                                                <textarea type="text" id="AccDesc" row="3" asp-for="@Model.AccidentReport.AccidentDescription" class="form-control" placeholder="Accident Description"></textarea>
-                                                <div><span asp-validation-for="@Model.AccidentReport.AccidentDescription" class="text-danger"></span></div>
+                                                <textarea type="text" row="3" id="AccidentDescription" class="form-control" placeholder="Accident Description" required></textarea>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -237,8 +158,7 @@
                                             </div>
                                         </div>
                                         <div class="card-body custom-file">                                        
-                                            <input asp-for="@Model.AccidentPicture" accept="image/gif, image/jpeg" class="custom-file-input form-control" id="customFile" type="file" />                                
-                                            <span asp-validation-for="@Model.AccidentPicture" class="text-danger"></span>                                        
+                                            <input accept="image/gif, image/jpeg" class="custom-file-input form-control" id="AccidentPicture" type="file" />                                                                            
                                         </div>
                                     </div>
 
@@ -248,10 +168,9 @@
                                                 <h5 class="card-title mb-0">Type of Collision</h5>
                                             </div>
                                             <div class="card-body">
-                                                <select class="form-select mb-3" id="AccColl" asp-for="@Model.AccidentReport.CollisionID" asp-items="Model.Collisions"  >
+                                                <select class="form-select mb-3" id="CollisionType" asp-items="Model.Collisions" required >
                                                     <option value="" selected>Select Collision Type</option>
-                                                </select>
-                                                <div><span asp-validation-for="@Model.AccidentReport.CollisionID" class="text-danger"></span></div>
+                                                </select>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -262,8 +181,7 @@
                                                 <h5 class="card-title mb-0">Number of People Killed</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="number" min="0" id="AccKilled" asp-for="@Model.AccidentReport.NrPeopleKilled" class="form-control" placeholder="Number of Peope Killed">
-                                                <div><span asp-validation-for="@Model.AccidentReport.NrPeopleKilled" class="text-danger"></span></div>
+                                                <input type="number" min="0"  id="AccKilled" class="form-control" placeholder="Number of Peope Killed">                                                
                                             </div>
                                         </div>
                                     </div>
@@ -274,8 +192,7 @@
                                                 <h5 class="card-title mb-0">Number of People Injured</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="number" min="0" id="AccInjured" asp-for="@Model.AccidentReport.NrPeopleInjured" class="form-control" placeholder="Number of Peope Injured">
-                                                <div><span asp-validation-for="@Model.AccidentReport.NrPeopleInjured" class="text-danger"></span></div>
+                                                <input type="number" min="0" id="AccInjured" class="form-control" placeholder="Number of Peope Injured">                                                
                                             </div>
                                         </div>
                                     </div>
@@ -286,7 +203,7 @@
                                                 <h5 class="card-title mb-0">Province</h5>
                                             </div>
                                             <div class="card-body">
-                                                <select class="form-select mb-3" id="AccProvince"> @*asp-items="Model.Provinces_Select" >*@
+                                                <select class="form-select mb-3" id="Province" required> @*asp-items="Model.Provinces_Select" >*@
                                                     <option value=""selected>Select Province</option> 
                                                     <option value="1" disabled>Gauteng</option> 
                                                     <option value="2" >Free State</option> 
@@ -309,7 +226,7 @@
                                                 <h5 class="card-title mb-0">City</h5>
                                             </div>
                                             <div class="card-body">
-                                                <select class="form-select mb-3" id="AccCity"> @*asp-items="Model.District_Select" >*@
+                                                <select class="form-select mb-3" id="City" required> @*asp-items="Model.District_Select" >*@
                                                     <option value="City" selected>Select City</option>
                                                     <option >Bloemfontein</option>
                                                     <option disabled>Clarens</option>
@@ -328,10 +245,9 @@
                                                 <h5 class="card-title mb-0">Police Station</h5>
                                             </div>
                                             <div class="card-body">
-                                                <select class="form-select mb-3" id="AccPoliceStation" asp-for="@Model.AccidentReport.PoliceStationID" asp-items="Model.PoliceStations_Select" >
+                                                <select class="form-select mb-3" id="PoliceStation" asp-items="Model.PoliceStations_Select" required >
                                                     <option value="" selected>Select Police Station</option>
-                                                </select>
-                                                <div><span asp-validation-for="@Model.AccidentReport.PoliceStationID" class="text-danger"></span></div>
+                                                </select>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -342,10 +258,9 @@
                                                 <h5 class="card-title mb-0">Type of Accident</h5>
                                             </div>
                                             <div class="card-body">
-                                                <select class="form-select mb-3" id="AccType" asp-for="@Model.AccidentReport.AccidentTypeID" asp-items="Model.AccidentTypes_Select" >
+                                                <select class="form-select mb-3" id="AccidentType" asp-items="Model.AccidentTypes_Select" required >
                                                     <option value="" selected>Select Accident Type</option>                                     
-                                                </select>
-                                                <div><span asp-validation-for="@Model.AccidentReport.AccidentTypeID" class="text-danger"></span></div>
+                                                </select>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -353,7 +268,7 @@
                                     <div class="col-sm-4">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h5 asp-for="@Model.AccidentReport.HitAndRun" class="card-title mb-0">Hit & Run ?</h5>
+                                                <h5 class="card-title mb-0">Hit & Run ?</h5>
                                             </div>
                                             <div class="card-body">
                                                 <div>
@@ -362,8 +277,7 @@
                                                             class="form-check-input"
                                                             type="radio"
                                                             value="True"
-                                                            asp-for="@Model.AccidentReport.HitAndRun"
-                                                            id="AccHitRun"
+                                                            id="HitAndRun"                                                           
                                                             checked />
                                                         <span class="form-check-label">
                                                             Yes
@@ -374,7 +288,7 @@
                                                             class="form-check-input"
                                                             type="radio"
                                                             value="False"
-                                                            asp-for="@Model.AccidentReport.HitAndRun"                                                            
+                                                            id="HitAndRun"                                                                                                                   
                                                             />
                                                         <span class="form-check-label">
                                                         No
@@ -392,15 +306,14 @@
                                                 <h5 class="card-title mb-0">Type of Weather</h5>
                                             </div>
                                             <div class="card-body">
-                                                <select class="form-select mb-3" id="AccWeather" asp-for="@Model.AccidentReport.WeatherTypeID" asp-items="Model.WeatherTypes" >
+                                                <select class="form-select mb-3" id="WeatherType" asp-items="Model.WeatherTypes" required>
                                                     <option value="" selected>Select Weather Type</option>                                    
-                                                </select>
-                                                <div><span asp-validation-for="@Model.AccidentReport.WeatherTypeID" class="text-danger"></span></div>
+                                                </select>                                                
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-12 text-center center">
+                                    <div class="col-sm-12 text-center center" >
                                         <div class="card">    
                                             <div class="card-header">
                                                 <h5 class="card-title mb-0">Accident Sketch</h5>
@@ -423,13 +336,13 @@
                                 </div>
 
                                 <div class="text-center">
-                                    @* <button type="submit" class="btn btn-primary">Save Accident Details</button>  *@
-                                    <a href="javascript:void(0)"  class="btn btn-primary" id="btn-addreport">Save Accident Details</a>              
+                                    <!-- <button type="submit" id="submitAddReport" onclick="validateAddReportForm()" class="btn btn-primary">Save Accident Details</button>                  -->
+                                    <a href="javascript:void(0)" class="btn btn-primary" id="submitAddReport">Save Accident Details</a>              
                                     <a href="~/AccidentReport/AddReport" class="btn btn-secondary">Cancel</a>
                                 </div>
 
                             </form>
-
+                           
                           
 
                         </div>
@@ -450,18 +363,16 @@
                                 <hr />
                             </div>
 
-                                <form asp-action="AddRoadFactors" id="frmAddRoadFactors" method="post" onsubmit="return validateAddRoadFactorForm()">
+                                <form id="frmAddRoadFactors">
                                     <div class="d-flex flex-row justify-content-between row">
-                                        
-                                     
+                                       
                                         <div class="col-sm-4">
                                             <div class="card">
                                                 <div class="card-header">
                                                     <h5 class="card-title mb-0">Road Name</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="Road Name" asp-for="@Model.RoadFactor.RoadName" class="form-control" placeholder="Road Name">
-                                                    <div><span asp-validation-for="@Model.RoadFactor.RoadName" class="text-danger"></span></div>
+                                                    <input type="text" id="RoadName" class="form-control" placeholder="Road Name" required>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -472,8 +383,7 @@
                                                     <h5 class="card-title mb-0">Road Number</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="Road Number" asp-for="@Model.RoadFactor.RoadNumber" class="form-control" placeholder="Road Number">
-                                                    <div><span asp-validation-for="@Model.RoadFactor.RoadNumber" class="text-danger"></span></div>
+                                                    <input type="text" id="RoadNumber" class="form-control" placeholder="Road Number" required>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -484,8 +394,7 @@
                                                     <h5 class="card-title mb-0">Landmark</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="Landmark" asp-for="@Model.RoadFactor.Landmark" class="form-control" placeholder="Landmark">
-                                                    
+                                                    <input type="text" id="Landamrk" class="form-control" placeholder="Landmark" required>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -502,7 +411,7 @@
                                                                 class="form-check-input"
                                                                 type="radio"
                                                                 value="True"                                                       
-                                                                asp-for="@Model.RoadFactor.PhysicalDivider"/>
+                                                                id="PhysicalDivider"/>
                                                             <span class="form-check-label">
                                                                 Yes
                                                             </span>
@@ -512,7 +421,7 @@
                                                                 class="form-check-input"
                                                                 type="radio"
                                                                 value="False"
-                                                                asp-for="@Model.RoadFactor.PhysicalDivider"                                                               
+                                                                id="PhysicalDivider"                                                               
                                                                />
                                                             <span class="form-check-label">
                                                                 No
@@ -535,7 +444,7 @@
                                                                 class="form-check-input"
                                                                 type="radio"
                                                                 value="True"                                                                
-                                                                asp-for="@Model.RoadFactor.OnGoingRoadWorks" />
+                                                                id="OnGoingRoadWorks" />
                                                             <span class="form-check-label">
                                                                 Yes
                                                             </span>
@@ -545,7 +454,7 @@
                                                                 class="form-check-input"
                                                                 type="radio"
                                                                 value="False"
-                                                                asp-for="@Model.RoadFactor.OnGoingRoadWorks" />
+                                                                id="OnGoingRoadWorks" />
                                                             <span class="form-check-label">
                                                                 No
                                                             </span>
@@ -561,10 +470,9 @@
                                                     <h5 class="card-title mb-0">Road Type</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Road Type" asp-for="@Model.RoadFactor.RoadTypeID" asp-items="Model.RoadType_Select" >
+                                                    <select class="form-select mb-3" id="RoadType" asp-items="Model.RoadType_Select" required>
                                                         <option value="" selected>Select Road Type</option>
-                                                    </select>
-                                                    <div><span asp-validation-for="@Model.RoadFactor.RoadTypeID" class="text-danger"></span></div>
+                                                    </select>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -575,10 +483,9 @@
                                                     <h5 class="card-title mb-0">Road Feature</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Road Feature" asp-for="@Model.RoadFactor.RoadFeatureID" asp-items="Model.RoadFeature_Select" >
+                                                    <select class="form-select mb-3" id="RoadFeature" asp-items="Model.RoadFeature_Select" required>
                                                         <option value="" selected>Select Road RoadFeature</option>
-                                                    </select>
-                                                    <div><span asp-validation-for="@Model.RoadFactor.RoadFeatureID" class="text-danger"></span></div>
+                                                    </select>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -589,10 +496,9 @@
                                                     <h5 class="card-title mb-0">Road Surface</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Road Surface" asp-for="@Model.RoadFactor.RoadSurfaceID" asp-items="Model.RoadSurface_Select" >
+                                                    <select class="form-select mb-3" id="RoadSurface" asp-items="Model.RoadSurface_Select" required>
                                                         <option value="" selected>Select Road Surface</option>
-                                                    </select>
-                                                    <div><span asp-validation-for="@Model.RoadFactor.RoadSurfaceID" class="text-danger"></span></div>
+                                                    </select>                                                   
                                                 </div>
                                             </div>
                                         </div>
@@ -603,10 +509,9 @@
                                                     <h5 class="card-title mb-0">Surface Condition</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Surface Condition" asp-for="@Model.RoadFactor.SurfaceConditionID" asp-items="Model.SurfaceCondition_Select" >
+                                                    <select class="form-select mb-3" id="SurfaceCondition" asp-items="Model.SurfaceCondition_Select" required>
                                                         <option value="" selected>Select Surface Condition</option>
-                                                    </select>
-                                                    <div><span asp-validation-for="@Model.RoadFactor.SurfaceConditionID" class="text-danger"></span></div>
+                                                    </select>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -617,10 +522,9 @@
                                                     <h5 class="card-title mb-0">Road Surface Quality</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Road Surface Quality" asp-for="@Model.RoadFactor.RoadSurfaceQualityID" asp-items="Model.RoadSurfaceQuality_Select" >
+                                                    <select class="form-select mb-3" id="SurfaceQuality" asp-items="Model.RoadSurfaceQuality_Select" required>
                                                         <option value="" selected>Select Surface Quality</option>
-                                                    </select>
-                                                    <div><span asp-validation-for="@Model.RoadFactor.RoadSurfaceQualityID" class="text-danger"></span></div>
+                                                    </select>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -631,10 +535,9 @@
                                                     <h5 class="card-title mb-0">Speed Limit</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Speed Limit" asp-for="@Model.RoadFactor.SpeedLimitID" asp-items="Model.SpeedLimit_Select" >
+                                                    <select class="form-select mb-3" id="SpeedLimit" asp-items="Model.SpeedLimit_Select" required >
                                                         <option value="" selected>Select Speed Limit</option>
-                                                    </select>
-                                                    <div><span asp-validation-for="@Model.RoadFactor.SpeedLimitID" class="text-danger"></span></div>
+                                                    </select>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -645,18 +548,18 @@
                                                     <h5 class="card-title mb-0">Lane</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Lane" asp-for="@Model.RoadFactor.LaneID" asp-items="Model.Lane_Select" >
+                                                    <select class="form-select mb-3" id="Lane" asp-items="Model.Lane_Select" required>
                                                         <option value="" selected>Select Road Lane</option>
-                                                    </select>
-                                                    <div><span asp-validation-for="@Model.RoadFactor.LaneID" class="text-danger"></span></div>
+                                                    </select>                                                    
                                                 </div>
                                             </div>
                                         </div>
                                 
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary text-center">
+                                            <!-- <button type="submit" id="submitAddRoadFactors" onclick="validateAddRoadFactorsForm()" class="btn btn-primary text-center">
                                                 Save Road Factors                                        
-                                            </button>   
+                                            </button>    -->
+                                            <a href="javascript:void(0)" class="btn btn-primary" id="submitAddRoadFactors">Save Road Factor Details</a>              
                                             <a href="~/AccidentReport/AddReport" class="btn btn-secondary">Cancel</a>
                                         </div>
                                     
@@ -666,6 +569,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Vehicle Details -->
                 <div class="accordion-item">
@@ -684,14 +588,13 @@
                                 </div>
 
                                 <div class="d-flex flex-row justify-content-center row mb-2" style="margin:0 auto;float:none;">
-                                    <button class="btn btn-success col-auto mb-2" style="padding: 5px;" onclick="addVehicle()">Add Vehicle</button>
+                                    <button class="btn btn-success col-auto mb-2" id="newVehicle" style="padding: 5px;" >Add Vehicle</button>
                                 </div>
 
                                
 
-                                <form asp-action="AddVehicle" method="post" id="frmAddVehicle" onsubmit="return validateAddVehicleForm()" >
-
-                               
+                                <form id="frmAddVehicle"  >
+                                     
                                     <div class="d-flex flex-row justify-content-center row">
                                         <div class="col-sm-4">
                                             <div class="card card-secondary">
@@ -699,7 +602,7 @@
                                                     <h5 class="card-title mb-0">Vehicle Registeration Number</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="Vehicle RegisterationNr" asp-for="@Model.Vehicle.RegistrationNumber" class="form-control" placeholder="Vehicle Registeration Number">
+                                                    <input type="text" id="VehicleRegistrationNr" class="form-control" placeholder="Vehicle Registeration Number" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -710,7 +613,7 @@
                                                     <h5 class="card-title mb-0">Vehicle Owner</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Vehicle Owner" asp-for="@Model.Vehicle.VehicleOwnerID" asp-items="Model.VehicleOwner_Select" required>
+                                                    <select class="form-select mb-3"  id="VehicleOwner" asp-items="Model.VehicleOwner_Select" required>
                                                         <option value="" selected>Select Vehicle Owner</option>
                                                     </select>
                                                 </div>
@@ -724,7 +627,7 @@
                                                 </div>
 
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Type of Vehicle" asp-for="@Model.Vehicle.VehicleTypeID" asp-items="Model.VehicleType_Select">
+                                                    <select class="form-select mb-3" id="VehicleType"  asp-items="Model.VehicleType_Select" required>
                                                         <option value="" selected>Select Type of Vehicle</option>
                                                     </select>
                                                 </div>
@@ -737,7 +640,7 @@
                                                     <h5 class="card-title mb-0">Load Type</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Load Type" asp-for="@Model.Vehicle.LoadTypeID" asp-items="Model.LoadType_Select">
+                                                    <select class="form-select mb-3" id="LoadType" asp-items="Model.LoadType_Select" required>
                                                         <option value="" selected>Select Type of Load</option>
                                                     </select>
                                                 </div>
@@ -750,7 +653,7 @@
                                                     <h5 class="card-title mb-0">Load Condition</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Load Condition" asp-for="@Model.Vehicle.LoadConditionID" asp-items="Model.LoadCondition_Select">
+                                                    <select class="form-select mb-3" id="LoadCondition" asp-items="Model.LoadCondition_Select" required>
                                                         <option value="" selected>Select Load Condition</option>                                                                                   
                                                     </select>
                                                 </div>
@@ -769,8 +672,9 @@
                                                                 class="form-check-input"
                                                                 type="radio"
                                                                 value="True"  
-                                                                asp-for="@Model.Vehicle.MechanicalFailure"                                                  
-                                                                checked />
+                                                                id="MechanicalFailure"
+                                                                name="MechanicalFailureCheck"                                                  
+                                                                 />
                                                             <span class="form-check-label">
                                                                 Yes
                                                             </span>
@@ -780,7 +684,8 @@
                                                                 class="form-check-input"
                                                                 type="radio"
                                                                 value="False"
-                                                                asp-for="@Model.Vehicle.MechanicalFailure" />
+                                                                id="MechanicalFailure"
+                                                                name="MechanicalFailureCheck" />
                                                             <span class="form-check-label">
                                                             No
                                                             </span>
@@ -792,9 +697,10 @@
 
 
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary text-center">
+                                            <!-- <button type="submit" id="submitAddVehicle" onclick="validateAddVehicleForm()" class="btn btn-primary text-center">
                                                 Save Vehicle Details                                        
-                                            </button>   
+                                            </button>    -->
+                                            <a href="javascript:void(0)" class="btn btn-primary" id="submitAddVehicle">Save Vehicle Details</a>              
                                             <a href="~/AccidentReport/AddReport" class="btn btn-secondary">Cancel</a>
                                         </div>
                                     </div>
@@ -817,17 +723,16 @@
                         <div class="d-flex flex-row justify-content-center row">
 
                             <div class="d-flex flex-row justify-content-center row" style="margin:0 auto;float:none;">
-                                <button class="btn btn-success col-auto" style="padding: 5px;" onclick="addDriverInfor()">Add Driver</button>
+                                <button class="btn btn-success col-auto" id="newDriver" style="padding: 5px;" >Add Driver</button>
                             </div>
-                          
-                        
+                                                  
                             <div id="">
                                 <div class="col-sm-12">
                                     <h4 class="mb-1 mt-1">Driver Details</h4>
                                     <hr />
                                 </div>
 
-                                <form asp-action="AddDriverInformation" id="frmAddDriverInfor" method="post" onsubmit="return validateAddDriverInforForm()">
+                                <form id="frmAddDriverInfor" >
                                 
                                     <div class="d-flex flex-row justify-content-center row">
 
@@ -837,7 +742,7 @@
                                                     <h5 class="card-title mb-0">Vehicle Driver Owner</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Vehicle Driver Owner" asp-for="@Model.DriverInfor.VehicleID" asp-items="Model.VehicleDriverOwner_Select">
+                                                    <select class="form-select mb-3" id="VehicleDriverOwner" asp-items="Model.VehicleDriverOwner_Select" required>
                                                         <option value="" selected>Select Vehicle Driver Owner</option>                                                                                   
                                                     </select>
                                                 </div>
@@ -850,8 +755,7 @@
                                                     <h5 class="card-title mb-0">Driver Name</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="Driver Name" asp-for="@Model.DriverInfor.Name" class="form-control" placeholder="Driver Name">
-                                                    <div><span asp-validation-for="@Model.DriverInfor.Name" class="text-danger"></span></div>
+                                                    <input type="text" id="Name" class="form-control" placeholder="Driver Name" required>                                                    
                                                 </div>
                                             </div>      
                                         </div>
@@ -862,8 +766,18 @@
                                                     <h5 class="card-title mb-0">Driver Surname</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="Driver Surname" asp-for="@Model.DriverInfor.Surname" class="form-control" placeholder="Driver Surname">
-                                                    <div><span asp-validation-for="@Model.DriverInfor.Surname" class="text-danger"></span></div>                                            
+                                                    <input type="text" id="Surname"  class="form-control" placeholder="Driver Surname" required>                                                    
+                                                </div>
+                                            </div>      
+                                        </div> 
+
+                                         <div class="col-sm-4">                               
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h5 class="card-title mb-0">Driver Age</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <input type="number" id="Age" min="0" class="form-control" placeholder="Driver Age" required>                                                    
                                                 </div>
                                             </div>      
                                         </div> 
@@ -874,8 +788,7 @@
                                                     <h5 class="card-title mb-0">Driver PhoneNumber</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="PhoneNumber" asp-for="@Model.DriverInfor.PhoneNumber" class="form-control" placeholder="Driver PhoneNumber">
-                                                    <div><span asp-validation-for="@Model.DriverInfor.PhoneNumber" class="text-danger"></span></div>                                            
+                                                    <input type="text" id="PhoneNumber" class="form-control" placeholder="Driver PhoneNumber" required>                                                   
                                                 </div>
                                             </div>      
                                         </div> 
@@ -886,8 +799,7 @@
                                                     <h5 class="card-title mb-0">Driver Address</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="Address" asp-for="@Model.DriverInfor.Address" class="form-control" placeholder="Driver Address">
-                                                    <div><span asp-validation-for="@Model.DriverInfor.Address" class="text-danger"></span></div>                                            
+                                                    <input type="text" id="Address"  class="form-control" placeholder="Driver Address" required>                                                    
                                                 </div>
                                             </div>      
                                         </div> 
@@ -898,7 +810,7 @@
                                                     <h5 class="card-title mb-0">Driver Race</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Race" asp-for="@Model.DriverInfor.Race">
+                                                    <select class="form-select mb-3" id="Race" required>
                                                         <option value="" selected>Select Race</option>
                                                         <option value="African">African</option>
                                                         <option value="White">White</option>   
@@ -916,7 +828,7 @@
                                                     <h5 class="card-title mb-0">Driver Gender</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="Gender" asp-for="@Model.DriverInfor.Gender">
+                                                    <select class="form-select mb-3" id="Gender" required>
                                                         <option value="" selected>Select Gender</option>
                                                         <option value="Male">Male</option>
                                                         <option value="Female">Female</option>                                          
@@ -931,7 +843,7 @@
                                                     <h5 class="card-title mb-0">Driver License</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="LicenceType" asp-for="@Model.DriverInfor.LicenceID" asp-items="Model.Licence_Select">
+                                                    <select class="form-select mb-3" id="License" asp-items="Model.Licence_Select" required>
                                                         <option selected>Select License Type</option>                                                                                   
                                                     </select>
                                                 </div>
@@ -944,8 +856,7 @@
                                                     <h5 class="card-title mb-0">Licence Reg. Number</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <input type="text" name="LicenceNumber" asp-for="@Model.DriverInfor.LicenceNumber" class="form-control" placeholder="Driver Licence Number">
-                                                    <div><span asp-validation-for="@Model.DriverInfor.LicenceNumber" class="text-danger"></span></div>                                            
+                                                    <input type="text" id="LicenseRegNumber" class="form-control" placeholder="Driver Licence Number" required>                                                    
                                                 </div>
                                             </div>      
                                         </div>           
@@ -956,30 +867,57 @@
                                                     Alcohol / Substance Use
                                                 </div>                                        
                                                 <div class="card-body">
-                                                    <div>
-                                                        <label class="form-check">
-                                                            <input
-                                                                class="form-check-input form-check-inline"
-                                                                type="checkbox"
-                                                                value="@Model.DriverInfor.AlcoholSuspected" />
-                                                            <span class="form-check-label">
-                                                                Alcohol Suspected
-                                                            </span>
-                                                        </label>                 
-                                                    
-                                                    </div>
-                                                    <div>
-                                                         <label class="form-check">
-                                                            <input
-                                                                class="form-check-input form-check-inline"
-                                                                type="checkbox"
-                                                                value="@Model.DriverInfor.AlcoholTested" />
-                                                            <span class="form-check-label">
-                                                                Alcohol Tested
-                                                            </span>
-                                                        </label>
-                                                        
-                                                    
+                                                    <div class="d-flex flex-row justify-content-center">
+                                                        <div class="col-auto">
+                                                            Alcohol Suspected
+                                                            <label class="form-check">
+                                                                <input
+                                                                    class="form-check-input"
+                                                                    type="radio"
+                                                                    value="True"  
+                                                                    id="AlcoholSuspected"   
+                                                                    name="AlcoholSuspectedCheck"                                               
+                                                                    checked />
+                                                                <span class="form-check-label">
+                                                                    Yes
+                                                                </span>
+                                                            </label>
+                                                            <label class="form-check">
+                                                                <input
+                                                                    class="form-check-input"
+                                                                    type="radio"
+                                                                    value="False"
+                                                                    id="AlcoholSuspected" 
+                                                                    name="AlcoholSuspectedCheck"/>
+                                                                <span class="form-check-label">
+                                                                No
+                                                                </span>
+                                                            </label>                                            
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            Alcohol Tested
+                                                            <label class="form-check">
+                                                                <input
+                                                                    class="form-check-input"
+                                                                    type="radio"
+                                                                    value="True"  
+                                                                    id="AlcoholTested"                                                  
+                                                                    checked />
+                                                                <span class="form-check-label">
+                                                                    Yes
+                                                                </span>
+                                                            </label>
+                                                            <label class="form-check">
+                                                                <input
+                                                                    class="form-check-input"
+                                                                    type="radio"
+                                                                    value="False"
+                                                                    id="AlcoholTested" />
+                                                                <span class="form-check-label">
+                                                                No
+                                                                </span>
+                                                            </label>                                            
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>  
@@ -991,7 +929,7 @@
                                                     <h5 class="card-title mb-0">Safety Device Used</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="SafetyDevice" asp-for="@Model.DriverInfor.SafetyDevice">
+                                                    <select class="form-select mb-3" id="SafetyDeviceUsed" required>
                                                         <option value="" selected>Select Device Used</option>
                                                         <option value="Seatbelt">Seatbelt</option>
                                                         <option value="Helmet">Helmet</option>   
@@ -1008,7 +946,7 @@
                                                     <h5 class="card-title mb-0">Type of Traffic Violation</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <select class="form-select mb-3" name="TrafficViolation"  asp-for="@Model.DriverInfor.TrafficViolationID" asp-items="Model.TrafficViolation_Select">
+                                                    <select class="form-select mb-3" id="TrafficViolation" asp-items="Model.TrafficViolation_Select" required>
                                                         <option value="" selected>Select Type of Traffic Violation</option>                                                                                     
                                                     </select>
                                                 </div>
@@ -1016,9 +954,10 @@
                                         </div>
 
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary text-center">
+                                            <!-- <button type="submit" id="submitAddDriverInfor" onclick="validateAddDriverInforForm()" class="btn btn-primary text-center">
                                                 Save Driver Information                                        
-                                            </button>   
+                                            </button>    -->
+                                            <a href="javascript:void(0)" class="btn btn-primary" id="submitAddDriverInfor">Save Driver Information</a>              
                                             <a href="~/AccidentReport/AddReport" class="btn btn-secondary">Cancel</a>
                                         </div>
                                     </div>
@@ -1032,8 +971,9 @@
                     <hr />
                     
                 </div>
+
                 @{
-                    //Data Confirmation
+                   //Data Confirmation
                   
                     @if(await userManager.IsInRoleAsync(user,"Data Manager"))
                      {
@@ -1061,25 +1001,24 @@
                                                             <input
                                                                 class="form-check-input"
                                                                 type="checkbox"
-                                                                value="@Model.AccidentReport.AccidentReportID"
+                                                                value="True"
                                                               
                                                                  />
                                                             <span class="form-check-label">
                                                                 confirm that I have read the road accident data as recorded by the officer.
                                                             </span>
-                                                        </label>                                                      
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                Confirm Form Data
+                                                            </button>
+                                                        </label>   
+                                                                                                        
                                                     
                                                     </div>
                                                 </div>
                                             </div>      
                                         </div>  
                                        
-                                        <form asp-action="ConfirmReport" method="post">
-                                            <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID"  />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" disabled>
-                                                Confirm Form Data
-                                            </button>
-                                        </form>
+                                    
                                     </div>                                            
 
                                 </div>
@@ -1088,44 +1027,50 @@
                     }
                 }
 
-                <!-- Complete -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header " id="flush-headingOne2" >                   
-                        <button class="accordion-button collapsed btn btn-lg btn-outline-success" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse4" aria-expanded="false" aria-controls="flush-collapseOne"> 
-                            Complete Report                      
-                        </button>                                        
-                    </h2>  
+        
+                 <!-- Complete -->
+                @if(await userManager.IsInRoleAsync(user,"Officer"))
+                {
+               
+                    <div class="accordion-item">
+                        <h2 class="accordion-header " id="flush-headingOne2" >                   
+                            <button class="accordion-button collapsed btn btn-lg btn-outline-success" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse4" aria-expanded="false" aria-controls="flush-collapseOne"> 
+                                Complete Report                      
+                            </button>                                        
+                        </h2>  
 
-                    <div id="flush-collapse4" class="accordion-collapse collapse accordion-body" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample1">
-                        <div class="d-flex flex-row justify-content-between row " style="padding: 5px;maring:3px;">
-                            <div class="">
-                                <div class="col-sm-12">
-                                    <h4 class="mb-1 mt-1">Submit Report</h4>
-                                    
-                                </div>  
-                                <div class="col-auto">
-                                    <div class="" role="alert">
-    
-                                        <h5 class="text-center">
-                                            <span class="h3 mb-3" style="margin:3px;padding: 5px;">Complete Report Submission</span>                                           
-                                        <h5>
-                                         <p class="text-center">Reports may take up to 24 Hours for review, you will receive 
-                                            feedback from from your report after review by data manager.
-                                        </p>
-                                    
+                        <div id="flush-collapse4" class="accordion-collapse collapse accordion-body" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample1">
+                            <div class="d-flex flex-row justify-content-between row " style="padding: 5px;maring:3px;">
+                                <div class="">
+                                    <div class="col-sm-12">
+                                        <h4 class="mb-1 mt-1">Submit Report</h4>
+                                        
+                                    </div>  
+                                    <div class="col-auto">
+                                        <div class="" role="alert">
+        
+                                            <h5 class="text-center">
+                                                <span class="h3 mb-3" style="margin:3px;padding: 5px;">Complete Report Submission</span>                                           
+                                            </h5>
+                                            <p class="text-center">Reports may take up to 24 Hours for review, you will receive 
+                                                feedback from your report after review by data manager.
+                                            </p>
+                                        
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="text-center">
-                                    <a class="btn btn-md btn-success" onclick="ReportComplete()">
-                                        Save Report
-                                    </a>
-                                </div>
-                            </div>                                            
+                                    <div class="text-center">
+                                        <a class="btn btn-md btn-success" onclick="ReportComplete()">
+                                            Save Report
+                                        </a>
+                                    </div>
+                                </div>                                            
 
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
 
+               
             </div>
 
         </div>
@@ -1134,8 +1079,7 @@
 </div>
 
 
-<script>
-        
+<script>        
 
     const x = document.getElementById("AccLoc");
 
@@ -1210,62 +1154,7 @@
         });
     });
 
-    //onsubmit="return validateAddRoadFactorForm()
+   
     
-    // function validateAddReportForm() {
-        
-    //     var el_AddReport = document.getElementById('frmAddReport');
-
-    //     var errorsAddReport = "";
-    //     var i;
-    //     for (i = 0; i < el_AddReport.length; i++) {
-    //             if(el_AddReport.elements[i].value === "" || el_AddReport.elements[i].value === 0){
-    //                 errorsAddReport += el_AddReport.elements[i].getAttribute("name") + " cannot be empty." + "<br>";
-    //             }
-    //     }
-    //         ReportAddError(errorsAddReport);
-    // }
-
-    // function validateAddVehicleForm() {
-        
-    //     var el_AddVehicle = document.getElementById('frmAddVehicle');
-
-    //     var errorsAddVehicle = "";
-    //     var i;
-    //     for (i = 0; i < el_AddVehicle.length; i++) {
-    //             if(el_AddVehicle.elements[i].value === "" || el_AddVehicle.elements[i].value === 0){
-    //                 errorsAddVehicle += el_AddVehicle.elements[i].getAttribute("name") + " cannot be empty" + "<br>";
-    //             }
-    //     }
-    //         ReportAddError(errorsAddVehicle);
-    // }
-
-    // function validateAddDriverInforForm() {
-        
-    //     var el_DriverInfor = document.getElementById('frmAddDriverInfor');
-
-    //     var errorsDriverInfor = "";
-    //     var i;
-    //     for (i = 0; i < el_DriverInfor.length; i++) {
-    //             if(el_DriverInfor.elements[i].value === "" || el_DriverInfor.elements[i].value === 0){
-    //                 errorsDriverInfor += el_DriverInfor.elements[i].getAttribute("name") + " cannot be empty" + "<br>";
-    //             }
-    //     }
-    //         ReportAddError(errorsDriverInfor);
-    // }
-
-    // function frmAddRoadFactors() {
-        
-    //     var el_AddRoadFactors = document.getElementById('frmAddRoadFactors');
-
-    //     var errorsRoadFactors = "";
-    //     var i;
-    //     for (i = 0; i < el_AddRoadFactors.length; i++) {
-    //             if(el_RoadFactors.elements[i].value === "" || el_RoadFactors.elements[i].value === 0){
-    //                 errorsRoadFactors += el_RoadFactors.elements[i].getAttribute("name") + " cannot be empty" + "<br>";
-    //             }
-    //     }
-    //         ReportAddError(errorsRoadFactors);
-    // }
     
 </script>

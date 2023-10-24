@@ -47,6 +47,7 @@ namespace rar.Models
         public IEnumerable<PoliceStation> PoliceStations { get; set; }
         public IEnumerable<AccidentType> AccidentTypes { get; set; }
         public IEnumerable<Collision> CollisionTypes { get; set; }
+        public IEnumerable<RoadFactor> RoadFactors { get; set; }
 
         public PaginationHeader PaginationHeader { get; set; }
         public int AccidentTypeID { get; set; }

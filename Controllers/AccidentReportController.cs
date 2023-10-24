@@ -73,10 +73,17 @@ namespace rar.Controllers
               
         public ViewResult UnconfirmedReports() =>
             View(context.AccidentReports.Where(ar => !ar.Confirmed));
+        
+        public ViewResult Ajax() 
+        {
+            AccidentReportViewModel vm = new AccidentReportViewModel();
+            vm.Accounts = acc_context.Accounts;
+            return View(vm);
+        }
 
         //Confirm Reports
         [HttpPost] 
-        public Microsoft.AspNetCore.Mvc.IActionResult ConfirmReport(int AccidentReportID)
+        public async Task<IActionResult> ConfirmReport(int AccidentReportID)
         {
             
             var AR = context.AccidentReports
@@ -84,12 +91,12 @@ namespace rar.Controllers
                 
             // if(AR != null)
             // {
+                AR.Confirmed = true;
                 try
                 {
-                    AR.Confirmed = true;
-                    context.SaveAccidentReport(AR);
+                    await context.SaveAccidentReport(AR);
                     //return Content(AR.Confirmed.ToString() + " : " + AR.AccidentReportID);//+ Convert.ToInt32(Request.Query["AccidentReportID"]));
-                    return Redirect("~/AccidentReport/AddReport");
+                    return Redirect("~/AccidentReport/LatestAccidents");
                 }
                 catch(Exception ex)
                 {
@@ -298,7 +305,8 @@ namespace rar.Controllers
             vm.PoliceStations = pol_context.PoliceStations;
             vm.AccidentTypes = acc_t_context.AccidentTypes;
             vm.CollisionTypes = coll_context.CollisionTypes;
-         
+            vm.RoadFactors = roadFac_context.RoadFactors;
+
             return View(vm);
                                 
         }
@@ -678,12 +686,13 @@ namespace rar.Controllers
         {
             int AccountID_ = 0;
             string RAR = "";
+
             AccidentReportViewModel vm = new AccidentReportViewModel();
 
             if (signInManager.IsSignedIn(User))
             {
-                if (vm.AccidentReport.AccidentLocation.Length > 0)
-                    RAR = "RAR-" + DateTime.UtcNow.ToString("HH:mm:ss").Substring(0, 3) + "-" + vm.AccidentReport.AccidentLocation.Substring(0, 3).ToUpper();
+                if (Convert.ToString(formcollection["AccidentLocation"]).Length > 0)
+                    RAR = "RAR-" + DateTime.UtcNow.ToString("HH:mm:ss").Substring(0, 3) + "-" + formcollection["AccidentLocation"].ToString().Substring(0, 3).ToUpper();
 
                 var userId = userManager.GetUserId(User);
 
@@ -694,7 +703,7 @@ namespace rar.Controllers
                         AccountID_ = item.AccountID;
                     }
                 }
-            }
+            }            
 
             string uploadedAPImage = UploadedAccidentPicture(vm);
 
@@ -706,22 +715,38 @@ namespace rar.Controllers
             JsonViewModel model = new JsonViewModel();
 
             var AccidentReport = new AccidentReport
-            {                 
-                AccidentID = "RAR-A987",
-                AccidentTime = Convert.ToDateTime(formcollection["AccDate"]),
-                AccidentLocation = formcollection["AccLoc"].ToString(),
-                AccidentDate = Convert.ToDateTime(formcollection["AccTime"]), 
-                AccidentDescription = formcollection["AccDesc"].ToString(),
+            {
+                AccidentID =  RAR,
+                AccidentTime = Convert.ToDateTime(formcollection["AccTime"]),
+                AccidentLocation = formcollection["AccidentLocation"].ToString(),
+                AccidentDate = Convert.ToDateTime(formcollection["AccDate"]), 
+                AccidentDescription = formcollection["AccidentDescription"].ToString(),
                 NrPeopleKilled = Convert.ToInt32(formcollection["AccKilled"]),
                 NrPeopleInjured = Convert.ToInt32(formcollection["AccInjured"]),
-                AccountID = AccountID_,
-                PoliceStationID = Convert.ToInt32(formcollection["AccPoliceStation"]),
-                CollisionID = Convert.ToInt32(formcollection["AccColl"]),
-                WeatherTypeID = Convert.ToInt32(formcollection["AccWeather"]),
-                AccidentTypeID = Convert.ToInt32(formcollection["AccType"]),
+                AccountID =  AccountID_,//Convert.ToInt32(formcollection["AccountID"]),
+                PoliceStationID = Convert.ToInt32(formcollection["PoliceStation"]),
+                CollisionID = Convert.ToInt32(formcollection["CollisionType"]),
+                WeatherTypeID = Convert.ToInt32(formcollection["WeatherType"]),
+                AccidentTypeID = Convert.ToInt32(formcollection["AccidentType"]),
                 AccidentPicture = uploadedAPImage,
                 AccidentSketch = uploadedAPImage,
-                HitAndRun = Convert.ToBoolean(formcollection["AccHitRun"])
+                HitAndRun = Convert.ToBoolean(formcollection["HitAndRun"])
+
+                // AccidentID = RAR,
+                // AccidentTime = vm.AccidentReport.AccidentTime,
+                // AccidentLocation = vm.AccidentReport.AccidentLocation,
+                // AccidentDate = vm.AccidentReport.AccidentDate,//System.DateTime.UtcNow,
+                // AccidentDescription = vm.AccidentReport.AccidentDescription,
+                // NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
+                // NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
+                // AccountID = AccountID_,
+                // PoliceStationID = vm.AccidentReport.PoliceStationID,
+                // CollisionID = vm.AccidentReport.CollisionID,
+                // WeatherTypeID = vm.AccidentReport.WeatherTypeID,
+                // AccidentTypeID = vm.AccidentReport.AccidentTypeID,
+                // AccidentPicture = uploadedAPImage,
+                // AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
+                // HitAndRun = vm.AccidentReport.HitAndRun
             };
             
             try
@@ -736,7 +761,7 @@ namespace rar.Controllers
             if (AccidentReport != null)
             {
                 model.ResponseCode = 0;
-                model.ResponseMessage = JsonConvert.SerializeObject(AccidentReport);
+                model.ResponseMessage = JsonConvert.SerializeObject(AccidentReport.AccidentID);//"Accident Report Added";
             }
             else
             {
@@ -747,68 +772,6 @@ namespace rar.Controllers
             return Json(model);
 
         }
-
-        #region AddAccidentFactor Deleted Code
-        // [HttpPost]
-        // public IActionResult AddAccidentFactor(AccidentReportViewModel vm)
-        // {
-        //     int AccountID_ = 0;
-
-        //     if (signInManager.IsSignedIn(User))
-        //     {                
-        //         var userId = userManager.GetUserId(User);
-
-        //         if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
-        //         {
-        //             foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
-        //             {
-        //                 AccountID_ = item.AccountID;
-        //             }
-        //         }
-        //     }
-
-        //     var AR_ID = context.AccidentReports
-        //         .FirstOrDefault(r => r.AccountID == AccountID_);
-
-        //     var AccidentFactor = new AccidentFactor
-        //     {                   
-        //         //HumanFactorID = vm.HumanFactor.HumanFactorID,
-        //         //VehicleFactorID = vm.VehicleFactor.VehicleFactorID,
-        //         //AccidentReportID = vm.AccidentReport.AccidentReportID //AR_ID
-        //     };
-
-        //     // if(String.IsNullOrEmpty(vm.HumanFactor.HumanFactorID))
-        //     // {
-        //     //     ModelState.AddModelError("HumanFactorID", "This field is a required field.");                
-        //     // }
-
-        //     // if(ModelState.IsValid)
-        //     // {
-        //         try
-        //         {
-        //             // if (signInManager.IsSignedIn(User))
-        //             // {
-        //                 accFac_context.SaveAccidentFactor(AccidentFactor);
-        //                 return RedirectToAction("AddReport"); //return Content("Added");//
-        //             // }
-        //             // else
-        //             // {
-        //             //     return Content("Error: Account not created or user not signed-in.");
-        //             // }
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             return Content("Accident Factors Not Added." + ex.Message);
-        //         }
-
-        //         //return Content("Valid AccidentFactor Model");
-        //     //}
-        //     // else
-        //     // {
-        //     //     return Content("Invalid AccidentFactor Model");
-        //     // }
-        // }
-        #endregion
 
 
         [HttpPost]
@@ -879,6 +842,72 @@ namespace rar.Controllers
             // }
         }
       
+        [HttpPost]
+        public async Task<JsonResult> AddRoadFactorsAjax(IFormCollection formcollection)
+        {
+            int AccountID_ = 0;
+
+            if (signInManager.IsSignedIn(User))
+            {                
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
+            var AR_ID = context.AccidentReports
+                .OrderByDescending(r => r.AccidentReportID)
+                .FirstOrDefault(r => r.AccountID == AccountID_);
+
+            JsonViewModel model = new JsonViewModel();
+           
+            var RoadFactor = new RoadFactor
+            {                   
+                RoadName = formcollection["RoadName"].ToString(),
+                RoadNumber = formcollection["RoadNumber"].ToString(),
+                Landmark = formcollection["Landamrk"].ToString(),
+                PhysicalDivider = Convert.ToBoolean(formcollection["PhysicalDivider"]),
+                OnGoingRoadWorks = Convert.ToBoolean(formcollection["OnGoingRoadWorks"]),
+                SurfaceConditionID = Convert.ToInt32(formcollection["SurfaceCondition"]),
+                RoadTypeID = Convert.ToInt32(formcollection["RoadType"]),
+                RoadFeatureID = Convert.ToInt32(formcollection["RoadFeature"]),
+                RoadSurfaceID = Convert.ToInt32(formcollection["RoadSurface"]),                
+                RoadSurfaceQualityID = Convert.ToInt32(formcollection["SurfaceQuality"]),       
+                SpeedLimitID = Convert.ToInt32(formcollection["SpeedLimit"]),
+                LaneID = Convert.ToInt32(formcollection["Lane"]),
+                AccidentReportID = AR_ID.AccidentReportID               
+            };
+
+            try
+            {                   
+                await roadFac_context.SaveRoadFactor(RoadFactor);               
+            }
+            catch (Exception ex)
+            {
+                model.ResponseCode = 1;
+            }
+
+            if (RoadFactor != null)
+            {
+                model.ResponseCode = 0;
+                model.ResponseMessage = JsonConvert.SerializeObject(RoadFactor.RoadName);
+            }
+            else
+            {
+                model.ResponseCode = 1;
+                model.ResponseMessage = "No record available";
+            }
+
+            return Json(model);
+           
+        
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> AddVehicle(AccidentReportViewModel vm)
@@ -954,6 +983,88 @@ namespace rar.Controllers
         }
 
         [HttpPost]
+        public async Task<JsonResult> AddVehicleAjax(IFormCollection formcollection)
+        {
+            int AccountID_ = 0;
+
+            if (signInManager.IsSignedIn(User))
+            {                
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            }
+
+            var AR_ID = context.AccidentReports
+                .OrderByDescending(r => r.AccidentReportID)
+                .FirstOrDefault(r => r.AccountID == AccountID_);
+
+            var reps = from r in context.AccidentReports
+                        where r.AccountID == AccountID_
+                        orderby r.AccidentReportID descending
+                        select new {
+                            r.AccidentReportID,
+                            r.AccidentID,
+                            r.AccountID
+                        };
+
+            var accID = reps.FirstOrDefault(r => r.AccountID == AccountID_);
+
+            ViewBag.UserAccidentReports = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(reps, "AccidentReportID", "AccidentID"); 
+
+            JsonViewModel model = new JsonViewModel();
+
+            var Vehicle = new Vehicle
+            {                   
+                RegistrationNumber = formcollection["VehicleRegistrationNr"].ToString(),
+                MechanicalFailure =  Convert.ToBoolean(formcollection["MechanicalFailure"]),
+                VehicleTypeID = Convert.ToInt32(formcollection["VehicleType"]),
+                LoadTypeID = Convert.ToInt32(formcollection["LoadType"]),
+                LoadConditionID = Convert.ToInt32(formcollection["LoadCondition"]),
+                VehicleOwnerID = Convert.ToInt32(formcollection["VehicleOwner"]),
+                AccidentReportID = AR_ID.AccidentReportID //vm.Vehicle.AccidentReportID  //AR_ID            
+            };
+           
+            if(ModelState.IsValid)
+            {
+                try
+                {
+                    await veh_context.SaveVehicle(Vehicle);                        
+                }
+                catch (Exception ex)
+                {
+                    model.ResponseCode = 0;
+                }
+
+       
+                if (Vehicle != null)
+                {
+                    model.ResponseCode = 0;
+                    model.ResponseMessage = JsonConvert.SerializeObject(Vehicle.RegistrationNumber);
+                }
+                else
+                {
+                    model.ResponseCode = 1;
+                    model.ResponseMessage = "No record available";
+                }
+                
+            }
+            else
+            {
+                model.ResponseCode = 1;
+                model.ResponseMessage = "Invalid Vehicle Model";
+            }
+
+            return Json(model);
+
+        }
+        
+        [HttpPost]
         public async Task<ActionResult> AddDriverInformation(AccidentReportViewModel vm)
         {
             int AccountID_ = 0;
@@ -996,11 +1107,11 @@ namespace rar.Controllers
                 LicenceNumber = vm.DriverInfor.LicenceNumber,
                 LicenceID = vm.DriverInfor.LicenceID,
                 TrafficViolationID = vm.DriverInfor.TrafficViolationID,               
-                VehicleID = Vehicle_ID//vm.DriverInfo.VehicleID                
+                VehicleID = vm.DriverInfor.VehicleID                
             };
            
-            if(ModelState.IsValid)
-            {
+            // if(ModelState.IsValid)
+            // {
                 try
                 {
                     if (signInManager.IsSignedIn(User))
@@ -1018,12 +1129,91 @@ namespace rar.Controllers
                     return Content("Road Factors Not Added." + ex.Message);
                 }
 
-                return Content("Valid DriverInfor Model");
-            }
-            else
-            {
-                return Content("Invalid DriverInfor Model");
-            }
+                //return Content("Valid DriverInfor Model");
+            // }
+            // else
+            // {
+            //     return Content("Invalid DriverInfor Model");
+            // }
+        }
+
+         [HttpPost]
+        public async Task<JsonResult> AddDriverInformationAjax(IFormCollection formcollection)
+        {
+            int AccountID_ = 0;
+
+            if (signInManager.IsSignedIn(User))
+            {                
+                var userId = userManager.GetUserId(User);
+
+                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+                {
+                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+                    {
+                        AccountID_ = item.AccountID;
+                    }
+                }
+            };
+
+            var AR = context.AccidentReports
+                .FirstOrDefault(r => r.AccountID == AccountID_);
+
+            int AR_ID = AR.AccidentReportID;
+
+            var Vehicle = veh_context.Vehicles
+                .FirstOrDefault(r => r.AccidentReportID == AR_ID);
+
+            int Vehicle_ID = Vehicle.VehicleID;
+
+            JsonViewModel model = new JsonViewModel();
+
+            var DriverInfor = new DriverInformation
+            {                   
+                Name = formcollection["Name"].ToString(),
+                Surname = formcollection["Surname"].ToString(),
+                Age = Convert.ToInt32(formcollection["Age"]),
+                Gender = formcollection["Gender"].ToString(),
+                Race = formcollection["Race"].ToString(),
+                PhoneNumber = formcollection["PhoneNumber"].ToString(),
+                Address = formcollection["Address"].ToString(),
+                SafetyDevice = formcollection["SafetyDeviceUsed"].ToString(),
+                AlcoholTested = Convert.ToBoolean(formcollection["AlcoholTested"]),
+                AlcoholSuspected = Convert.ToBoolean(formcollection["AlcoholSuspected"]),
+                LicenceNumber = formcollection["LicenseRegNumber"].ToString(),
+                LicenceID = Convert.ToInt32(formcollection["License"]),
+                TrafficViolationID = Convert.ToInt32(formcollection["TrafficViolation"]),               
+                VehicleID = Convert.ToInt32(formcollection["VehicleDriverOwner"]),              
+            };
+           
+                try
+                {
+                    if (signInManager.IsSignedIn(User))
+                    {
+                        await drvFac_context.SaveDriverInformation(DriverInfor);                        
+                    }
+                    else
+                    {
+                        model.ResponseMessage = "Error: Account not created or user not signed-in.";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    model.ResponseMessage = "DriverInfor details Not Added.";
+                }
+
+                if (DriverInfor != null)
+                {
+                    model.ResponseCode = 0;
+                    model.ResponseMessage = JsonConvert.SerializeObject(DriverInfor.Name);
+                }
+                else
+                {
+                    model.ResponseCode = 1;
+                    model.ResponseMessage = "No record available";
+                }
+
+                return Json(model);
+
         }
 
         [HttpPost]
@@ -1049,7 +1239,7 @@ namespace rar.Controllers
                 AccidentReport.CollisionID = vm.AccidentReport.CollisionID;
                 AccidentReport.WeatherTypeID = vm.AccidentReport.WeatherTypeID;
               
-                AccidentReport.Confirmed = vm.AccidentReport.Confirmed;
+                AccidentReport.Confirmed = true;
                 AccidentReport.HitAndRun = vm.AccidentReport.HitAndRun;
 
                 //var userId = userManager.GetUserId(User);
@@ -1110,7 +1300,7 @@ namespace rar.Controllers
         {
             AccidentReport AccidentReport = context.DeleteAccidentReport(AccidentReportID);
 
-            return Redirect("~/AccidentReport/AddReport");
+            return Redirect("~/AccidentReport/LatestAccidents");
         }
 
         //Filter        
@@ -1848,7 +2038,7 @@ namespace rar.Controllers
                 using (SqlCommand cmd = new SqlCommand("", connection))
                 {
                     connection.Open();
-                    cmd.CommandText = "Select top 1 VehicleID, concat(v.RegistrationNumber, '/', vo.VehicleOwnerType) as [RegistrationNumber]" 
+                    cmd.CommandText = "Select top 2 VehicleID, concat(v.RegistrationNumber, '/', vo.VehicleOwnerType) as [RegistrationNumber]" 
                                 + " from [Vehicle] v join VehicleOwner vo on v.VehicleOwnerID = vo.VehicleOwnerID"
                                 + " join AccidentReport r on r.AccidentReportID = v.AccidentReportID"
                                 + " where r.AccountID = " +  AccountID_.ToString()
