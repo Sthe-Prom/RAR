@@ -152,7 +152,7 @@ namespace rar.Controllers
         }  
 
          [HttpGet]        
-        public ViewResult LatestAccidents(int accidentType, string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
+        public ViewResult LatestAccidents(int accidentType, string sortOrder, string currentFilter, string sortUser, string filterConfirmed, int Page = 1)
         {       
             //Logged in User
             int AccountID_ = 0;
@@ -175,6 +175,7 @@ namespace rar.Controllers
             ViewBag.CurrentSort = sortOrder;
             ViewBag.DateSortParm = sortOrder == "Oldest" ? "Newest" : "Oldest";
             ViewBag.UserSortParm = sortUser == "AllUsers" ? "LoggedIn" : "AllUsers";
+            ViewBag.ConfirmedSortParm = filterConfirmed == "Confirmed" ? "Unconfirmed" : "Confirmed";
 
             AccidentReportViewModel vm = new AccidentReportViewModel();
 
@@ -266,6 +267,37 @@ namespace rar.Controllers
                 // vm.PaginationHeader.TotalItems = context.AccidentReports.Count();
             }
 
+
+            //Filter By Confirmed 
+
+            if (!string.IsNullOrEmpty(Request.Query["filterConfirmed"]))
+            {
+                switch (filterConfirmed)
+                {
+                    case "Confirmed":
+                        vm.PaginationHeader.TotalItems = context.AccidentReports.Where(r => r.Confirmed == true).Count();
+                        vm.AccidentReports = context.AccidentReports
+                            .Where(r => r.Confirmed == true)
+                            .OrderBy(r => r.AccidentDate)
+                            .Skip((Page - 1) * PageSize)
+                            .Take(PageSize);
+                        break;
+                    case "Unconfirmed":
+                        vm.PaginationHeader.TotalItems = context.AccidentReports.Where(r => r.Confirmed == false).Count();
+                        vm.AccidentReports = context.AccidentReports
+                            .Where(r => r.Confirmed == false)
+                            .OrderBy(r => r.AccidentDate)
+                            .Skip((Page - 1) * PageSize)
+                            .Take(PageSize);
+                        break;     
+                    default:                       
+                        break;
+
+                }
+
+            }
+          
+
             vm.AccidentTypeID = accidentType;
 
             // switch (sortOrder)
@@ -312,7 +344,7 @@ namespace rar.Controllers
         }
 
         [HttpGet]        
-        public ViewResult AddReport(int accidentType, string sortOrder, string currentFilter, string sortUser, string searchString, int Page = 1)
+        public ViewResult AddReport(int accidentType, string sortOrder, string currentFilter, string sortUser, int Page = 1)
         {       
             //Logged in User
             int AccountID_ = 0;
@@ -334,7 +366,7 @@ namespace rar.Controllers
             ViewBag.CurrentSort = sortOrder;
             ViewBag.DateSortParm = sortOrder == "Oldest" ? "Newest" : "Oldest";
             ViewBag.UserSortParm = sortUser == "AllUsers" ? "LoggedIn" : "AllUsers";
-            
+
             AccidentReportViewModel vm = new AccidentReportViewModel();
                      
             vm.AccidentReports = context.AccidentReports
@@ -560,9 +592,9 @@ namespace rar.Controllers
         [HttpGet]
         public IActionResult GetAccidentReport(int id)
         {
-            //AccidentReportViewModel vm = new AccidentReportViewModel();
+             AccidentReportViewModel vm = new AccidentReportViewModel();
                           
-            // vm.AccidentReport = new AccidentReport();
+             vm.AccidentReport = new AccidentReport();
 
             // AccidentReport AccidentReport = context.AccidentReports
             //     .FirstOrDefault(r => r.AccidentReportID == AccidentReportID);
@@ -572,7 +604,7 @@ namespace rar.Controllers
             // vm.AccidentReport.AccidentLocation = AccidentReport.AccidentLocation;
             // vm.AccidentReport.NrPeopleInjured = AccidentReport.NrPeopleInjured;
             
-            //return View(vm); 
+            // return View(vm); 
 
             // AccidentReportViewModel vm = new AccidentReportViewModel
             // {
@@ -583,103 +615,156 @@ namespace rar.Controllers
             // if(vm.AccidentReport.AccidentReportID == AccidentReportID)
             //     return PartialView("",vm);
 
-            // return PartialView(vm);
+             return PartialView(vm);
 
-            return PartialView(id);
+            //return PartialView(id);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddReport(AccidentReportViewModel vm)
-        {
-            int AccountID_ = 0;
-            string RAR = "";
+        
+        public ViewResult GetAccidentData()
+        {         
+            var AccidentReportData = new List<AccidentReport>();
+            AccidentReportViewModel vm = new AccidentReportViewModel();
 
-            if (signInManager.IsSignedIn(User))
+            //AccidentReport AccidentReports = context.AccidentReport();
+
+            foreach (var item in context.AccidentReports)
             {
-                if(vm.AccidentReport.AccidentLocation.Length > 0)
-                     RAR = "RAR-" + DateTime.UtcNow.ToString("HH:mm:ss").Substring(0, 3) + "-" + vm.AccidentReport.AccidentLocation.Substring(0, 3).ToUpper();
+                AccidentReportData.Add(new AccidentReport
+                {
+                    AccidentReportID = item.AccidentReportID,
+                    HitAndRun = item.HitAndRun,
+                    Confirmed = item.Confirmed,
+                    AccidentLocation = item.AccidentLocation,
+                    NrPeopleInjured = item.NrPeopleInjured,
+                    AccidentDate = item.AccidentDate
+                });
+            }
+
+           
+            JsonViewModel model = new JsonViewModel();
+
+            try
+            {
+                vm.AccidentReports = AccidentReportData.ToArray();
+            }
+            catch (Exception ex)
+            {
+                model.ResponseCode = 1;
+            }
+
+            if (AccidentReportData.Count > 0)
+            {
+                model.ResponseCode = 0;
+                model.ResponseMessage = JsonConvert.SerializeObject(AccidentReportData);
+            }
+            else
+            {
+                model.ResponseCode = 1;
+                model.ResponseMessage = "No record available";
+            }
+
+            vm.AccidentReports = AccidentReportData;
+
+            return View(vm);
+
+            //return View(vm);
+
+        }
+
+        
+        //[HttpPost]
+        // public async Task<IActionResult> AddReport(AccidentReportViewModel vm)
+        // {
+        //     int AccountID_ = 0;
+        //     string RAR = "";
+
+        //     if (signInManager.IsSignedIn(User))
+        //     {
+        //         if(vm.AccidentReport.AccidentLocation.Length > 0)
+        //              RAR = "RAR-" + DateTime.UtcNow.ToString("HH:mm:ss").Substring(0, 3) + "-" + vm.AccidentReport.AccidentLocation.Substring(0, 3).ToUpper();
                 
-                var userId = userManager.GetUserId(User);
+        //         var userId = userManager.GetUserId(User);
 
-                if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
-                {
-                    foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
-                    {
-                        AccountID_ = item.AccountID;
-                    }
-                }
-            }
+        //         if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
+        //         {
+        //             foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
+        //             {
+        //                 AccountID_ = item.AccountID;
+        //             }
+        //         }
+        //     }
 
-            string uploadedAPImage = UploadedAccidentPicture(vm);
+        //     string uploadedAPImage = UploadedAccidentPicture(vm);
      
-            if (uploadedAPImage == null)
-            {
-                uploadedAPImage = "Upload is null";
-            }
+        //     if (uploadedAPImage == null)
+        //     {
+        //         uploadedAPImage = "Upload is null";
+        //     }
                         
-                var AccidentReport = new AccidentReport
-                {                   
-                    // AccidentID = RAR,
-                    // AccidentTime = System.DateTime.UtcNow,//vm.AccidentReport.AccidentTime,
-                    // AccidentLocation = vm.AccidentReport.AccidentLocation,           
-                    // AccidentDate = System.DateTime.UtcNow,//vm.AccidentReport.AccidentDate, //System.DateTime.UtcNow
-                    // AccidentDescription = vm.AccidentReport.AccidentDescription,
-                    // NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
-                    // NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
-                    // AccountID = AccountID_,
-                    // PoliceStationID = vm.AccidentReport.PoliceStationID,
-                    // CollisionID = vm.AccidentReport.CollisionID,
-                    // WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
-                    // AccidentTypeID = vm.AccidentReport.AccidentTypeID,
-                    // AccidentPicture = vm.AccidentReport.AccidentPicture,
-                    // AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
-                    // HitAndRun = vm.AccidentReport.HitAndRun
+        //         var AccidentReport = new AccidentReport
+        //         {                   
+        //             // AccidentID = RAR,
+        //             // AccidentTime = System.DateTime.UtcNow,//vm.AccidentReport.AccidentTime,
+        //             // AccidentLocation = vm.AccidentReport.AccidentLocation,           
+        //             // AccidentDate = System.DateTime.UtcNow,//vm.AccidentReport.AccidentDate, //System.DateTime.UtcNow
+        //             // AccidentDescription = vm.AccidentReport.AccidentDescription,
+        //             // NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
+        //             // NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
+        //             // AccountID = AccountID_,
+        //             // PoliceStationID = vm.AccidentReport.PoliceStationID,
+        //             // CollisionID = vm.AccidentReport.CollisionID,
+        //             // WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
+        //             // AccidentTypeID = vm.AccidentReport.AccidentTypeID,
+        //             // AccidentPicture = vm.AccidentReport.AccidentPicture,
+        //             // AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
+        //             // HitAndRun = vm.AccidentReport.HitAndRun
 
-                    AccidentID = RAR,
-                    AccidentTime = vm.AccidentReport.AccidentTime,
-                    AccidentLocation = vm.AccidentReport.AccidentLocation,           
-                    AccidentDate = vm.AccidentReport.AccidentDate,//System.DateTime.UtcNow,
-                    AccidentDescription =  vm.AccidentReport.AccidentDescription,
-                    NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
-                    NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
-                    AccountID = AccountID_,
-                    PoliceStationID = vm.AccidentReport.PoliceStationID,
-                    CollisionID = vm.AccidentReport.CollisionID,
-                    WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
-                    AccidentTypeID = vm.AccidentReport.AccidentTypeID,
-                    AccidentPicture = uploadedAPImage,
-                    AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
-                    HitAndRun = vm.AccidentReport.HitAndRun
-                };
-            //}
-            // if (ModelState.IsValid)
-            // {
-                try
-                {
-                //     if (signInManager.IsSignedIn(User))
-                //     {   
+        //             AccidentID = RAR,
+        //             AccidentTime = vm.AccidentReport.AccidentTime,
+        //             AccidentLocation = vm.AccidentReport.AccidentLocation,           
+        //             AccidentDate = vm.AccidentReport.AccidentDate,//System.DateTime.UtcNow,
+        //             AccidentDescription =  vm.AccidentReport.AccidentDescription,
+        //             NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
+        //             NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
+        //             AccountID = AccountID_,
+        //             PoliceStationID = vm.AccidentReport.PoliceStationID,
+        //             CollisionID = vm.AccidentReport.CollisionID,
+        //             WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
+        //             AccidentTypeID = vm.AccidentReport.AccidentTypeID,
+        //             AccidentPicture = uploadedAPImage,
+        //             AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
+        //             HitAndRun = vm.AccidentReport.HitAndRun
+        //         };
+        //     //}
+        //     // if (ModelState.IsValid)
+        //     // {
+        //         try
+        //         {
+        //         //     if (signInManager.IsSignedIn(User))
+        //         //     {   
                        
-                        await context.SaveAccidentReport(AccidentReport);
-                        ViewBag.Result = "Success";
-                        return RedirectToAction("AddReport"); //return Content("Added");//
-                        //return Content("Added");
-                //     }
-                //     else
-                //     {
-                //         return Content("Please go to your profile to create an account before you can report accident");
-                //     }
-                }
-                catch (Exception ex)
-                {
-                    return Content("Not Added. " + ex.Message);
-                }
-                //return Content("Valid");
-            // }
-            // else
-            // {
-            //     return Content("Invalid Model");
-            // }
-        }
+        //                 await context.SaveAccidentReport(AccidentReport);
+        //                 ViewBag.Result = "Success";
+        //                 return RedirectToAction("AddReport"); //return Content("Added");//
+        //                 //return Content("Added");
+        //         //     }
+        //         //     else
+        //         //     {
+        //         //         return Content("Please go to your profile to create an account before you can report accident");
+        //         //     }
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             return Content("Not Added. " + ex.Message);
+        //         }
+        //         //return Content("Valid");
+        //     // }
+        //     // else
+        //     // {
+        //     //     return Content("Invalid Model");
+        //     // }
+        // }
 
         [HttpPost]
         public async Task<JsonResult> AddReportAjax(IFormCollection formcollection)
@@ -1378,7 +1463,9 @@ namespace rar.Controllers
 
         }
 
-       
+
+        
+
         /*Drop Downs / Chechboxes / Radio*/
 
         //Accident Information

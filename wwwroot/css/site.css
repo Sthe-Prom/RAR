@@ -15226,4 +15226,14 @@ span.flatpickr-weekday {
   width: 260px
 }
 
+.takePicture{
+  display: none;
+}
+
+@media screen and (max-width:500px) {
+  .takePicture {
+   display: block;
+  }
+}
+
 /*# sourceMappingURL=app.css.map*/

@@ -98,15 +98,21 @@
                     formData.append("HitAndRun", $("#HitAndRun").val());
                     formData.append("WeatherType", $("#WeatherType").val());
                     
-                     var f = [];
+                    var f = [];
                     for (const pair of formData.entries()) {
                         if(pair[1] == ""){
                             f.push(pair[1]);
                         }
                     }
 
-                     if(f.length > 0){
-                        validateAddReportForm();
+                    const forms = document.querySelectorAll('.needs-validation')
+
+                     
+
+
+                     if(f.length > 0){                        
+                       // alert(validateAddReportForm());
+                       validatedNew();
                     }else{                                  
                         $.ajax({
                             type: 'POST',
@@ -161,7 +167,8 @@
                     }
 
                      if(f.length > 0){
-                        validateAddRoadFactorsForm();
+                        //validateAddRoadFactorsForm();
+                        validatedNew();
                     }else{              
                         $.ajax({
                             type: 'POST',
@@ -209,7 +216,8 @@
                     }
                     
                     if(f.length > 0){
-                        validateAddVehicleForm();
+                        // validateAddVehicleForm();
+                        validatedNew();
                     }else{                        
                         $.ajax({
                             type: 'POST',
@@ -278,7 +286,8 @@
                     }
                            
                      if(f.length > 0){
-                        validateAddDriverInforForm();
+                        // validateAddDriverInforForm();
+                        validatedNew();
                     }else{
                         $.ajax({
                             type: 'POST',
@@ -299,7 +308,7 @@
                     $("#Age").val("");
                     $("#PhoneNumber").val("");
                     $("#Race").val("");
-                     $("#Gender").val("");
+                    $("#Gender").val("");
                     $("#VehicleOwner").val("");
                     $("#LicenseRegNumber").val("");
                     $("#VehicleDriverOwner").val("");
@@ -424,32 +433,66 @@
 
 
 <script>
-      function validateAddReportForm() {
-            
-        var el_AddReport = document.getElementById('frmAddReport');
-        var btn = document.getElementById('submitAddReport');
-       
-        var errorsAddReport = "";            
-        var i;
-        var counter;
-        for (i = 0; i < el_AddReport.length; i++) {
-                if(el_AddReport.elements[i].value === "" || el_AddReport.elements[i].value === 0){                   
-                    errorsAddReport += el_AddReport.elements[i].getAttribute("id") + " cannot be empty." + "<br>";
-                    counter++;
-                }
-        }
-                
-        if(errorsAddReport.length > 10){
-             btn.addEventListener('click', (e) => {
-                
-                e.preventDefault();                
-            });
 
-            ReportAddError("Error Adding Report",errorsAddReport);
-        }else{
-            el_AddReport.submit();
-        }  
-                        
+    const x = document.getElementById("AccidentLocation");
+
+    //Geo-Location [HTML5 JS] - API
+    function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else { 
+        x.value = "Geolocation is not supported by this browser.";
+    }
+    }
+
+    //Get LAt. and Long.
+    function showPosition(position) {
+        x.value = position.coords.latitude + "," + position.coords.longitude;
+    }
+
+    function showError(error) {
+            switch(error.code) {
+            case error.PERMISSION_DENIED:
+            x.innerHTML = "User denied the request for Geolocation."
+            break;
+            case error.POSITION_UNAVAILABLE:
+            x.innerHTML = "Location information is unavailable."
+            break;
+            case error.TIMEOUT:
+            x.innerHTML = "The request to get user location timed out."
+            break;
+            case error.UNKNOWN_ERROR:
+            x.innerHTML = "An unknown error occurred."
+            break;
+        }
+    }
+
+    function validateAddReportForm() {
+            
+        // var el_AddReport = document.getElementById('frmAddReport');
+        // var btn = document.getElementById('submitAddReport');
+       
+        // var errorsAddReport = "";            
+        // var i;
+        // var counter;
+
+        // for (i = 0; i < el_AddReport.length; i++) {
+        //     if(el_AddReport.elements[i].value === "" || el_AddReport.elements[i].value === 0){                   
+        //         errorsAddReport += el_AddReport.elements[i].getAttribute("id") + " cannot be empty." + "<br>";
+        //         counter++;
+        //     }
+        // }
+                
+        // if(errorsAddReport.length > 0){
+        //      btn.addEventListener('click', (e) => {                
+        //         e.preventDefault();                
+        //     });
+        //     ReportAddError("Error Adding Report",errorsAddReport);
+        // }else{
+        //     el_AddReport.submit();
+        // }  
+                
+
     }
 
     function validateAddVehicleForm() {
@@ -534,6 +577,22 @@
         }
 
     }
+
+
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+        }, false)
+    });
+    
 
 </script>
 

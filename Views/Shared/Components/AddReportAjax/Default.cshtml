@@ -8,7 +8,6 @@
     User user = await userManager.FindByIdAsync(userId);
 }
 
-
 <style>
     #accordionFlushExample1 .card{
         background-color: #F5F7FB;
@@ -64,7 +63,6 @@
 
 
 </style>
-
  
 <div class="container-fluid p-0">
  
@@ -97,16 +95,16 @@
                                 <hr />
                             </div>
                             
-                            <form id="frmAddReport">                                
+                            <form id="frmAddReport" class="needs-validation" novalidate>                                
                             
-                                <div class="row"> 
+                                <div class="row">  
                                     <div class="col-sm-4">
                                         <div class="card">
                                             <div class="card-header">
                                                 <h5 class="card-title mb-0">Accident Date</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="date" id="AccDate" class="form-control" placeholder="Accident Date">                                                
+                                                <input type="date" id="AccDate" class="form-control" placeholder="Accident Date" required>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -117,7 +115,7 @@
                                                 <h5 class="card-title mb-0">Accident Time</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="time" value="12:00" id="AccTime" class="form-control" placeholder="Accident Time">                                                
+                                                <input type="time" value="12:00" id="AccTime" class="form-control" placeholder="Accident Time" required>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -126,7 +124,7 @@
                                         <div class="card">
                                             <div class="card-header">                                                 
                                                 <h5 class="card-title mb-0">
-                                                    <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to get device's' current location." required="">
+                                                    <span class="" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to get device's' current location." required>
                                                         Accident Location 
                                                         <a onclick="getLocation()">
                                                             <i class="align-middle" data-feather="map-pin"></i>    
@@ -154,7 +152,21 @@
                                     <div class="col-sm-4 text-center center">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h5 class="card-title mb-0">Accident Picture</h5>
+                                                <h5 class="card-title mb-0">
+                                                    Accident Picture                                                
+                                                    <span>
+                                                        <span class="takePicture" data-bs-toggle="tooltip" data-bs-placement="top" title="Upload a picture from your device.">
+                                                            <a onclick="takePicture()" >
+                                                                <i class="align-middle" data-feather="camera"></i>    
+                                                            </a>
+                                                        </span>
+                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Upload a picture from your device.">                                                 
+                                                            <a onclick="uploadPicture()">
+                                                                <i class="align-middle" data-feather="upload"></i>    
+                                                            </a>
+                                                        </span>
+                                                    </span>
+                                                </h5>
                                             </div>
                                         </div>
                                         <div class="card-body custom-file">                                        
@@ -181,7 +193,7 @@
                                                 <h5 class="card-title mb-0">Number of People Killed</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="number" min="0"  id="AccKilled" class="form-control" placeholder="Number of Peope Killed">                                                
+                                                <input type="number" min="0"  id="AccKilled" class="form-control" placeholder="Number of Peope Killed" required>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -192,7 +204,7 @@
                                                 <h5 class="card-title mb-0">Number of People Injured</h5>
                                             </div>
                                             <div class="card-body">
-                                                <input type="number" min="0" id="AccInjured" class="form-control" placeholder="Number of Peope Injured">                                                
+                                                <input type="number" min="0" id="AccInjured" class="form-control" placeholder="Number of Peope Injured" required>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -277,6 +289,7 @@
                                                             class="form-check-input"
                                                             type="radio"
                                                             value="True"
+                                                            name="HitAndRun"
                                                             id="HitAndRun"                                                           
                                                             checked />
                                                         <span class="form-check-label">
@@ -288,6 +301,7 @@
                                                             class="form-check-input"
                                                             type="radio"
                                                             value="False"
+                                                            name="HitAndRun"
                                                             id="HitAndRun"                                                                                                                   
                                                             />
                                                         <span class="form-check-label">
@@ -331,20 +345,20 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>                                   
+                                    </div>  
 
-                                </div>
+                                </div>                                 
+
 
                                 <div class="text-center">
-                                    <!-- <button type="submit" id="submitAddReport" onclick="validateAddReportForm()" class="btn btn-primary">Save Accident Details</button>                  -->
+                                    <!-- <button id="submitAddReport" class="btn btn-primary">Save Accident Details</button>                  -->
                                     <a href="javascript:void(0)" class="btn btn-primary" id="submitAddReport">Save Accident Details</a>              
+                                    <!-- <a class="text-center" onclick="">Save A-D</a> -->
                                     <a href="~/AccidentReport/AddReport" class="btn btn-secondary">Cancel</a>
                                 </div>
 
                             </form>
                            
-                          
-
                         </div>
                     </div>
                 </div>
@@ -363,208 +377,215 @@
                                 <hr />
                             </div>
 
-                                <form id="frmAddRoadFactors">
-                                    <div class="d-flex flex-row justify-content-between row">
-                                       
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Road Name</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <input type="text" id="RoadName" class="form-control" placeholder="Road Name" required>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
+                            <form id="frmAddRoadFactors" class="needs-validation" novalidate>
 
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Road Number</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <input type="text" id="RoadNumber" class="form-control" placeholder="Road Number" required>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Landmark</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <input type="text" id="Landamrk" class="form-control" placeholder="Landmark" required>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Physical Divider</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div>
-                                                        <label class="form-check">
-                                                            <input
-                                                                class="form-check-input"
-                                                                type="radio"
-                                                                value="True"                                                       
-                                                                id="PhysicalDivider"/>
-                                                            <span class="form-check-label">
-                                                                Yes
-                                                            </span>
-                                                        </label>
-                                                        <label class="form-check">
-                                                            <input
-                                                                class="form-check-input"
-                                                                type="radio"
-                                                                value="False"
-                                                                id="PhysicalDivider"                                                               
-                                                               />
-                                                            <span class="form-check-label">
-                                                                No
-                                                            </span>
-                                                        </label>                                                
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Ongoing Road Works</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div>
-                                                        <label class="form-check">
-                                                            <input
-                                                                class="form-check-input"
-                                                                type="radio"
-                                                                value="True"                                                                
-                                                                id="OnGoingRoadWorks" />
-                                                            <span class="form-check-label">
-                                                                Yes
-                                                            </span>
-                                                        </label>
-                                                        <label class="form-check">
-                                                            <input
-                                                                class="form-check-input"
-                                                                type="radio"
-                                                                value="False"
-                                                                id="OnGoingRoadWorks" />
-                                                            <span class="form-check-label">
-                                                                No
-                                                            </span>
-                                                        </label>                                                
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Road Type</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <select class="form-select mb-3" id="RoadType" asp-items="Model.RoadType_Select" required>
-                                                        <option value="" selected>Select Road Type</option>
-                                                    </select>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Road Feature</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <select class="form-select mb-3" id="RoadFeature" asp-items="Model.RoadFeature_Select" required>
-                                                        <option value="" selected>Select Road RoadFeature</option>
-                                                    </select>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Road Surface</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <select class="form-select mb-3" id="RoadSurface" asp-items="Model.RoadSurface_Select" required>
-                                                        <option value="" selected>Select Road Surface</option>
-                                                    </select>                                                   
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Surface Condition</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <select class="form-select mb-3" id="SurfaceCondition" asp-items="Model.SurfaceCondition_Select" required>
-                                                        <option value="" selected>Select Surface Condition</option>
-                                                    </select>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Road Surface Quality</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <select class="form-select mb-3" id="SurfaceQuality" asp-items="Model.RoadSurfaceQuality_Select" required>
-                                                        <option value="" selected>Select Surface Quality</option>
-                                                    </select>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Speed Limit</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <select class="form-select mb-3" id="SpeedLimit" asp-items="Model.SpeedLimit_Select" required >
-                                                        <option value="" selected>Select Speed Limit</option>
-                                                    </select>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title mb-0">Lane</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <select class="form-select mb-3" id="Lane" asp-items="Model.Lane_Select" required>
-                                                        <option value="" selected>Select Road Lane</option>
-                                                    </select>                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                
-                                        <div class="text-center">
-                                            <!-- <button type="submit" id="submitAddRoadFactors" onclick="validateAddRoadFactorsForm()" class="btn btn-primary text-center">
-                                                Save Road Factors                                        
-                                            </button>    -->
-                                            <a href="javascript:void(0)" class="btn btn-primary" id="submitAddRoadFactors">Save Road Factor Details</a>              
-                                            <a href="~/AccidentReport/AddReport" class="btn btn-secondary">Cancel</a>
-                                        </div>
+                                <div class="d-flex flex-row justify-content-between row">
                                     
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Road Name</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <input type="text" id="RoadName" class="form-control" placeholder="Road Name" required>                                                    
+                                            </div>
+                                        </div>
                                     </div>
-                                </form>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Road Number</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <input type="text" id="RoadNumber" class="form-control" placeholder="Road Number" required>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Landmark</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <input type="text" id="Landamrk" class="form-control" placeholder="Landmark" required>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Physical Divider</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div>
+                                                    <label class="form-check">
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            value="True" 
+                                                            name="PhysicalDivider"                                                      
+                                                            id="PhysicalDivider"
+                                                            checked/>
+                                                        <span class="form-check-label">
+                                                            Yes
+                                                        </span>
+                                                    </label>
+                                                    <label class="form-check">
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            value="False"
+                                                            name="PhysicalDivider"
+                                                            id="PhysicalDivider"                                                               
+                                                            />
+                                                        <span class="form-check-label">
+                                                            No
+                                                        </span>
+                                                    </label>                                                
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Ongoing Road Works</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div>
+                                                    <label class="form-check">
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            value="True"  
+                                                            name="OnGoingRoadWorks"                                                              
+                                                            id="OnGoingRoadWorks" 
+                                                            checked/>
+                                                        <span class="form-check-label">
+                                                            Yes
+                                                        </span>
+                                                    </label>
+                                                    <label class="form-check">
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            value="False"
+                                                            name="OnGoingRoadWorks"
+                                                            id="OnGoingRoadWorks"/>
+                                                        <span class="form-check-label">
+                                                            No
+                                                        </span>
+                                                    </label>                                                
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Road Type</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <select class="form-select mb-3" id="RoadType" asp-items="Model.RoadType_Select" required>
+                                                    <option value="" selected>Select Road Type</option>
+                                                </select>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Road Feature</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <select class="form-select mb-3" id="RoadFeature" asp-items="Model.RoadFeature_Select" required>
+                                                    <option value="" selected>Select Road RoadFeature</option>
+                                                </select>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Road Surface</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <select class="form-select mb-3" id="RoadSurface" asp-items="Model.RoadSurface_Select" required>
+                                                    <option value="" selected>Select Road Surface</option>
+                                                </select>                                                   
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Surface Condition</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <select class="form-select mb-3" id="SurfaceCondition" asp-items="Model.SurfaceCondition_Select" required>
+                                                    <option value="" selected>Select Surface Condition</option>
+                                                </select>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Road Surface Quality</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <select class="form-select mb-3" id="SurfaceQuality" asp-items="Model.RoadSurfaceQuality_Select" required>
+                                                    <option value="" selected>Select Surface Quality</option>
+                                                </select>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Speed Limit</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <select class="form-select mb-3" id="SpeedLimit" asp-items="Model.SpeedLimit_Select" required >
+                                                    <option value="" selected>Select Speed Limit</option>
+                                                </select>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Lane</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <select class="form-select mb-3" id="Lane" asp-items="Model.Lane_Select" required>
+                                                    <option value="" selected>Select Road Lane</option>
+                                                </select>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="text-center">
+                                        <!-- <button type="submit" id="submitAddRoadFactors" onclick="validateAddRoadFactorsForm()" class="btn btn-primary text-center">
+                                            Save Road Factors                                        
+                                        </button>    -->
+                                        <a href="javascript:void(0)" class="btn btn-primary" id="submitAddRoadFactors">Save Road Factor Details</a>              
+                                        <a href="~/AccidentReport/AddReport" class="btn btn-secondary">Cancel</a>
+                                    </div>
+                                
+                                </div>
+                            </form>
                            
                         </div>
                     </div>
@@ -589,11 +610,10 @@
 
                                 <div class="d-flex flex-row justify-content-center row mb-2" style="margin:0 auto;float:none;">
                                     <button class="btn btn-success col-auto mb-2" id="newVehicle" style="padding: 5px;" >Add Vehicle</button>
-                                </div>
+                                </div>                               
 
-                               
-
-                                <form id="frmAddVehicle"  >
+                                
+                                <form id="frmAddVehicle" class="needs-validation" novalidate >
                                      
                                     <div class="d-flex flex-row justify-content-center row">
                                         <div class="col-sm-4">
@@ -607,7 +627,7 @@
                                             </div>
                                         </div>
 
-                                         <div class="col-sm-4">
+                                        <div class="col-sm-4">
                                             <div class="card">
                                                 <div class="card-header">
                                                     <h5 class="card-title mb-0">Vehicle Owner</h5>
@@ -706,6 +726,7 @@
                                     </div>
                                     
                                 </form>
+                                
                             </div>
                            
                         </div>
@@ -732,7 +753,8 @@
                                     <hr />
                                 </div>
 
-                                <form id="frmAddDriverInfor" >
+                            
+                                <form id="frmAddDriverInfor" class="needs-validation" novalidate>
                                 
                                     <div class="d-flex flex-row justify-content-center row">
 
@@ -901,6 +923,7 @@
                                                                     class="form-check-input"
                                                                     type="radio"
                                                                     value="True"  
+                                                                    name="AlcoholTested"
                                                                     id="AlcoholTested"                                                  
                                                                     checked />
                                                                 <span class="form-check-label">
@@ -912,6 +935,7 @@
                                                                     class="form-check-input"
                                                                     type="radio"
                                                                     value="False"
+                                                                    name="AlcoholTested"
                                                                     id="AlcoholTested" />
                                                                 <span class="form-check-label">
                                                                 No
@@ -963,6 +987,7 @@
                                     </div>
 
                                 </form>
+                            
                             </div>
 
                         </div>
@@ -1081,7 +1106,7 @@
 
 <script>        
 
-    const x = document.getElementById("AccLoc");
+    const x = document.getElementById("AccidentLocation");
 
     //Geo-Location [HTML5 JS] - API
     function getLocation() {

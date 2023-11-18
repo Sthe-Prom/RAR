@@ -163,7 +163,6 @@ function ReportDetails(rep_detail) {
 }
 
 function getReportDetail(el) {
-
    
      swal({
         title: "Report Details",
@@ -211,7 +210,7 @@ function ReportAddError(tit,msg) {
 
     swal({
         title: tit ,
-        text: "<h3>Please correct following fields: </h3><br />" + msg,
+        text: "<h3>Please correct the following fields: </h3><br />" + msg,
         type: "error",
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "Okay",
@@ -235,6 +234,59 @@ function SectionAdd(tit,msg) {
     });   
 }
 
+//Admin - User Control
+function UserAdded() {
+    
+    swal({
+        title: "<small>New Data Manager added</small>!",
+        text: "<h3>User with role: Data Manager, created successfully </h3><br /><span style=\"color: #222E3C\">"
+            + "</span> <br />"
+            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"/AccidentReport/LatestAccidents\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Reports" + "</a>"
+            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"#\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Done" + "</a>",
+        type: "success",
+        html: true,
+        showCancelButton: false,
+        showConfirmButton: false,
+        allowOutsideClick: false
+        });
+}
+
+function ReportConfirmed() {
+    
+    swal({
+        title: "<small>Report Successfully Confirmed</small>!",
+        text: "<h3>User with role: Data Manager, created successfully </h3><br /><span style=\"color: #222E3C\">"
+            + "</span> <br />"
+            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"/AccidentReport/LatestAccidents\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Reports" + "</a>"
+            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"#\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Done" + "</a>",
+        type: "success",
+        html: true,
+        showCancelButton: false,
+        showConfirmButton: false,
+        allowOutsideClick: false
+    });
+    
+}
+
+// Fetch all the forms we want to apply custom Bootstrap validation styles to
+function validatedNew() {
+     
+ 
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('click', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+      
+    });
+}
 
 
 

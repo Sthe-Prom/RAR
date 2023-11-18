@@ -50,6 +50,8 @@
 
 </style>
 
+
+
 <div class="row">
     <div class="d-flex flex-row justify-content-between" >
         <div class="col-12">
@@ -76,13 +78,13 @@
             
                 <div class="card-header" >
                     <div class="row">
-                        <div class="col-sm-3" >
+                        <div class="col-sm-2" >
                             <h2 class="card-title col-form-label">Latest Accidents</h2>
                         </div>
-                        <div class="col-sm-9" style="margin:0 auto; float: none;">
+                        <div class="col-sm-10" style="margin:0 auto; float: none;">
                             
                             <div class="row">
-                                <div class="col-sm-2" style="margin:0 auto; float: right;">
+                                @*<div class="col-sm-2" style="margin:0 auto; float: right;">
                                     <h2 class="text-right col-form-label card-title">
                                         Filter / Sort: 
                                         <!-- @using (Html.BeginForm("AddReport","AccidentReport", System.Web.Mvc.FormMethod.Get))
@@ -94,22 +96,34 @@
 
                                         } -->
                                     </h2>
-                                </div>
+                                </div>*@
+                                
                                 <div class="col-sm-3" >
                                     <select class="form-select mb-3" id="sortOrder">                                                         
                                         <option selected>Sort By Date</option> 
-                                        <option value="Newest">@Html.ActionLink("Newest", "AddReport", new { sortOrder = "Newest" })</option>
-                                        <option value="Oldest">@Html.ActionLink("Oldest", "AddReport", new { sortOrder = "Oldest" })</option>                                    
+                                        <option value="Newest">@Html.ActionLink("Newest", "LatestAccidents", new { sortOrder = "Newest" })</option>
+                                        <option value="Oldest">@Html.ActionLink("Oldest", "LatestAccidents", new { sortOrder = "Oldest" })</option>                                    
                                     </select>                           
                                 </div>
+                                
+                                <div class="col-sm-3" >                                                                                                            
+                                    <select class="form-select mb-3" id="sortConfirmed">                                                         
+                                        <option selected>Filter By Confirmed</option> 
+                                        <option value="Confirmed">@Html.ActionLink("Confirmed", "LatestAccidents", new { filterConfirmed = "Confirmed" })</option>
+                                        <option value="Unconfirmed">@Html.ActionLink("Unconfirmed", "LatestAccidents", new { filterConfirmed = "Unconfirmed" })</option>                                            
+                                    </select>                                            
+                                </div>  
+                                                                                                               
+                                
                                 <div class="col-sm-3" >                                                                   
                                     <select class="form-select mb-3" id="sortUser">                                                         
                                         <option selected>Filter By User</option> 
-                                        <option value="LoggedIn">@Html.ActionLink("Logged In", "AddReport", new { sortUser = "LoggedIn" })</option>
-                                        <option value="AllUsers">@Html.ActionLink("All Users", "AddReport", new { sortUser = "AllUsers" })</option>                                            
+                                        <option value="LoggedIn">@Html.ActionLink("Logged In", "LatestAccidents", new { sortUser = "LoggedIn" })</option>
+                                        <option value="AllUsers">@Html.ActionLink("All Users", "LatestAccidents", new { sortUser = "AllUsers" })</option>                                            
                                     </select>
-                                </div>                                    
-                                <div class="col-sm-4" >
+                                </div>
+                                   
+                                <div class="col-sm-3" >
                                     @await Component.InvokeAsync("AccidentType")                                      
                                 </div>
                             </div>
@@ -455,41 +469,44 @@
                         string sortUser = Context.Request.Query["sortUser"];
                         string sortOrder = Context.Request.Query["sortOrder"];
                         string accidentType = Context.Request.Query["accidentType"];
+                        string filterConfirmed_ = Context.Request.Query["filterConfirmed"];
                     }
-
                     
-                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagersortUser">
-                       
+                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagersortUser">                       
                         <div page-model="@Model.PaginationHeader" page-action="LatestAccidents"  page-classes-enabled="true"
                             page-class="btn" page-class-normal="btn-secondary"
                             page-class-selected="btn-primary" page-url-sortUser="@sortUser" class="btn-group text-center"> 
                         </div>
                     </div>
                     
-                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagersortOrder">
-                      
+                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagersortOrder">                      
                         <div page-model="@Model.PaginationHeader" page-action="LatestAccidents"  page-classes-enabled="true"
                             page-class="btn" page-class-normal="btn-secondary"
                             page-class-selected="btn-primary" page-url-sortOrder="@sortOrder" class="btn-group text-center">  
                         </div>
                     </div> 
 
-                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagerAccType">
-                      
+                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagerAccType">                      
                         <div page-model="@Model.PaginationHeader" page-action="LatestAccidents"  page-classes-enabled="true"
                             page-class="btn" page-class-normal="btn-secondary"
                             page-class-selected="btn-primary" page-url-accidentType="@Model.AccidentTypeID" class="btn-group text-center">  
                         </div>
                     </div>
 
-                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagerDefault">
-                        
-                         <div page-model="@Model.PaginationHeader" page-action="LatestAccidents"  page-classes-enabled="true"
+                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagerfilterConfirmed">    
+                        <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" page-classes-enabled="true"
+                            page-class="btn" page-class-normal="btn-secondary"
+                            page-class-selected="btn-primary" page-url-filterConfirmed="@filterConfirmed_" class="btn-group text-center">  
+                        </div>
+                    </div>  
+
+                    <div class="text-center" style="float:none; margin: 0 auto;" id="pagerDefault">                        
+                         <div page-model="@Model.PaginationHeader" page-action="LatestAccidents" page-classes-enabled="true"
                             page-class="btn" page-class-normal="btn-secondary"
                             page-class-selected="btn-primary" class="btn-group text-center"> 
                         </div> 
                     </div> 
-                                      
+            
                   
                 </div>
                         
@@ -505,30 +522,39 @@
     var accType = document.getElementById('pagerAccType');
     var sortOrder = document.getElementById('pagersortOrder');
     var sortUser = document.getElementById('pagersortUser');
-    var pagerDef = document.getElementById('pagerDefault');
+    var sortConfirmed = document.getElementById('pagerfilterConfirmed');
+    var pagerDef = document.getElementById('pagerDefault');   
 
   
     var urlParams = new URLSearchParams(window.location.search);
     var qs_sortUser = urlParams.get('sortUser');
     var qs_sortOrder = urlParams.get('sortOrder');       
-    var qs_accidentType = urlParams.get('accidentType');   
+    var qs_accidentType = urlParams.get('accidentType'); 
+    var qs_filterConfirmed = urlParams.get('filterConfirmed');  
+
                    
         if(qs_sortOrder =="Oldest" || qs_sortOrder=="Newest"){
             sortOrderChange();
-            document.getElementById("sortOrder").value=qs_sortOrder;
+            document.getElementById("sortOrder").value = qs_sortOrder;
         }else{
             if(qs_sortUser == "LoggedIn" || qs_sortUser == "AllUsers"){
                 sortUserChange();   
-                document.getElementById("sortUser").value=qs_sortUser;
+                document.getElementById("sortUser").value = qs_sortUser;
             }else{
-                if(qs_accidentType > 0){
-                    accTypeChange();
-                    document.getElementById("AccType").value=qs_accidentType;
-                }else{
-                    showDefault();
-                }
-            
-            }                      
+                if(qs_filterConfirmed == "Confirmed" || qs_filterConfirmed == "Unconfirmed"){
+                    filterConfirmedFunc();   
+                    document.getElementById("sortConfirmed").value = qs_filterConfirmed;                }
+                else{
+                    if(qs_accidentType > 0){
+                        accTypeChange();
+                        document.getElementById("AccType").value = qs_accidentType;
+                    }else{
+                        showDefault();
+                    }
+                
+               }   
+            }
+                               
         } 
   
     function showDefault(){            
@@ -536,14 +562,15 @@
         sortUser.style.display = 'none';
         pagerDef.style.display = 'block';
         accType.style.display = 'none';
-    } 
-        
+        sortConfirmed.style.display = 'none';
+    }         
    
     function accTypeChange(){
         sortOrder.style.display = 'none';
         sortUser.style.display = 'none';
         pagerDef.style.display = 'none';
         accType.style.display = 'block';
+        sortConfirmed.style.display = 'none';
         
     }
 
@@ -552,34 +579,55 @@
         accType.style.display = 'none';
         pagerDef.style.display = 'none';
         sortUser.style.display = 'block';
+        sortConfirmed.style.display = 'none';
     }
 
     function sortOrderChange(){
         accType.style.display = 'none';
         sortUser.style.display = 'none';
         pagerDef.style.display = 'none';   
-        sortOrder.style.display = 'block';     
+        sortOrder.style.display = 'block';    
+        sortConfirmed.style.display = 'none'; 
     }
 
+    function filterConfirmedFunc(){
+        accType.style.display = 'none';
+        sortUser.style.display = 'none';
+        pagerDef.style.display = 'none';   
+        sortOrder.style.display = 'none';
+        sortConfirmed.style.display = 'block';
+
+    }
             
         document.getElementById("AccType").onchange = function() {
-            if (this.selectedIndex!==0) {
+            if (this.selectedIndex !== 0) {
                 window.location.href = "LatestAccidents?accidentType="+ this.value + "&Page=1?";       
+                //alert("LatestAccidents?accidentType="+ this.value + "&Page=1?");
+                 document.getElementById("AccType").value = this.value; 
             }        
         };
 
         document.getElementById("sortUser").onchange = function() {
-            if (this.selectedIndex!==0) {
-                window.location.href = "LatestAccidents?sortUser="+ this.value + "&Page=1?";               
-                document.getElementById("sortUser").value=this.value;
-               
+            if (this.selectedIndex !== 0) {
+                //alert("LatestAccidents?sortUser="+ this.value + "&Page=1?"); 
+                window.location.href = "LatestAccidents?sortUser="+ this.value + "&Page=1?";                
+                document.getElementById("sortUser").value = this.value;               
             }        
         };
 
         document.getElementById("sortOrder").onchange = function() {
-            if (this.selectedIndex!==0) {
-                window.location.href = "LatestAccidents?sortOrder="+ this.value + "&Page=1?";
-                document.getElementById("sortOrder").value=this.value;
+            if (this.selectedIndex !== 0) {
+                //alert("LatestAccidents?sortOrder="+ this.value + "&Page=1?");
+                window.location.href = "LatestAccidents?sortOrder="+ this.value + "&Page=1?";  
+                document.getElementById("sortOrder").value = this.value;
+            }        
+        };
+
+        document.getElementById("sortConfirmed").onchange = function() {
+            if (this.selectedIndex !== 0) {
+                //alert("LatestAccidents?filterConfirmed="+ this.value + "&Page=1?");
+                window.location.href = "LatestAccidents?filterConfirmed="+ this.value + "&Page=1?";  
+                document.getElementById("filterConfirmed").value = this.value;
             }        
         };
     

@@ -112,64 +112,49 @@
                     </li>
                     *@
                     
-                    @if((signInManager.IsSignedIn(User)) )                                                
-                    {
+                    @if(signInManager.IsSignedIn(User))                                              
+                    {                                            
+                               
+                        @*-- User / Role Manager --*@
+                        
+                        @if(await userManager.IsInRoleAsync(user_id,"Admins"))
+                        {
+
+                            <li class="sidebar-header">Role Management</li>
+
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="~/RoleAdmin/Index">
+                                    <i class="align-middle" data-feather="settings"></i>
+                                    <span>Manage User Roles</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="~/UserAdmin/Index">
+                                    <i class="align-middle" data-feather="user-plus"></i>
+                                    <span>Manage Users</span>
+                                </a>                        
+                            </li>                         
+                            
+                        }
+
                         <li class="sidebar-header">
                             Login / Register
                         </li>
+                        if(await userManager.IsInRoleAsync(user_id,"Officer"))
+                        {
+                            <li class="sidebar-item ">
+                                <a class="sidebar-link" href="~/Account/myprofile">
+                                    <i class="align-middle" data-feather="user"></i> <span class="align-middle">Account</span>
+                                </a>
+                            </li>
+                        }
+
                         <li class="sidebar-item">
                             <a class="sidebar-link" asp-action="Logout" asp-controller="UserAccount">
                                 <i class="align-middle" data-feather="log-out"></i> <span class="align-middle">Logout</span>
                             </a>
                         </li>
-                      
-                                if(await userManager.IsInRoleAsync(user_id,"Officer"))
-                                {
-                                    <li class="sidebar-item ">
-                                        <a class="sidebar-link" href="~/Account/myprofile">
-                                            <i class="align-middle" data-feather="user"></i> <span class="align-middle">Account</span>
-                                        </a>
-                                    </li>
-                                }
-
-                                @*-- User / Role Manager --*@
-                               
-                                @if(await userManager.IsInRoleAsync(user_id,"Admins"))
-                                {
-
-                                    <li class="sidebar-header">Role Management</li>
-
-                                    <li class="sidebar-item">
-                                        <a class="sidebar-link" href="~/RoleAdmin/Index">
-                                            <i class="align-middle" data-feather="settings"></i>
-                                            <span>Manage User Roles</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a class="sidebar-link" href="~/UserAdmin/Index">
-                                            <i class="align-middle" data-feather="user-plus"></i>
-                                            <span>Manage Users</span>
-                                        </a>                        
-                                    </li>
-                                    @* End Register Page Nav *@
-                                
-                                    <hr />
-                                    @*
-                                    <li class="sidebar-header">Admin Settings</li>
-
-                                    <li class="sidebar-item">
-                                        <a class="sidebar-link" href="~/Settings/Settings">
-                                            <i class="align-middle" data-feather="user-check"></i>
-                                            <span>Manage Admin Settings</span>
-                                        </a>
-                                        
-                                    </li>                     
-                                    *@
-                                    @* End Register Page Nav *@
-                                
-                                   
-                                }
-                                
+                            
                     }
                 </ul>
                 
@@ -270,7 +255,7 @@
                                                 <div class="row g-0 align-items-center">
                                                    
                                                     <div class="col-12 ps-2">
-                                                        <div class="text-dark">User SB38</div>
+                                                        <div class="text-dark">Officer Test 02</div>
                                                         <div class="text-muted small mt-1">User Marked Incident as Completed</div>
                                                         <div class="text-muted small mt-1">15m ago</div>
                                                     </div>
@@ -280,7 +265,7 @@
                                                 <div class="row g-0 align-items-center">
                                                     
                                                     <div class="col-12 ps-2">
-                                                        <div class="text-dark">User SB38</div>
+                                                        <div class="text-dark">Officer Test 01</div>
                                                         <div class="text-muted small mt-1">Urgent request to Driver Information</div>
                                                         <div class="text-muted small mt-1">15m ago</div>
                                                     </div>
