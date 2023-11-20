@@ -22,13 +22,109 @@
 
 </style>
 
+@section Scripts{
+    <script>
+        $(document).ready(function() {
+            
+            //Edit Accident Report
+            $("#submitEditReport").on("click", function() {
+                var formData = new FormData();
+                formData.append("AccidentReport_AccidentReportID", $("#AccidentReport_AccidentReportID").val());
+                formData.append("AccidentReport_AccidentDate", $("#AccidentReport_AccidentDate").val());
+                formData.append("AccidentReport_AccidentTime", $("#AccidentReport_AccidentTime").val());
+                formData.append("AccidentReport_AccidentLocation", $("#AccidentReport_AccidentLocation").val());
+                formData.append("AccidentReport_AccidentDescription", $("#AccidentReport_AccidentDescription").val());
+                formData.append("AccidentReport_CollisionID", $("#AccidentReport_CollisionID").val());
+                formData.append("AccidentReport_NrPeopleKilled", $("#AccidentReport_NrPeopleKilled").val());
+                formData.append("AccidentReport_NrPeopleInjured", $("#AccidentReport_NrPeopleInjured").val());      
+                formData.append("AccidentReport_PoliceStationID", $("#AccidentReport_PoliceStationID").val());
+                formData.append("AccidentReport_AccidentTypeID", $("#AccidentReport_AccidentTypeID").val());
+                formData.append("AccidentReport_HitAndRun", $("#AccidentReport_HitAndRun").val());
+                formData.append("AccidentReport_WeatherTypeID", $("#AccidentReport_WeatherTypeID").val());
+                                                             
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("EditReportAjax", "AccidentReport")',
+                        contentType: false,
+                        processData: false,
+                        cache: false,
+                        data: formData,
+                        success: editReportSuccessCallback,
+                        error: editReportErrorCallback
+                    });    
+                //}           
+            });              
+                        
+            function editReportErrorCallback() {
+                alert("An error while editing your report. please try again.");
+                //console.log("An error while editing your report. please try again."+response.responseMessage);
+            };
+
+            function editReportSuccessCallback(response) {
+                if (response.responseCode == 0) {
+                    
+                    SectionEdit("Report Edit", "Accident ID: " + response.responseMessage 
+                       + " was edited successfully.");   
+                    //alert("success: report edited: ");                     
+                    //console.log("success: report edited." + response.responseMessage);
+                }
+                else {
+                    //alert("error: " response.responseCode);
+                    console.log("code:"+response.responseMessage)
+                    //console.log("code:" +response.responseCode + ", error:"+response.responseMessage);
+                }
+            };
+
+            //Edit
+            //Confirm Accident Report
+            $("#confirmReport").on("click", function() {
+                var formData = new FormData();
+                formData.append("AccidentReport_AccidentReportID", $("#AccidentReport_AccidentReportID").val());
+                formData.append("AccidentReport_Confirmed", $("#AccidentReport_Confirmed").val());
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("ConfirmReport", "AccidentReport")',
+                    contentType: false,
+                    processData: false,
+                    cache: false,
+                    data: formData,
+                    success: confirmReportSuccessCallback,
+                    error: confirmReportErrorCallback
+                });   
+
+            });
+
+            function confirmReportErrorCallback() {
+                alert("An error while confirming your report. please try again.");
+                //console.log(response.responseMessage)    
+            };
+
+            function confirmReportSuccessCallback(response) {
+                if (response.responseCode == 0) {            
+                    //alert("success: report confirmed.");        
+                    ReportConfirmed("Report Confirmation", "Accident ID: " + response.responseMessage 
+                        + " was confirmed successfully.");   
+                    //console.log(response.responseMessage)                     
+                }
+                else {
+                    //alert(response.responseCode);
+                    console.log(response.ResponseMessage)
+                }
+            };
+
+        });
+    </script>
+}    
+
+
 <div class="container-fluid p-0"> 
                                              
     <div class="card">                    
             
         <div class="card-header">
             <h2 class="card-title">Edit Report</h2>
-            <hr />
+            <hr />            
         </div>
         
         @{            
@@ -44,20 +140,20 @@
             }
             if((await userManager.IsInRoleAsync(user,"Data Manager")) )
             {                    
-                 <form asp-action="EditReport" class="col-auto" style="padding: 2px;" method="post">  
-                    <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID"  />                                  
+                 <form asp-action="ConfirmReport" class="col-auto" style="padding: 2px;" method="post">  
+                    @*<input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID"  />     *@ 
                     <div class="card-body">                            
-                        @await Component.InvokeAsync("EditReport")
+                        @await Component.InvokeAsync("EditReportAjax")
                     </div> 
                 </form>    
                 
             }
             if((await userManager.IsInRoleAsync(user,"Officer")) )
             {    
-                <form asp-action="EditReport" class="col-auto" style="padding: 2px;" method="post">  
-                    <input type="hidden" asp-for="@Model.AccidentReport.AccidentReportID"  />                                  
+                <form asp-action="EditReport" class="col-auto needs-validation" style="padding: 2px;" method="post" novalidate >  
+                    @*<input type="hidden" id="AccidentReport_AccidentReportID" asp-for="@Model.AccidentReport.AccidentReportID"  />                                  *@
                     <div class="card-body">                            
-                        @await Component.InvokeAsync("EditReport")
+                        @await Component.InvokeAsync("EditReportAjax")
                     </div> 
                 </form>                
             }
@@ -96,6 +192,54 @@
     //     document.getElementById('AccidentReportEditID').disabled = false; 
     //     document.getElementById('ARID').disabled = false;  
     // }
+
+     const x = document.getElementById("AccidentLocation");
+
+    //Geo-Location [HTML5 JS] - API
+    function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else { 
+        x.value = "Geolocation is not supported by this browser.";
+    }
+    }
+
+    //Get LAt. and Long.
+    function showPosition(position) {
+        x.value = position.coords.latitude + "," + position.coords.longitude;
+    }
+
+    function showError(error) {
+            switch(error.code) {
+            case error.PERMISSION_DENIED:
+            x.innerHTML = "User denied the request for Geolocation."
+            break;
+            case error.POSITION_UNAVAILABLE:
+            x.innerHTML = "Location information is unavailable."
+            break;
+            case error.TIMEOUT:
+            x.innerHTML = "The request to get user location timed out."
+            break;
+            case error.UNKNOWN_ERROR:
+            x.innerHTML = "An unknown error occurred."
+            break;
+        }
+    }
+
+
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+        }, false)
+    });
     
 </script>
 

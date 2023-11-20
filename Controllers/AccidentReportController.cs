@@ -83,32 +83,39 @@ namespace rar.Controllers
 
         //Confirm Reports
         [HttpPost] 
-        public async Task<IActionResult> ConfirmReport(int AccidentReportID)
+        public async Task<JsonResult> ConfirmReport(IFormCollection formcollection)
         {
-            
-            var AR = context.AccidentReports
-                .FirstOrDefault(r => r.AccidentReportID == AccidentReportID);//Convert.ToInt32(Request.Query["AccidentReportID"]));
-                
-            // if(AR != null)
-            // {
-                AR.Confirmed = true;
-                try
-                {
-                    await context.SaveAccidentReport(AR);
-                    //return Content(AR.Confirmed.ToString() + " : " + AR.AccidentReportID);//+ Convert.ToInt32(Request.Query["AccidentReportID"]));
-                    return Redirect("~/AccidentReport/LatestAccidents");
-                }
-                catch(Exception ex)
-                {
-                    return Content("Not edited. " + ex.Message );
-                }
+            var id = Convert.ToInt32(formcollection["AccidentReport_AccidentReportID"]);
+            var AccidentReport = context.AccidentReports.FirstOrDefault(r => r.AccidentReportID == id);
+        
+            AccidentReport.Confirmed = Convert.ToBoolean(formcollection["AccidentReport_Confirmed"]);
 
-                // return Content("AR not null");
-            // }
-            //  return Content("AR null" );
-            //return RedirectToAction(nameof(AddReport));
-            //return Redirect("~/");
-           
+            JsonViewModel model = new JsonViewModel();
+
+            try
+            {
+                await context.SaveAccidentReport(AccidentReport);
+                model.ResponseMessage = "Success ";
+            }
+            catch (Exception ex)
+            {
+                model.ResponseCode = 0;
+                model.ResponseMessage = "Could not save";
+            }
+
+            if (AccidentReport != null)
+            {
+                model.ResponseCode = 0;
+                model.ResponseMessage = JsonConvert.SerializeObject(AccidentReport.AccidentID);
+            }
+            else
+            {
+                model.ResponseCode = 1;
+                model.ResponseMessage = "No record available";
+            }
+
+            return Json(model);            
+            
         }
 
         [HttpGet]
@@ -131,10 +138,24 @@ namespace rar.Controllers
           
             AccidentReport AccidentReport = context.AccidentReports
                 .FirstOrDefault(r => r.AccidentReportID == AccidentReportID);
-                 
+
+            // Convert.ToInt32(formcollection["AccidentReportID"]) = AccidentReport.AccidentReportID;
+            // formcollection["AccidentLocation"].ToString() = AccidentReport.AccidentLocation;
+            // Convert.ToInt32(formcollection["AccidentDescription"]) = AccidentReport.AccidentDescription;
+            // Convert.ToInt32(formcollection["NrPeopleInjured"]) = AccidentReport.NrPeopleInjured;
+            // Convert.ToInt32(formcollection["NrPeopleKilled"]) = AccidentReport.NrPeopleKilled;
+            // Convert.ToBoolean(formcollection["HitAndRun"]) = AccidentReport.HitAndRun;
+            // Convert.ToInt32(formcollection["WeatherTypeID"]) = AccidentReport.WeatherTypeID;
+            // Convert.ToInt32(formcollection["AccidentTypeID"]) = AccidentReport.AccidentTypeID;
+            // Convert.ToInt32(formcollection["CollisionID"]) = AccidentReport.CollisionID;
+            // Convert.ToInt32(formcollection["PoliceStationID"]) = AccidentReport.PoliceStationID;
+            // Convert.ToDateTime(formcollection["AccidentDate"]) = AccidentReport.AccidentDate;
+            // Convert.ToDateTime(formcollection["AccidentTime"]) = AccidentReport.AccidentTime;
+            // Convert.ToInt32(formcollection["AccidentID"]) = AccidentReport.AccidentID;
+
             vm.AccidentReport.AccidentReportID = AccidentReport.AccidentReportID;
             vm.AccidentReport.AccidentLocation = AccidentReport.AccidentLocation;
-            vm.AccidentReport.AccidentDescription = AccidentReport.AccidentDescription;           
+            vm.AccidentReport.AccidentDescription = AccidentReport.AccidentDescription;
             vm.AccidentReport.NrPeopleInjured = AccidentReport.NrPeopleInjured;
             vm.AccidentReport.NrPeopleKilled = AccidentReport.NrPeopleKilled;
             vm.AccidentReport.HitAndRun = AccidentReport.HitAndRun;
@@ -143,9 +164,8 @@ namespace rar.Controllers
             vm.AccidentReport.CollisionID = AccidentReport.CollisionID;
             vm.AccidentReport.PoliceStationID = AccidentReport.PoliceStationID;
             vm.AccidentReport.AccidentDate = AccidentReport.AccidentDate;
-            vm.AccidentReport.AccidentTime = AccidentReport.AccidentTime;          
+            vm.AccidentReport.AccidentTime = AccidentReport.AccidentTime;
             vm.AccidentReport.AccidentID = AccidentReport.AccidentID;
-            vm.AccidentReport.Confirmed = AccidentReport.Confirmed;
 
             return View(vm);            
 
@@ -206,13 +226,14 @@ namespace rar.Controllers
                         vm.PaginationHeader.TotalItems = context.AccidentReports.Count();
                         vm.AccidentReports = context.AccidentReports                           
                             .Skip((Page - 1) * PageSize)
+                            .OrderBy(c => c.AccidentDate)
                             .Take(PageSize);
                         break;
                     case "LoggedIn":
                         vm.PaginationHeader.TotalItems = context.AccidentReports.Where(r => r.AccountID == AccountID_).Count();
                         vm.AccidentReports = context.AccidentReports
                             .Where(r => r.AccountID == AccountID_ )
-                            .OrderBy(c => c.AccidentReportID)
+                            .OrderBy(c => c.AccidentDate)
                             .Skip((Page - 1) * PageSize)
                             .Take(PageSize);
                         break;
@@ -278,7 +299,7 @@ namespace rar.Controllers
                         vm.PaginationHeader.TotalItems = context.AccidentReports.Where(r => r.Confirmed == true).Count();
                         vm.AccidentReports = context.AccidentReports
                             .Where(r => r.Confirmed == true)
-                            .OrderBy(r => r.AccidentDate)
+                            .OrderByDescending(r => r.AccidentDate)
                             .Skip((Page - 1) * PageSize)
                             .Take(PageSize);
                         break;
@@ -286,7 +307,7 @@ namespace rar.Controllers
                         vm.PaginationHeader.TotalItems = context.AccidentReports.Where(r => r.Confirmed == false).Count();
                         vm.AccidentReports = context.AccidentReports
                             .Where(r => r.Confirmed == false)
-                            .OrderBy(r => r.AccidentDate)
+                            .OrderByDescending(r => r.AccidentDate)
                             .Skip((Page - 1) * PageSize)
                             .Take(PageSize);
                         break;     
@@ -516,8 +537,7 @@ namespace rar.Controllers
             return View(vm);
                                 
         }
-                   
-       
+                          
         [HttpGet]
         public ViewResult AddRoadFactors()
         {
@@ -672,100 +692,8 @@ namespace rar.Controllers
 
         }
 
-        
-        //[HttpPost]
-        // public async Task<IActionResult> AddReport(AccidentReportViewModel vm)
-        // {
-        //     int AccountID_ = 0;
-        //     string RAR = "";
-
-        //     if (signInManager.IsSignedIn(User))
-        //     {
-        //         if(vm.AccidentReport.AccidentLocation.Length > 0)
-        //              RAR = "RAR-" + DateTime.UtcNow.ToString("HH:mm:ss").Substring(0, 3) + "-" + vm.AccidentReport.AccidentLocation.Substring(0, 3).ToUpper();
-                
-        //         var userId = userManager.GetUserId(User);
-
-        //         if (acc_context.Accounts != null && acc_context.Accounts.Count() != 0)
-        //         {
-        //             foreach (var item in acc_context.Accounts.Where(c => c.Id == userId))
-        //             {
-        //                 AccountID_ = item.AccountID;
-        //             }
-        //         }
-        //     }
-
-        //     string uploadedAPImage = UploadedAccidentPicture(vm);
-     
-        //     if (uploadedAPImage == null)
-        //     {
-        //         uploadedAPImage = "Upload is null";
-        //     }
-                        
-        //         var AccidentReport = new AccidentReport
-        //         {                   
-        //             // AccidentID = RAR,
-        //             // AccidentTime = System.DateTime.UtcNow,//vm.AccidentReport.AccidentTime,
-        //             // AccidentLocation = vm.AccidentReport.AccidentLocation,           
-        //             // AccidentDate = System.DateTime.UtcNow,//vm.AccidentReport.AccidentDate, //System.DateTime.UtcNow
-        //             // AccidentDescription = vm.AccidentReport.AccidentDescription,
-        //             // NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
-        //             // NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
-        //             // AccountID = AccountID_,
-        //             // PoliceStationID = vm.AccidentReport.PoliceStationID,
-        //             // CollisionID = vm.AccidentReport.CollisionID,
-        //             // WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
-        //             // AccidentTypeID = vm.AccidentReport.AccidentTypeID,
-        //             // AccidentPicture = vm.AccidentReport.AccidentPicture,
-        //             // AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
-        //             // HitAndRun = vm.AccidentReport.HitAndRun
-
-        //             AccidentID = RAR,
-        //             AccidentTime = vm.AccidentReport.AccidentTime,
-        //             AccidentLocation = vm.AccidentReport.AccidentLocation,           
-        //             AccidentDate = vm.AccidentReport.AccidentDate,//System.DateTime.UtcNow,
-        //             AccidentDescription =  vm.AccidentReport.AccidentDescription,
-        //             NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
-        //             NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
-        //             AccountID = AccountID_,
-        //             PoliceStationID = vm.AccidentReport.PoliceStationID,
-        //             CollisionID = vm.AccidentReport.CollisionID,
-        //             WeatherTypeID = vm.AccidentReport.WeatherTypeID,                    
-        //             AccidentTypeID = vm.AccidentReport.AccidentTypeID,
-        //             AccidentPicture = uploadedAPImage,
-        //             AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
-        //             HitAndRun = vm.AccidentReport.HitAndRun
-        //         };
-        //     //}
-        //     // if (ModelState.IsValid)
-        //     // {
-        //         try
-        //         {
-        //         //     if (signInManager.IsSignedIn(User))
-        //         //     {   
-                       
-        //                 await context.SaveAccidentReport(AccidentReport);
-        //                 ViewBag.Result = "Success";
-        //                 return RedirectToAction("AddReport"); //return Content("Added");//
-        //                 //return Content("Added");
-        //         //     }
-        //         //     else
-        //         //     {
-        //         //         return Content("Please go to your profile to create an account before you can report accident");
-        //         //     }
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             return Content("Not Added. " + ex.Message);
-        //         }
-        //         //return Content("Valid");
-        //     // }
-        //     // else
-        //     // {
-        //     //     return Content("Invalid Model");
-        //     // }
-        // }
-
+       
+      
         [HttpPost]
         public async Task<JsonResult> AddReportAjax(IFormCollection formcollection)
         {
@@ -817,21 +745,6 @@ namespace rar.Controllers
                 AccidentSketch = uploadedAPImage,
                 HitAndRun = Convert.ToBoolean(formcollection["HitAndRun"])
 
-                // AccidentID = RAR,
-                // AccidentTime = vm.AccidentReport.AccidentTime,
-                // AccidentLocation = vm.AccidentReport.AccidentLocation,
-                // AccidentDate = vm.AccidentReport.AccidentDate,//System.DateTime.UtcNow,
-                // AccidentDescription = vm.AccidentReport.AccidentDescription,
-                // NrPeopleKilled = vm.AccidentReport.NrPeopleKilled,
-                // NrPeopleInjured = vm.AccidentReport.NrPeopleInjured,
-                // AccountID = AccountID_,
-                // PoliceStationID = vm.AccidentReport.PoliceStationID,
-                // CollisionID = vm.AccidentReport.CollisionID,
-                // WeatherTypeID = vm.AccidentReport.WeatherTypeID,
-                // AccidentTypeID = vm.AccidentReport.AccidentTypeID,
-                // AccidentPicture = uploadedAPImage,
-                // AccidentSketch = uploadedAPImage,//vm.AccidentReport.AccidentSketch,
-                // HitAndRun = vm.AccidentReport.HitAndRun
             };
             
             try
@@ -1222,7 +1135,7 @@ namespace rar.Controllers
             // }
         }
 
-         [HttpPost]
+        [HttpPost]
         public async Task<JsonResult> AddDriverInformationAjax(IFormCollection formcollection)
         {
             int AccountID_ = 0;
@@ -1304,7 +1217,7 @@ namespace rar.Controllers
         [HttpPost]
         public async Task<IActionResult> EditReport(AccidentReportViewModel vm)
         {             
-            var AccidentReport = context.AccidentReports.FirstOrDefault(r => r.AccidentReportID == vm.AccidentReport.AccidentReportID); //Convert.ToInt32(Request.Query["AccidentReportID"]));//8);//
+            var AccidentReport = context.AccidentReports.FirstOrDefault(r => r.AccidentReportID == Convert.ToInt32(Request.Query["AccidentReportID"]));//8);//
             
             if (AccidentReport != default(AccidentReport))
             {     
@@ -1314,7 +1227,7 @@ namespace rar.Controllers
                 // AccidentReport.AccidentID = vm.AccidentReport.AccidentID;
                 // AccidentReport.AccidentTime = vm.AccidentReport.AccidentTime;
                 AccidentReport.AccidentLocation = vm.AccidentReport.AccidentLocation;        
-                // AccidentReport.AccidentDate = vm.AccidentReport.AccidentDate;
+                AccidentReport.AccidentDate = vm.AccidentReport.AccidentDate;
                 AccidentReport.AccidentDescription = vm.AccidentReport.AccidentDescription;
                 AccidentReport.NrPeopleKilled = vm.AccidentReport.NrPeopleKilled;
                 AccidentReport.NrPeopleInjured = vm.AccidentReport.NrPeopleInjured;
@@ -1324,7 +1237,7 @@ namespace rar.Controllers
                 AccidentReport.CollisionID = vm.AccidentReport.CollisionID;
                 AccidentReport.WeatherTypeID = vm.AccidentReport.WeatherTypeID;
               
-                AccidentReport.Confirmed = true;
+                //AccidentReport.Confirmed = vm.AccidentReport.Confirmed;
                 AccidentReport.HitAndRun = vm.AccidentReport.HitAndRun;
 
                 //var userId = userManager.GetUserId(User);
@@ -1379,7 +1292,57 @@ namespace rar.Controllers
             //     return Content("Invalid Model");
             // }
 
-        }        
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> EditReportAjax(IFormCollection formcollection)
+        {
+            var id = Convert.ToInt32(formcollection["AccidentReport_AccidentReportID"]);
+            var AccidentReport = context.AccidentReports.FirstOrDefault(r => r.AccidentReportID == id);
+            //Convert.ToInt32(formcollection["AccidentReportID"]));//Convert.ToInt32(Request.Query["AccidentReportID"]));
+            //Convert.ToInt32(formcollection["AccidentReportID"])); //Convert.ToInt32(Request.Query["AccidentReportID"]));//8);//
+
+            JsonViewModel model = new JsonViewModel();
+
+            if (AccidentReport != default(AccidentReport))
+            {                
+                AccidentReport.AccidentTime = Convert.ToDateTime(formcollection["AccidentReport_AccidentTime"]);
+                AccidentReport.AccidentLocation = formcollection["AccidentReport_AccidentLocation"].ToString();
+                AccidentReport.AccidentDate = Convert.ToDateTime(formcollection["AccidentReport_AccidentDate"]);
+                AccidentReport.AccidentDescription = formcollection["AccidentReport_AccidentDescription"].ToString();
+                AccidentReport.NrPeopleKilled = Convert.ToInt32(formcollection["AccidentReport_NrPeopleKilled"]);
+                AccidentReport.NrPeopleInjured = Convert.ToInt32(formcollection["AccidentReport_NrPeopleInjured"]);
+                AccidentReport.PoliceStationID = Convert.ToInt32(formcollection["AccidentReport_PoliceStationID"]);
+                AccidentReport.CollisionID = Convert.ToInt32(formcollection["AccidentReport_CollisionID"]);
+                AccidentReport.WeatherTypeID = Convert.ToInt32(formcollection["AccidentReport_WeatherTypeID"]);
+                AccidentReport.AccidentTypeID = Convert.ToInt32(formcollection["AccidentReport_AccidentTypeID"]);
+                AccidentReport.HitAndRun = Convert.ToBoolean(formcollection["AccidentReport_HitAndRun"]);               
+            }            
+          
+            try
+            {
+                await context.SaveAccidentReport(AccidentReport);
+            }
+            catch (Exception ex)
+            {
+                model.ResponseCode = 0;
+                model.ResponseMessage = "Issue is: " + ex.Message;
+            }
+
+            if (AccidentReport != null)
+            {
+                model.ResponseCode = 0;
+                model.ResponseMessage = JsonConvert.SerializeObject(AccidentReport.AccidentID);
+            }
+            else
+            {
+                model.ResponseCode = 1;
+                model.ResponseMessage = "No record available";
+            }
+
+            return Json(model);           
+
+        }
 
         public Microsoft.AspNetCore.Mvc.IActionResult Delete(int AccidentReportID)
         {

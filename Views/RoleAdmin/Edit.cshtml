@@ -40,15 +40,15 @@
                                     {
                                         @foreach (User user in Model.NonMembers)
                                         {
-                                            @if(await userManager.IsInRoleAsync(user,"Officer") || await userManager.IsInRoleAsync(user,"Admins") || await userManager.IsInRoleAsync(user,"Data Manager"))
-                                            {
+                                           @* @if(await userManager.IsInRoleAsync(user,"Officer") || await userManager.IsInRoleAsync(user,"Admins") || await userManager.IsInRoleAsync(user,"Data Manager"))
+                                            {*@
                                                 <tr>
                                                     <td>@user.UserName</td>
                                                     <td>
                                                         <input type="checkbox" name="IDstoAdd" value="@user.Id">
                                                     </td>
                                                 </tr>
-                                            }
+                                            @*}*@
                                         }
                                     }
                                 </table>

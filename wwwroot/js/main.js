@@ -234,36 +234,57 @@ function SectionAdd(tit,msg) {
     });   
 }
 
+function SectionEdit(tit,msg) {
+
+    swal({
+        title: tit+"<hr />",
+        text: "<h3>" +msg+"</h3><br />"
+            + "<a type=\"button\" class=\"btn btn-md btn-success\" style=\"text-decoration:none;\" href=\"/AccidentReport/LatestAccidents\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Latest Accidents" + "</a>",
+            // + "<a type=\"button\" class=\"btn btn-secondary\" style=\"text-decoration:none;\" href=\"#\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Okay" + "</a>",
+        type: "success",
+        showConfirmButton: false,
+        closeOnConfirm: false,
+        showCancelButton: false,
+        confirmButtonColor: "#222E3C",
+        confirmButtonText: "<span class=\"btn btn-md btn-secondary\">Close</span>",
+        html: true           
+    });   
+}
+
 //Admin - User Control
 function UserAdded() {
     
     swal({
         title: "<small>New Data Manager added</small>!",
         text: "<h3>User with role: Data Manager, created successfully </h3><br /><span style=\"color: #222E3C\">"
-            + "</span> <br />"
-            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"/AccidentReport/LatestAccidents\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Reports" + "</a>"
-            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"#\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Done" + "</a>",
+            + "</span> <br />",
+            // + "<a type=\"button\" style=\"text-decoration:none;\" href=\"/AccidentReport/LatestAccidents\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Reports" + "</a>"
+            // + "<a type=\"button\" style=\"text-decoration:none;\" href=\"#\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Done" + "</a>",
         type: "success",
         html: true,
         showCancelButton: false,
-        showConfirmButton: false,
+        showConfirmButton: true,
         allowOutsideClick: false
         });
 }
 
-function ReportConfirmed() {
+function ReportConfirmed(tit, msg) {
     
     swal({
-        title: "<small>Report Successfully Confirmed</small>!",
-        text: "<h3>User with role: Data Manager, created successfully </h3><br /><span style=\"color: #222E3C\">"
+        title:tit+"<hr />",
+        text: "<h3>" +msg+"</h3><br />"
+            + "<h3>The respective officers will be notified.</h3><br /><span style=\"color: #222E3C\">"
             + "</span> <br />"
-            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"/AccidentReport/LatestAccidents\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Reports" + "</a>"
-            + "<a type=\"button\" style=\"text-decoration:none;\" href=\"#\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Done" + "</a>",
+            + "<a type=\"button\" class=\"btn btn-md btn-success\" style=\"text-decoration:none;\" href=\"/AccidentReport/LatestAccidents\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Latest Accidents" + "</a>",
+            // + "<a type=\"button\" class=\"btn btn-secondary\" style=\"text-decoration:none;\" href=\"AccidentReport/Add\" role=\"button\" tabindex=\"0\" class=\"SwalBtn1 customSwalBtn\">" + "Close" + "</a>",
         type: "success",
         html: true,
+        closeOnConfirm: false,
         showCancelButton: false,
         showConfirmButton: false,
-        allowOutsideClick: false
+        allowOutsideClick: false,
+        confirmButtonColor: "#222E3C",
+        confirmButtonText: "<span class=\"btn btn-md btn-secondary\">Close</span>",
     });
     
 }

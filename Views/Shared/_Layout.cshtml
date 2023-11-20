@@ -88,74 +88,49 @@
                         </li>
                        
                     }
-
-                    @*<li class="sidebar-header">
-                        About & More
-                    </li>
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="~/Home/FAQ">
-                            <i class="align-middle" data-feather="help-circle"></i> <span class="align-middle">F-A-Q</span>
-                        </a>
-                    </li>
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="~/Home/Contact">
-                            <i class="align-middle" data-feather="mail"></i> <span class="align-middle">Contacts</span>
-                        </a>
-                    </li>
-
-                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="~/Home/About">
-                            <i class="align-middle" data-feather="message-circle"></i> <span class="align-middle">About</span>
-                        </a>
-                    </li>
-                    *@
-                    
-                    @if(signInManager.IsSignedIn(User))                                              
-                    {                                            
+                                         
                                
-                        @*-- User / Role Manager --*@
-                        
-                        @if(await userManager.IsInRoleAsync(user_id,"Admins"))
-                        {
-
-                            <li class="sidebar-header">Role Management</li>
-
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="~/RoleAdmin/Index">
-                                    <i class="align-middle" data-feather="settings"></i>
-                                    <span>Manage User Roles</span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="~/UserAdmin/Index">
-                                    <i class="align-middle" data-feather="user-plus"></i>
-                                    <span>Manage Users</span>
-                                </a>                        
-                            </li>                         
-                            
-                        }
-
-                        <li class="sidebar-header">
-                            Login / Register
-                        </li>
-                        if(await userManager.IsInRoleAsync(user_id,"Officer"))
-                        {
-                            <li class="sidebar-item ">
-                                <a class="sidebar-link" href="~/Account/myprofile">
-                                    <i class="align-middle" data-feather="user"></i> <span class="align-middle">Account</span>
-                                </a>
-                            </li>
-                        }
+                    @*-- User / Role Manager --*@
+                    
+                    @if(await userManager.IsInRoleAsync(user_id,"Admins"))
+                    {                             
+                        <li class="sidebar-header">Role Management</li>
 
                         <li class="sidebar-item">
-                            <a class="sidebar-link" asp-action="Logout" asp-controller="UserAccount">
-                                <i class="align-middle" data-feather="log-out"></i> <span class="align-middle">Logout</span>
+                            <a class="sidebar-link" href="~/RoleAdmin/Index">
+                                <i class="align-middle" data-feather="settings"></i>
+                                <span>Manage User Roles</span>
                             </a>
                         </li>
-                            
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="~/UserAdmin/Index">
+                                <i class="align-middle" data-feather="user-plus"></i>
+                                <span>Manage Users</span>
+                            </a>                        
+                        </li>                         
+                        
                     }
+
+                    <li class="sidebar-header">
+                        Login / Register
+                    </li>
+
+                    @if(await userManager.IsInRoleAsync(user_id,"Officer"))
+                    {
+                        <li class="sidebar-item ">
+                            <a class="sidebar-link" href="~/Account/myprofile">
+                                <i class="align-middle" data-feather="user"></i> <span class="align-middle">Account</span>
+                            </a>
+                        </li>
+                    }
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" asp-action="Logout" asp-controller="UserAccount">
+                            <i class="align-middle" data-feather="log-out"></i> <span class="align-middle">Logout</span>
+                        </a>
+                    </li>
+                        
+                    
                 </ul>
                 
             </div>
@@ -282,45 +257,45 @@
                                 <li class="nav-item dropdown">
                                    
                                     
-                                        @{
-                                            if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                                    @{
+                                        if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                                        {
+                                            @foreach (var item in Model.Accounts.Where(c => c.Id == userId))
                                             {
-                                                @foreach (var item in Model.Accounts.Where(c => c.Id == userId))
-                                                {
-                                                <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-                                                    <img src="~/users/profiles/@item.ProfileImg"  class="avatar img-fluid rounded me-1" alt="UserImage" />                                                   
-                                                    <span class="text-dark">@User.Identity.Name</span>                                                
-                                                </a>
-                                                }
-                                            
-                                            
-                                                var v_id = Model.Accounts.Where(c => c.Id == userId).ToList();
-                            
-                                                var s_id = "";
-                                                foreach(var i in v_id)
-                                                {
-                                                    s_id = i.Id;
-                                                }
-
-                                                if (String.IsNullOrEmpty(s_id))
-                                                {
-                                                    
-                                                    <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-                                                            
-                                                            <i class="align-middle me-1" data-feather="user"></i> 
-                                                            <span class="text-dark">@User.Identity.Name</span>
-                                                        
-                                                    </a>
-                                                    
-                                                }
+                                            <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
+                                                <img src="~/users/profiles/@item.ProfileImg"  class="avatar img-fluid rounded me-1" alt="UserImage" />                                                   
+                                                <span class="text-dark">@User.Identity.Name</span>                                                
+                                            </a>
                                             }
-                                            else
+                                        
+                                        
+                                            var v_id = Model.Accounts.Where(c => c.Id == userId).ToList();
+                        
+                                            var s_id = "";
+                                            foreach(var i in v_id)
                                             {
-                                                <a class="nav-icon dropdown-toggle d-inline-block" href="#" data-bs-toggle="dropdown">
-                                                    <i class="align-middle" data-feather="settings"></i>
+                                                s_id = i.Id;
+                                            }
+
+                                            if (String.IsNullOrEmpty(s_id))
+                                            {
+                                                
+                                                <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
+                                                        
+                                                        <i class="align-middle me-1" data-feather="user"></i> 
+                                                        <span class="text-dark">@User.Identity.Name</span>
+                                                    
                                                 </a>
+                                                
                                             }
                                         }
+                                        else
+                                        {
+                                            <a class="nav-icon dropdown-toggle d-inline-block" href="#" data-bs-toggle="dropdown">
+                                                <i class="align-middle" data-feather="settings"></i>
+                                            </a>
+                                        }
+                                    }
 
                                         
                                     <div class="dropdown-menu dropdown-menu-end">
